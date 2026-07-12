@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -31,6 +32,8 @@ model Business {
   name               String
   slug               String   @unique
   industryTemplateId String
+  description        String?
+  logoUrl            String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -49,6 +52,7 @@ model Branch {
   id          String   @id @default(cuid())
   name        String
   businessId  String
+  address     String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -63,12 +67,14 @@ model Branch {
 // ──────────────────────────────────────────
 
 model UserProfile {
-  id          String   @id
-  email       String   @unique
-  fullName    String?
-  avatarUrl   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String    @id
+  email                 String    @unique
+  fullName              String?
+  avatarUrl             String?
+  onboardingStep        Int       @default(1)
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   memberships BusinessMember[]
 }

@@ -1,0 +1,48 @@
+import { createClient } from '@/lib/supabase/server';
+import { successResponse, errorResponse } from '@/lib/api/response';
+import { loginSchema } from '@/lib/validators/auth';
+
+/**
+ * POST /api/auth/login
+ *
+ * Authenticates the user with email + password via Supabase.
+ * Sets the session cookie automatically via the SSR client.
+ */
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const result = loginSchema.safeParse(body);
+
+    if (!result.success) {
+      return errorResponse(
+        'VALIDATION_ERROR',
+        result.error.issues[0]?.message ?? 'Invalid input.',
+        400
+      );
+    }
+
+    const { email, password } = result.data;
+
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      // Return a generic error — do not reveal whether the email exists
+      return errorResponse('UNAUTHORIZED', 'Invalid email or password.', 401);
+    }
+
+    return successResponse({
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        emailConfirmedAt: data.user.email_confirmed_at ?? null,
+      },
+    });
+  } catch (err) {
+    console.error('[login] Unexpected error:', err);
+    return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
+  }
+}

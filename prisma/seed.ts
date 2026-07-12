@@ -1,27 +1,54 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+const prisma = new PrismaClient({
+  adapter,
+});
 
 async function main() {
-  console.log('Seeding industry templates...');
-
   const templates = [
-    { name: 'Healthcare Clinic', slug: 'healthcare-clinic' },
-    { name: 'Education', slug: 'education' },
-    { name: 'Restaurant', slug: 'restaurant' },
-    { name: 'Retail', slug: 'retail' },
-    { name: 'Hospitality', slug: 'hospitality' },
+    {
+      name: "Healthcare Clinic",
+      slug: "healthcare-clinic",
+      description: "Healthcare clinics and medical service providers",
+    },
+    {
+      name: "Education",
+      slug: "education",
+      description: "Education consultancies and institutions",
+    },
+    {
+      name: "Restaurant",
+      slug: "restaurant",
+      description: "Restaurants and food businesses",
+    },
+    {
+      name: "Retail",
+      slug: "retail",
+      description: "Retail businesses and stores",
+    },
+    {
+      name: "Hospitality",
+      slug: "hospitality",
+      description: "Hotels and hospitality businesses",
+    },
   ];
 
-  for (const t of templates) {
+  for (const template of templates) {
     await prisma.industryTemplate.upsert({
-      where: { slug: t.slug },
+      where: {
+        slug: template.slug,
+      },
       update: {},
-      create: t,
+      create: template,
     });
   }
 
-  console.log('Seeding complete!');
+  console.log("✅ Industry templates seeded successfully");
 }
 
 main()
