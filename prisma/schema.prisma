@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// ──────────────────────────────────────────
+// IndustryTemplate
+// ──────────────────────────────────────────
+
+model IndustryTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  businesses  Business[]
+}
+
+// ──────────────────────────────────────────
+// Business (Tenant)
+// ──────────────────────────────────────────
+
+model Business {
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  industryTemplateId String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  industryTemplate   IndustryTemplate @relation(fields: [industryTemplateId], references: [id])
+  branches           Branch[]
+  members            BusinessMember[]
+
+  @@index([industryTemplateId])
+}
+
+// ──────────────────────────────────────────
+// Branch
+// ──────────────────────────────────────────
+
+model Branch {
+  id          String   @id @default(cuid())
+  name        String
+  businessId  String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+// ──────────────────────────────────────────
+// UserProfile
+// ──────────────────────────────────────────
+
+model UserProfile {
+  id          String   @id
+  email       String   @unique
+  fullName    String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships BusinessMember[]
+}
+
+// ──────────────────────────────────────────
+// BusinessMember (join table)
+// ──────────────────────────────────────────
+
+model BusinessMember {
+  id          String     @id @default(cuid())
+  userId      String
+  businessId  String
+  role        MemberRole @default(MEMBER)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+// ──────────────────────────────────────────
+// AuditLog
+// ──────────────────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String
+  entityType  String
+  entityId    String
+  actorId     String?
+  businessId  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([businessId])
+  @@index([createdAt])
+}
