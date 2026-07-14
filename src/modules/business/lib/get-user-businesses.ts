@@ -9,13 +9,27 @@ export async function getUserBusinesses(
   userId: string
 ): Promise<BusinessWithMembership[]> {
   const memberships = await prisma.businessMember.findMany({
-    where: { userId },
-    include: { business: true },
+    where: { 
+      userId,
+      business: { deletedAt: null }
+    },
+    include: { 
+      business: true,
+      rbacRole: {
+        select: {
+          name: true,
+          permissions: {
+            select: { permission: { select: { key: true } } }
+          }
+        }
+      }
+    },
     orderBy: { createdAt: 'asc' },
   });
 
   return memberships.map((m) => ({
     ...m.business,
     role: m.role,
+    rbacRole: m.rbacRole,
   }));
 }

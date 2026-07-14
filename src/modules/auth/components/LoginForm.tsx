@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ type FormState = {
 async function loginAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const returnTo = formData.get('returnTo') as string | null;
 
   const res = await fetch('/api/auth/login', {
     method: 'POST',
@@ -29,11 +30,15 @@ async function loginAction(_prev: FormState, formData: FormData): Promise<FormSt
     return { error: json.error?.message ?? 'Invalid email or password.' };
   }
 
-  // Fetch the user's profile to determine redirect destination
+  // If returnTo is provided (e.g., from an invitation), redirect there
+  if (returnTo && returnTo.startsWith('/')) {
+    return { success: true, redirectTo: returnTo };
+  }
+
+  // Otherwise, fetch the user's profile to determine redirect destination
   const meRes = await fetch('/api/auth/me');
   const me = await meRes.json();
-  // MVP: Bypass email verification check
-
+  
   const profile = me?.data?.profile;
   if (!profile?.onboardingCompletedAt) {
     const step = profile?.onboardingStep ?? 1;
@@ -46,6 +51,11 @@ async function loginAction(_prev: FormState, formData: FormData): Promise<FormSt
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') || '';
+  const initialEmail = searchParams.get('email') || '';
+  
+  const [email, setEmail] = useState(initialEmail);
   const [state, action, pending] = useActionState(loginAction, undefined);
 
   useEffect(() => {
@@ -60,6 +70,7 @@ export function LoginForm() {
 
   return (
     <form action={action} className="space-y-5">
+      {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
       <div className="space-y-2">
         <Label htmlFor="email">Email address</Label>
         <Input
@@ -70,6 +81,8 @@ export function LoginForm() {
           required
           placeholder="you@example.com"
           disabled={pending}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
@@ -100,7 +113,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-medium underline underline-offset-4 hover:text-foreground">
+        <Link href={`/signup${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''}`} className="font-medium underline underline-offset-4 hover:text-foreground">
           Create one
         </Link>
       </p>

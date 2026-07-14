@@ -1,10 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { errorResponse } from '@/lib/api/response';
 import type { AuthUser } from '@/modules/auth/types';
+import { prisma } from '@/lib/db/prisma';
 
 /**
  * Validates the current Supabase session and returns the authenticated user.
- * Throws an UNAUTHORIZED error response if no valid session exists.
+ * Throws an UNAUTHORIZED error response if no valid session exists,
+ * and a FORBIDDEN error response if the user account is deactivated.
  *
  * Usage in API route handlers:
  *   const { user, errorRes } = await requireAuth();
@@ -24,6 +26,18 @@ export async function requireAuth(): Promise<
     return {
       user: null,
       errorRes: errorResponse('UNAUTHORIZED', 'Authentication required.', 401),
+    };
+  }
+
+  const userProfile = await prisma.userProfile.findUnique({
+    where: { id: user.id },
+    select: { isActive: true }
+  });
+
+  if (userProfile && !userProfile.isActive) {
+    return {
+      user: null,
+      errorRes: errorResponse('FORBIDDEN', 'Your account has been deactivated.', 403),
     };
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,12 +10,14 @@ import { Label } from '@/components/ui/label';
 type FormState = {
   error?: string;
   success?: boolean;
+  redirectTo?: string;
 } | undefined;
 
 async function signupAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
+  const returnTo = formData.get('returnTo') as string | null;
 
   if (password !== confirmPassword) {
     return { error: 'Passwords do not match.' };
@@ -33,25 +35,38 @@ async function signupAction(_prev: FormState, formData: FormData): Promise<FormS
     return { error: json.error?.message ?? 'Failed to create account. Please try again.' };
   }
 
-  return { success: true };
+  if (returnTo && returnTo.startsWith('/invitations/')) {
+    return { success: true, redirectTo: returnTo };
+  } else if (returnTo && returnTo.startsWith('/')) {
+    return { success: true, redirectTo: `/onboarding/step/1?returnTo=${encodeURIComponent(returnTo)}` };
+  }
+
+  return { success: true, redirectTo: '/onboarding/step/1' };
 }
 
 export function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') || '';
+  const initialEmail = searchParams.get('email') || '';
+  
+  const [email, setEmail] = useState(initialEmail);
   const [state, action, pending] = useActionState(signupAction, undefined);
 
   useEffect(() => {
-    if (state?.success) {
-      router.push('/onboarding/step/1');
+    if (state?.success && state.redirectTo) {
+      router.push(state.redirectTo);
     }
-  }, [state?.success, router]);
+  }, [state?.success, state?.redirectTo, router]);
 
-  if (state?.success) {
+  if (state?.success && state.redirectTo) {
     return null;
   }
 
   return (
     <form action={action} className="space-y-5">
+      {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
+      {initialEmail && <input type="hidden" name="email" value={initialEmail} />}
       <div className="space-y-2">
         <Label htmlFor="email">Email address</Label>
         <Input
@@ -61,8 +76,16 @@ export function SignupForm() {
           autoComplete="email"
           required
           placeholder="you@example.com"
-          disabled={pending}
+          disabled={pending || !!initialEmail}
+          readOnly={!!initialEmail}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
+        {initialEmail && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Email is locked because you are accepting an invitation.
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -103,7 +126,7 @@ export function SignupForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <Link href="/login" className="font-medium underline underline-offset-4 hover:text-foreground">
+        <Link href={`/login${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''}`} className="font-medium underline underline-offset-4 hover:text-foreground">
           Sign in
         </Link>
       </p>

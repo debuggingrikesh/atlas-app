@@ -13,6 +13,8 @@ export type UserProfile = {
   avatarUrl: string | null;
   onboardingStep: number;
   onboardingCompletedAt: Date | null;
+  onboardingData: Record<string, unknown> | null;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

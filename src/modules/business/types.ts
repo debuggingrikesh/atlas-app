@@ -25,6 +25,10 @@ export type Branch = {
 
 export type BusinessWithMembership = Business & {
   role: MemberRole;
+  rbacRole?: { 
+    name: string;
+    permissions?: { permission: { key: string } }[];
+  } | null;
 };
 
 export type CreateBusinessInput = {

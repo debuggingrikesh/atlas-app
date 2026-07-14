@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { Step1ProfileForm } from '@/modules/auth/components/onboarding/Step1ProfileForm';
 import { Step2BusinessForm } from '@/modules/auth/components/onboarding/Step2BusinessForm';
 import { Step3IndustryForm } from '@/modules/auth/components/onboarding/Step3IndustryForm';
@@ -50,6 +50,8 @@ function clearSession() {
 export function OnboardingWizard() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
   const currentStep = Number(params.step) || 1;
 
   // Hydrate from sessionStorage via lazy initializer — runs once, avoids useEffect setState
@@ -61,7 +63,37 @@ export function OnboardingWizard() {
     router.push(`/onboarding/step/${step}`);
   }
 
-  function handleStep1(values: { fullName: string }) {
+  async function handleStep1(values: { fullName: string }) {
+    if (returnTo) {
+      setSubmitting(true);
+      setSubmitError(undefined);
+      try {
+        // 1. Create the user profile by pushing step 4 to onboarding draft
+        const draftRes = await fetch('/api/onboarding/draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 4, data: null }),
+        });
+        if (!draftRes.ok) throw new Error('Failed to create profile skeleton.');
+
+        // 2. Update the full name
+        const profileRes = await fetch('/api/users/profile', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName: values.fullName }),
+        });
+        if (!profileRes.ok) throw new Error('Failed to save profile name.');
+
+        clearSession();
+        router.push(returnTo);
+      } catch (err) {
+        console.error(err);
+        setSubmitError('Failed to save profile. Please try again.');
+        setSubmitting(false);
+      }
+      return;
+    }
+
     setData(writeSession(values));
     goTo(2);
   }

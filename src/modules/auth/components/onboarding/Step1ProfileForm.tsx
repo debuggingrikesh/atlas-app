@@ -4,13 +4,16 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 interface Step1FormProps {
   defaultValue?: string;
   onNext: (data: { fullName: string }) => void;
+  submitting?: boolean;
+  error?: string;
 }
 
-export function Step1ProfileForm({ defaultValue, onNext }: Step1FormProps) {
+export function Step1ProfileForm({ defaultValue, onNext, submitting, error }: Step1FormProps) {
   const [fullName, setFullName] = useState(defaultValue ?? '');
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,11 +40,19 @@ export function Step1ProfileForm({ defaultValue, onNext }: Step1FormProps) {
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           autoFocus
+          disabled={submitting}
         />
         <p className="text-xs text-muted-foreground">This is how your name will appear in the platform.</p>
       </div>
-      <Button type="submit" className="w-full" disabled={fullName.trim().length < 2}>
-        Continue →
+
+      {error && (
+        <p role="alert" className="text-sm text-red-500">
+          {error}
+        </p>
+      )}
+
+      <Button type="submit" className="w-full" disabled={fullName.trim().length < 2 || submitting}>
+        {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Continue →'}
       </Button>
     </form>
   );

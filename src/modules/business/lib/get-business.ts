@@ -4,11 +4,11 @@ import type { Business } from '@/modules/business/types';
 /**
  * Fetches a single business by ID.
  * Always pass businessId from a trusted server source — never from unverified URL params alone.
- * Call requireBusinessMember() before this function to verify access.
+ * Call requirePermission() before this function to verify access.
  */
 export async function getBusiness(businessId: string): Promise<Business | null> {
-  return prisma.business.findUnique({
-    where: { id: businessId },
+  return prisma.business.findFirst({
+    where: { id: businessId, deletedAt: null },
   });
 }
 
@@ -17,7 +17,7 @@ export async function getBusiness(businessId: string): Promise<Business | null> 
  * Used by the dashboard to resolve [businessSlug] route params.
  */
 export async function getBusinessBySlug(slug: string): Promise<Business | null> {
-  return prisma.business.findUnique({
-    where: { slug },
+  return prisma.business.findFirst({
+    where: { slug, deletedAt: null },
   });
 }

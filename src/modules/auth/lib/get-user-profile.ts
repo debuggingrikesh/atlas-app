@@ -19,6 +19,12 @@ export async function getUserProfile(
       memberships: {
         include: {
           business: true,
+          rbacRole: { 
+            select: { 
+              name: true,
+              permissions: { select: { permission: { select: { key: true } } } }
+            } 
+          },
         },
       },
     },
@@ -33,11 +39,14 @@ export async function getUserProfile(
     avatarUrl: profile.avatarUrl,
     onboardingStep: profile.onboardingStep,
     onboardingCompletedAt: profile.onboardingCompletedAt,
+    onboardingData: profile.onboardingData ? (profile.onboardingData as Record<string, unknown>) : null,
+    isActive: profile.isActive,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
     businesses: profile.memberships.map((m) => ({
       ...m.business,
       role: m.role,
+      rbacRole: m.rbacRole,
     })),
   };
 }
