@@ -1,136 +1,141 @@
 # Deployment Architecture Document
 
-## 1. Overview
+## Project Atlas
 
-Project Atlas deployment architecture defines the infrastructure, environments, deployment workflow, and operational practices required to run the SaaS platform reliably.
-
-The deployment strategy focuses on:
-
-- Fast iteration during MVP development
-- Secure production deployment
-- Automated deployments
-- Environment separation
-- Scalability readiness
+Version: 1.0  
+Status: Architecture Specification  
+Document Type: Technical Architecture  
+Last Updated: July 2026
 
 ---
 
-# 2. Infrastructure Overview
+# 1. Executive Summary
 
-Current architecture:
+Project Atlas is a multi-tenant SaaS platform designed to provide configurable business management capabilities across different industries.
 
+The deployment architecture defines how Project Atlas is developed, deployed, monitored, secured, and scaled across environments.
 
-Users
+The architecture prioritizes:
 
-↓
+- Reliability
+- Security
+- Developer velocity
+- Infrastructure simplicity
+- Production scalability
 
-CDN / Edge Network
+The initial deployment model uses:
 
-↓
-
-Next.js Application
-
-↓
-
-Supabase Services
-
-├── PostgreSQL Database
-├── Authentication
-└── Storage
-
-↓
-
-External Services
-
-
----
-
-# 3. Technology Stack
-
-## Application Hosting
-
-Platform:
-
-
-Vercel
-
-
-Responsibilities:
-
-- Next.js hosting
-- Edge network
-- Automatic deployments
-- Environment management
+| Component | Technology |
+|---|---|
+| Frontend | Next.js 16 App Router |
+| Backend | Next.js Server Actions + API Routes |
+| Database | PostgreSQL |
+| ORM | Prisma 7 |
+| Authentication | Supabase Auth |
+| Hosting | Vercel |
+| Database Hosting | Supabase |
+| Package Manager | npm |
 
 ---
 
-## Database
+# 2. Deployment Goals
 
-Platform:
+The deployment architecture must support:
 
+## Development Velocity
 
-Supabase PostgreSQL
+Engineers should be able to:
 
-
-Responsibilities:
-
-- Relational database
-- Connection pooling
-- Backups
-- Database management
+- Run the entire platform locally
+- Test database changes safely
+- Create isolated features
+- Deploy quickly
 
 ---
 
-## Authentication
+## Reliability
 
-Platform:
+The platform should provide:
 
-
-Supabase Auth
-
-
-Responsibilities:
-
-- User authentication
-- Session management
-- OAuth providers
-- User identity
+- Predictable deployments
+- Automated validation
+- Rollback capability
+- Database consistency
 
 ---
 
-# 4. Environment Architecture
+## Security
 
-Project Atlas uses three environments:
+The deployment system must protect:
+
+- Authentication credentials
+- Database access
+- User information
+- Business data
+
+---
+
+## Scalability
+
+The architecture should support growth from:
 
 
-Development
+Early MVP
 
 ↓
 
-Staging
+Growing SaaS
 
 ↓
 
-Production
+Enterprise Platform
 
 
 ---
 
-# 5. Development Environment
+# 3. Deployment Environment Model
+
+Project Atlas uses four environments:
+
+                Git Repository
+
+                     |
+
+    ---------------------------------
+
+    |               |               |
+
+Local Dev       Preview          Production
+
+    |               |               |
+
+Developer Pull Request Users
+
+
+---
+
+# 4. Environment Definitions
+
+## 4.1 Local Development Environment
 
 Purpose:
 
-- Local development
-- Feature implementation
-- Testing
+Daily development and feature creation.
 
-Stack:
+Used by:
+
+- Developers
+- AI coding assistants
+- Local testing
+
+Components:
 
 
 Developer Machine
 
 ↓
 
-Next.js Dev Server
+Next.js Development Server
 
 ↓
 
@@ -138,399 +143,760 @@ Local Environment Variables
 
 ↓
 
-Supabase Development Project
+Supabase Development Database
+
+↓
+
+Prisma Client
 
 
-Commands:
+---
+
+Required services:
 
 ```bash
-npm run dev
+npm install
 
-Database:
+npx prisma generate
 
 npx prisma migrate dev
-6. Staging Environment
+
+npm run db:seed
+
+npm run dev
+4.2 Preview Environment
 
 Purpose:
 
-Pre-production testing
-QA validation
-Client review
+Testing changes before production release.
 
-Architecture:
+Created automatically from:
 
-Staging Branch
+Git Branch
+
+↓
+
+Pull Request
 
 ↓
 
 Vercel Preview Deployment
 
-↓
-
-Staging Supabase Project
-
 Used for:
 
-Testing migrations
-Testing new features
-Integration testing
-7. Production Environment
+QA testing
+Feature validation
+Stakeholder review
+4.3 Staging Environment
 
 Purpose:
 
-Live SaaS platform.
+Production-like testing.
 
-Architecture:
+Characteristics:
 
-Production Users
+Production configuration
+Separate database
+Separate authentication project
+Real deployment pipeline
 
-↓
+Used for:
 
-Vercel Production Deployment
+Migration testing
+Performance testing
+Release validation
+4.4 Production Environment
 
-↓
+Purpose:
 
-Next.js Application
+Serve real customers.
 
-↓
+Characteristics:
 
-Supabase Production
+High availability
+Protected secrets
+Monitoring enabled
+Backup enabled
+5. Infrastructure Overview
+High Level Architecture
+6. Core Infrastructure Components
+6.1 Next.js Application
 
-↓
+Responsibilities:
 
-PostgreSQL Database
-8. Environment Variables
+UI rendering
+Server components
+API endpoints
+Route protection
+Business logic orchestration
 
-Environment variables are separated by environment.
+Deployment:
 
-Example:
+Vercel
+6.2 Supabase Authentication
 
-.env.local
+Responsibilities:
 
-Development
-Vercel Environment Variables
+User registration
+Login
+Sessions
+Token handling
 
-Production
+Project Atlas does not store passwords.
 
-Required variables:
+Authentication ownership:
 
-DATABASE_URL
-
-DIRECT_URL
-
-NEXT_PUBLIC_SUPABASE_URL
-
-NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-SUPABASE_SERVICE_ROLE_KEY
-
-NEXT_PUBLIC_APP_URL
-9. Secret Management
-
-Rules:
-
-Never commit secrets
-Never expose server keys
-Never use service role keys in client code
-
-Sensitive keys:
-
-SUPABASE_SERVICE_ROLE_KEY
-
-DATABASE_URL
-
-Storage:
-
-Vercel Environment Variables
-
-Supabase Secrets
-10. Deployment Workflow
-
-Git based deployment:
-
-Developer
+Supabase Auth
 
 ↓
 
-Git Commit
+Application UserProfile
+6.3 PostgreSQL Database
+
+Responsibilities:
+
+Persistent data
+Business records
+User profiles
+Audit history
+
+Managed by:
+
+Supabase PostgreSQL
+6.4 Prisma ORM
+
+Responsibilities:
+
+Database access
+Schema management
+Migration control
+
+Workflow:
+
+schema.prisma
 
 ↓
 
-GitHub Repository
+Migration
 
 ↓
 
-Vercel Build
+Database
 
 ↓
 
-Deployment
+Generated Client
+7. Deployment Flow
 
-↓
+Production deployment lifecycle:
 
-Production
-11. Branch Strategy
+Invalid or unsupported diagram.
+8. Git Strategy
 
-Recommended:
+Recommended workflow:
 
 main
 
 |
-|-- production
 
-develop
+|-- feature/authentication
 
-|
-|-- feature branches
+|-- feature/dashboard
+
+|-- feature/modules
+
+
+Branch rules:
+
 Main Branch
 
-Purpose:
+Contains:
 
-Production-ready code.
-
-Develop Branch
-
-Purpose:
-
-Integration testing.
-
+Production-ready code
+Reviewed changes only
 Feature Branch
 
-Purpose:
+Contains:
 
-Individual development.
+New functionality
+Bug fixes
+Experiments
+9. Deployment Rules
 
-Example:
-
-feature/customer-module
-12. CI/CD Pipeline
-
-Deployment pipeline:
-
-Push Code
-
-↓
-
-Install Dependencies
-
-↓
-
-Run Type Check
-
-↓
-
-Run Lint
-
-↓
-
-Build Application
-
-↓
-
-Deploy
-
-Required checks:
+Every deployment must pass:
 
 npm run lint
 
 npx tsc --noEmit
 
 npm run build
-13. Database Deployment Strategy
 
-Database changes follow:
+No deployment should happen with:
 
-Schema Change
+Type errors
+Failed migrations
+Broken tests
+Missing environment variables
+10. Environment Variables Architecture
+
+Environment variables are separated into:
+
+Public Variables
+
++
+
+Server Secrets
+Public Variables
+
+Accessible by browser.
+
+Examples:
+
+NEXT_PUBLIC_SUPABASE_URL
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+Server Secrets
+
+Never exposed.
+
+Examples:
+
+DATABASE_URL
+
+SUPABASE_SERVICE_ROLE_KEY
+11. Environment Variable Management
+
+Rules:
+
+Never commit .env
+Maintain .env.example
+Rotate production secrets
+Separate environments
+
+Example:
+
+.env.local
+
+.env.staging
+
+.env.production
+12. Deployment Checklist
+
+Before deployment:
+
+[ ] Environment variables configured
+
+[ ] Database migration reviewed
+
+[ ] Build successful
+
+[ ] Tests passing
+
+[ ] Security review completed
+
+[ ] Monitoring active
+
+# 13. Vercel Deployment Strategy
+
+## 13.1 Overview
+
+Project Atlas uses Vercel as the primary application deployment platform.
+
+Vercel provides:
+
+- Global CDN
+- Automatic deployments
+- Preview environments
+- Serverless execution
+- Edge capabilities
+- Deployment rollback
+
+Deployment architecture:
+
+
+GitHub Repository
+
+    |
+
+    ↓
+
+Vercel Build System
+
+    |
+
+    ↓
+
+Next.js Application
+
+    |
+
+    ↓
+
+Production Traffic
+
+
+---
+
+# 13.2 Production Deployment Flow
+
+Production deployment follows:
+
+
+Developer
 
 ↓
 
-Prisma Migration
+Feature Branch
 
 ↓
 
-Review Migration
+Pull Request
 
 ↓
 
-Deploy Migration
+Automated Checks
 
 ↓
 
-Application Update
-
-Production migration:
-
-npx prisma migrate deploy
-14. Prisma Migration Rules
-
-Never:
-
-Modify Production Database Manually
-
-Always:
-
-schema.prisma
+Code Review
 
 ↓
 
-Migration File
+Merge to Main
+
+↓
+
+Vercel Production Build
 
 ↓
 
 Deployment
-15. Backup Strategy
 
-Database backups handled by:
+↓
 
-Supabase PostgreSQL Backups
+Monitoring
 
-Backup frequency:
 
-Daily automated backups
-Point-in-time recovery (based on plan)
-16. Monitoring Strategy
+---
 
-Monitor:
+# 13.3 Build Process
 
-Application
-Errors
-Response time
-Server failures
-Database
-Query performance
-Connection usage
-Storage
+Vercel executes:
+
+```bash
+npm install
+
+↓
+
+prisma generate
+
+↓
+
+next build
+
+↓
+
+deployment
+
+The build must validate:
+
+TypeScript compilation
+Next.js compilation
+Prisma generation
+Static analysis
+13.4 Preview Deployments
+
+Every pull request should generate:
+
+Pull Request
+
+↓
+
+Unique Preview URL
+
+↓
+
+QA Testing
+
+↓
+
+Approval
+
+Preview environments allow:
+
+Feature testing
+Client review
+UI validation
+Regression checking
+13.5 Rollback Strategy
+
+If a production deployment causes issues:
+
+Production Failure
+
+↓
+
+Identify Previous Stable Deployment
+
+↓
+
+Rollback
+
+↓
+
+Investigate Issue
+
+↓
+
+Deploy Fix
+
+Rollback priorities:
+
+Restore availability
+Protect data integrity
+Investigate root cause
+14. Supabase Production Architecture
+14.1 Overview
+
+Supabase provides:
+
+PostgreSQL database
 Authentication
-Failed logins
-Session problems
-17. Error Tracking
+Storage
+Database APIs
 
-Future integration:
+Architecture:
 
-Application
+Next.js Application
 
-↓
+        |
 
-Error Tracking Service
+        |
 
-↓
+Supabase Services
 
-Alerts
+        |
 
-↓
+------------------------
 
-Developer Response
+|          |            |
 
-Examples:
+Auth    Database    Storage
 
-Production exceptions
-API failures
-Database errors
-18. Performance Optimization
+14.2 Supabase Authentication
 
-Deployment optimizations:
+Responsibilities:
 
-Next.js
-Server Components
-Image optimization
-Route caching
-Code splitting
-Database
-Proper indexes
-Query optimization
-Connection pooling
-19. Scaling Strategy
+User identity
+Session management
+Password handling
+Token generation
 
-Current:
+Flow:
 
-Single Next.js Deployment
-
-+
-
-Supabase PostgreSQL
-
-Future:
-
-Multiple Application Instances
+User Login
 
 ↓
 
-Load Balancer
+Supabase Auth
 
 ↓
 
-Database Cluster
+Session Created
 
 ↓
 
-Background Workers
-20. Domain Architecture
-
-Production:
-
-app.projectatlas.com
-
-Possible future:
-
-tenant.projectatlas.com
-
-api.projectatlas.com
-
-docs.projectatlas.com
-21. SSL and Security
-
-Handled by:
-
-Vercel SSL certificates
-HTTPS enforcement
-Secure cookies
-Environment isolation
-22. Deployment Checklist
-
-Before production release:
-
-Application
- Lint passes
- Type check passes
- Build succeeds
- Environment variables configured
-Database
- Migration reviewed
- Backup available
- Production migration tested
-Security
- Secrets secured
- Authentication tested
- Authorization tested
-Performance
- Images optimized
- Queries optimized
- Loading states implemented
-23. Disaster Recovery Plan
-
-If deployment fails:
-
-Rollback Application
+Application Validates User
 
 ↓
 
-Restore Previous Version
+UserProfile Loaded
+14.3 Database Architecture
+
+Production database:
+
+PostgreSQL
+
+|
+
+Schemas
+
+|
+
+Tables
+
+|
+
+Indexes
+
+|
+
+Relations
+
+Core tables:
+
+IndustryTemplate
+
+Business
+
+Branch
+
+UserProfile
+
+BusinessMember
+
+AuditLog
+14.4 Database Access Pattern
+
+Application never directly manipulates database connections.
+
+Flow:
+
+API Layer
 
 ↓
 
-Verify Database
+Service Layer
 
 ↓
 
-Resume Service
-
-If database issue:
-
-Stop Writes
+Prisma Client
 
 ↓
 
-Restore Backup
+PostgreSQL
+
+Benefits:
+
+Centralized logic
+Better testing
+Safer queries
+Easier migrations
+14.5 Supabase Storage
+
+Future storage requirements:
+
+Business logos
+User avatars
+Documents
+Reports
+
+Storage flow:
+
+User Upload
+
+↓
+
+Application Validation
+
+↓
+
+Supabase Storage
+
+↓
+
+Secure URL
+
+↓
+
+Database Reference
+15. Database Migration Strategy
+15.1 Migration Philosophy
+
+Database changes must always be:
+
+Version controlled
+Reviewable
+Reversible
+
+Prisma migrations are the source of truth.
+
+15.2 Development Migration
+
+Developer workflow:
+
+Modify schema.prisma
+
+↓
+
+Create Migration
+
+↓
+
+Review SQL
+
+↓
+
+Apply Locally
+
+Command:
+
+npx prisma migrate dev --name migration_name
+15.3 Staging Migration
+
+Process:
+
+Migration Created
+
+↓
+
+Applied To Staging
+
+↓
+
+Application Tested
+
+↓
+
+Approved For Production
+15.4 Production Migration
+
+Production migrations require:
+
+Backup
+
+↓
+
+Migration Review
+
+↓
+
+Migration Execution
+
+↓
+
+Verification
+
+↓
+
+Monitoring
+15.5 Migration Rules
+
+Never:
+
+Edit production database manually
+Delete migration history
+Skip migration review
+
+Always:
+
+Commit migration files
+Test before deployment
+Backup before major changes
+16. CI/CD Pipeline
+16.1 Pipeline Overview
+Code Push
+
+↓
+
+CI Pipeline
+
+↓
+
+Validation
+
+↓
+
+Build
+
+↓
+
+Deployment
+16.2 Continuous Integration Checks
+
+Every pull request should execute:
+
+npm run lint
+
+npx tsc --noEmit
+
+npm run build
+
+Future additions:
+
+Unit Tests
+
+Integration Tests
+
+Security Scan
+16.3 Continuous Deployment
+
+Production deployment:
+
+Main Branch Updated
+
+↓
+
+CI Passed
+
+↓
+
+Automatic Deployment
+
+↓
+
+Health Check
+
+↓
+
+Release
+17. Database Backup Strategy
+17.1 Backup Goals
+
+Protect against:
+
+Data corruption
+Human mistakes
+Failed migrations
+Infrastructure failures
+17.2 Backup Types
+Automated Backups
+
+Frequency:
+
+Daily
+Logical Backups
+
+Used for:
+
+Data export
+Migration
+Recovery
+Restore Testing
+
+Backups must periodically be tested.
+
+A backup without restore validation is incomplete.
+
+18. Disaster Recovery
+Recovery Objectives
+
+Project Atlas defines:
+
+Recovery Point Objective (RPO)
+
+Maximum acceptable data loss.
+
+Target:
+
+24 hours
+Recovery Time Objective (RTO)
+
+Maximum acceptable downtime.
+
+Target:
+
+Few hours
+18.1 Disaster Scenarios
+Database Failure
+
+Response:
+
+Detect Failure
+
+↓
+
+Restore Database
 
 ↓
 
@@ -538,14 +904,207 @@ Validate Data
 
 ↓
 
-Resume Operations
-Conclusion
+Resume Service
+Deployment Failure
 
-Project Atlas deployment architecture provides:
+Response:
 
-Reliable deployment workflow
-Secure environment management
-Production readiness
-Scalable infrastructure foundation
+Detect Issue
 
-The architecture supports MVP velocity while maintaining a path toward enterprise-scale operations.
+↓
+
+Rollback Deployment
+
+↓
+
+Investigate
+
+↓
+
+Redeploy Fix
+Authentication Failure
+
+Response:
+
+Monitor Auth Errors
+
+↓
+
+Verify Supabase Status
+
+↓
+
+Restore Service
+19. Security Deployment Practices
+19.1 Secret Protection
+
+Rules:
+
+Secrets stored only in deployment platform
+No secrets in Git
+Rotate credentials periodically
+19.2 Access Control
+
+Production access limited to:
+
+Authorized developers
+Administrators
+19.3 Dependency Security
+
+Regular checks:
+
+npm audit
+
+Review:
+
+Vulnerable packages
+Outdated dependencies
+Security patches
+20. Performance Scaling Strategy
+
+Project Atlas scaling path:
+
+Stage 1
+
+MVP
+
+↓
+
+Single Next.js Deployment
+
+↓
+
+Managed PostgreSQL
+
+
+Stage 2
+
+Growth
+
+↓
+
+Caching Layer
+
+↓
+
+Background Workers
+
+
+Stage 3
+
+Enterprise
+
+↓
+
+Service Separation
+
+↓
+
+Advanced Infrastructure
+21. Infrastructure Evolution
+Current Architecture
+Next.js
+
++
+
+Supabase
+
++
+
+Prisma
+
++
+
+Vercel
+Future Architecture
+
+Potential additions:
+
+Next.js
+
++
+
+API Services
+
++
+
+Queue System
+
++
+
+Redis
+
++
+
+Analytics Pipeline
+
++
+
+Dedicated Workers
+22. Operational Runbooks
+Application Down
+
+Steps:
+
+Check deployment status
+Review logs
+Verify environment variables
+Check dependencies
+Rollback if required
+Database Issue
+
+Steps:
+
+Check database availability
+Review recent migrations
+Inspect queries
+Restore if required
+Authentication Issue
+
+Steps:
+
+Check Supabase status
+Verify configuration
+Test login flow
+Review auth logs
+23. Deployment Checklist
+Before Release
+[ ] Code reviewed
+
+[ ] Tests passed
+
+[ ] Migration verified
+
+[ ] Environment variables checked
+
+[ ] Build successful
+
+[ ] Backup confirmed
+After Release
+[ ] Application loads
+
+[ ] Login works
+
+[ ] Database connected
+
+[ ] Error monitoring active
+
+[ ] User flows tested
+24. Architecture Decisions
+Decision	Reason
+Vercel Hosting	Optimized Next.js deployment
+Supabase	Managed PostgreSQL + Auth
+Prisma	Type-safe database access
+Migration Based DB Changes	Controlled evolution
+Environment Separation	Safety and reliability
+Automated Deployments	Faster iteration
+25. Future Improvements
+
+Planned improvements:
+
+Automated integration testing
+Infrastructure as Code
+Advanced monitoring
+Multi-region deployment
+Automated disaster recovery
+Database read replicas

@@ -1,130 +1,357 @@
 # Testing Strategy Document
 
-## 1. Overview
+## Project Atlas
 
-Project Atlas testing strategy defines the quality assurance approach required to maintain a reliable, secure, and scalable SaaS platform.
-
-The testing philosophy focuses on:
-
-- Preventing regressions
-- Protecting critical business workflows
-- Maintaining code quality
-- Ensuring database integrity
-- Supporting rapid development
+Version: 1.0  
+Status: Architecture Specification  
+Document Type: Engineering Quality Standard  
+Last Updated: July 2026
 
 ---
 
-# 2. Testing Pyramid
+# 1. Executive Summary
 
-Project Atlas follows a layered testing approach:
+Project Atlas is a multi-tenant SaaS platform where reliability, data isolation, and predictable behavior are critical.
+
+This testing strategy defines the quality framework used to validate:
+
+- Application functionality
+- Database integrity
+- Authentication flows
+- Tenant isolation
+- API reliability
+- User experience
+- Production readiness
+
+The objective is to ensure every feature introduced into Project Atlas is:
+
+- Correct
+- Secure
+- Maintainable
+- Scalable
+
+---
+
+# 2. Testing Principles
+
+## 2.1 Quality Is Built During Development
+
+Testing is not a final verification step.
+
+Every feature should include:
+
+
+Design
+
+↓
+
+Implementation
+
+↓
+
+Testing
+
+↓
+
+Review
+
+↓
+
+Deployment
+
+
+---
+
+## 2.2 Test Business Behavior
+
+Tests should validate:
+
+- What users can do
+- What users cannot do
+- How data flows
+- How failures are handled
+
+---
+
+## 2.3 Protect Tenant Isolation
+
+Since Project Atlas is multi-tenant:
+
+The most important security rule:
+
+
+Business A
+
+Cannot access
+
+Business B data
+
+
+Every module must include tenant boundary tests.
+
+---
+
+# 3. Testing Pyramid
+
+Project Atlas follows the testing pyramid:
 
           E2E Tests
-             ▲
 
-    Integration Tests
-             ▲
+      Integration Tests
 
-      Unit Tests
-             ▲
+   API + Database Tests
 
-    Static Analysis
-
-Each layer provides different protection.
+    Unit Tests
 
 ---
 
-# 3. Testing Levels
+# 4. Testing Layers
 
-## 3.1 Static Analysis
+## 4.1 Unit Testing
 
 Purpose:
 
-Catch issues before runtime.
-
-Tools:
-
-
-TypeScript
-ESLint
-Prisma Validation
-
-
-Checks:
-
-```bash
-npm run lint
-
-npx tsc --noEmit
-
-Required before every merge.
-
-4. Unit Testing
-Purpose
-
-Test individual functions and business logic independently.
+Validate isolated logic.
 
 Examples:
 
-Validation functions
-Utility functions
-Permission checks
-Data transformations
+- Utility functions
+- Validation logic
+- Permission checks
+- Data transformations
 
-Example:
+---
 
-BusinessService.createSlug()
+Examples:
 
-Input:
 
-"My Clinic"
-
-Expected:
-
-"my-clinic"
-5. Integration Testing
-Purpose
-
-Verify multiple backend components working together.
-
-Tests include:
-
-API routes
-Prisma queries
-Authentication flows
-Database transactions
-
-Example:
-
-Signup
+slug generator
 
 ↓
 
-Create User
+input
 
 ↓
+
+expected slug
+
+
+---
+
+## Unit Testing Rules
+
+Unit tests should be:
+
+- Fast
+- Independent
+- Deterministic
+
+Avoid:
+
+- Database calls
+- External APIs
+- Network requests
+
+---
+
+# 5. Integration Testing
+
+Purpose:
+
+Validate multiple components working together.
+
+Examples:
+
+
+API Route
+
+↓
+
+Service Logic
+
+↓
+
+Prisma
+
+↓
+
+Database
+
+
+---
+
+Integration tests validate:
+
+- Database writes
+- Relations
+- Transactions
+- Error handling
+
+---
+
+# 6. API Testing Strategy
+
+All API endpoints must validate:
+
+## Authentication
+
+Example:
+
+
+Unauthenticated Request
+
+↓
+
+Rejected
+
+
+---
+
+## Authorization
+
+Example:
+
+
+Member
+
+↓
+
+Admin Action
+
+↓
+
+Denied
+
+
+---
+
+## Input Validation
+
+Example:
+
+
+Invalid Data
+
+↓
+
+Validation Error
+
+
+---
+
+## Success Response
+
+Example:
+
+
+Valid Request
+
+↓
+
+Expected Response
+
+
+---
+
+# 7. API Test Structure
+
+Every API endpoint should have:
+
+
+Success Case
+
+Validation Failure
+
+Authentication Failure
+
+Authorization Failure
+
+Database Failure
+
+
+---
+
+# 8. Database Testing
+
+## 8.1 Schema Validation
+
+Verify:
+
+- Required fields
+- Relations
+- Constraints
+- Indexes
+
+---
+
+## 8.2 Transaction Testing
+
+Critical flows:
+
+Example:
+
+Onboarding:
+
 
 Create UserProfile
 
 ↓
 
-Verify Database State
-6. End-to-End Testing
-Purpose
-
-Validate complete user workflows.
-
-Primary tool:
-
-Playwright
-
-Critical flows:
-
-Authentication
-Signup
+Create Business
 
 ↓
 
-Login
+Create Member
+
+↓
+
+Create Branch
+
+↓
+
+Create AuditLog
+
+
+If one step fails:
+
+
+Rollback Everything
+
+
+---
+
+# 9. Authentication Testing
+
+Authentication is a critical system boundary.
+
+Test cases:
+
+---
+
+## Signup
+
+Verify:
+
+
+User enters details
+
+↓
+
+Account created
+
+↓
+
+Profile created
+
+
+---
+
+## Login
+
+Verify:
+
+
+Valid Credentials
 
 ↓
 
@@ -133,298 +360,356 @@ Session Created
 ↓
 
 Dashboard Access
-Onboarding
-Step 1
 
-↓
 
-Step 2
+---
 
-↓
-
-Step 3
-
-↓
-
-Step 4
-
-↓
-
-Business Created
-
-↓
-
-Dashboard Redirect
-7. Authentication Testing
-
-Authentication is a critical system.
-
-Tests:
-
-Signup
+## Invalid Login
 
 Verify:
 
-User created in Supabase Auth
-UserProfile created
-Session established
-Login
 
-Verify:
-
-Valid credentials accepted
-Invalid credentials rejected
-Session persisted
-Logout
-
-Verify:
-
-Session destroyed
-Protected routes inaccessible
-8. Authorization Testing
-
-Every protected action requires permission testing.
-
-Example:
-
-OWNER
-
-Can create branch
-
-
-MEMBER
-
-Cannot create branch
-
-Test cases:
-
-Valid role
-Invalid role
-Missing membership
-Wrong tenant access
-9. Multi-Tenant Testing
-
-Critical SaaS requirement.
-
-Test:
-
-Business A User
-
-Cannot access
-
-Business B Data
-
-Verify:
-
-Queries always filter by businessId
-APIs enforce ownership
-Services validate tenant boundaries
-10. Database Testing
-
-Database tests verify:
-
-Schema integrity
-Relations
-Constraints
-Transactions
-
-Examples:
-
-Unique Constraints
-Duplicate Business Slug
+Wrong Password
 
 ↓
 
 Rejected
-Cascade Rules
-Delete Business
+
+
+---
+
+## Logout
+
+Verify:
+
+
+Session Removed
 
 ↓
 
-Related Records Removed
-11. API Testing
+Protected Routes Blocked
 
-Every API endpoint should test:
 
-Success Case
+---
 
-Example:
+# 10. Authorization Testing
 
-POST /api/business/create
+Project Atlas uses:
 
-Response:
 
-201 Created
-Validation Failure
-
-Example:
-
-Missing business name
+User
 
 ↓
 
-400 Bad Request
-Authorization Failure
-
-Example:
-
-Unauthenticated Request
+Business Membership
 
 ↓
 
-401 Unauthorized
+Role
+
+↓
+
+Permission
+
+
+---
+
+Test roles:
+
+## OWNER
+
+Can:
+
+- Manage business
+- Manage members
+- Access all modules
+
+---
+
+## ADMIN
+
+Can:
+
+- Manage operations
+- Limited settings access
+
+---
+
+## MEMBER
+
+Can:
+
+- Access assigned features
+
+---
+
+# 11. Multi-Tenant Testing
+
+Critical tests:
+
+---
+
+## Tenant Data Isolation
+
+Scenario:
+
+
+Business A User
+
+Attempts
+
+Business B Resource
+
+
+Expected:
+
+
+Access Denied
+
+
+---
+
+## Query Filtering
+
+Every database query must include:
+
+
+businessId
+
+
+Example:
+
+Bad:
+
+```ts
+prisma.customer.findMany()
+
+Good:
+
+prisma.customer.findMany({
+ where:{
+   businessId:user.businessId
+ }
+})
 12. Frontend Testing
 
 Frontend testing focuses on:
 
-Component behavior
-Form handling
-User interactions
+Components
+Forms
+Navigation
+User flows
 
 Test:
 
-Input validation
-Loading states
-Error states
+Forms
+
+Validate:
+
+Required fields
+Error messages
+Submission behavior
+Components
+
+Validate:
+
+Rendering
+User interaction
+State changes
 Navigation
-Responsive behavior
-13. Form Testing
 
-All forms must test:
+Validate:
 
-Valid Input
-Submit
+Protected routes
+Redirect behavior
+13. End-To-End Testing
 
-↓
+E2E tests simulate real users.
 
-Success
-Invalid Input
-Empty Required Field
+Primary flows:
 
-↓
-
-Validation Message
-Server Failure
-API Error
+User Registration
+Open Signup
 
 ↓
 
-User Feedback
-14. Error Handling Testing
+Create Account
 
-Verify:
+↓
 
-Errors are captured
-User sees friendly messages
-Sensitive information is hidden
+Complete Onboarding
+
+↓
+
+Access Dashboard
+Business Creation
+Create Business
+
+↓
+
+Select Industry
+
+↓
+
+Create Branch
+
+↓
+
+Verify Dashboard
+User Management
+Invite Member
+
+↓
+
+Assign Role
+
+↓
+
+Verify Permissions
+14. Testing Environment Strategy
+Local Testing
+
+Purpose:
+
+Developer validation.
+
+Uses:
+
+Local Code
+
++
+
+Development Database
+Preview Testing
+
+Purpose:
+
+Feature review.
+
+Uses:
+
+Pull Request Deployment
+Production Testing
+
+Purpose:
+
+Monitoring real behavior.
+
+Uses:
+
+Smoke tests
+Health checks
+15. Test Data Management
+
+Testing data must be:
+
+Predictable
+Isolated
+Disposable
 
 Example:
 
-Backend:
+Test Business
 
-DATABASE_CONNECTION_FAILED
+↓
 
-Frontend:
+Test User
 
-Something went wrong. Try again.
-15. Performance Testing
+↓
+
+Test Branch
+
+Never use:
+
+Real customer data
+Production credentials
+16. Seed Strategy
+
+Development database uses:
+
+prisma db seed
+
+Seed data includes:
+
+Industry templates
+Test users
+Sample businesses
+17. Regression Testing
+
+Before major release:
+
+Validate:
+
+Authentication
+
++
+
+Onboarding
+
++
+
+Dashboard
+
++
+
+Core Modules
+
+Regression checklist:
+
+[ ] Signup works
+
+[ ] Login works
+
+[ ] Authorization works
+
+[ ] Database operations work
+
+[ ] Tenant isolation works
+18. Performance Testing
+
+Future performance tests:
+
+API Performance
 
 Measure:
 
-Page load speed
-API response time
+Response time
 Database queries
+Error rates
+Database Performance
 
-Important areas:
+Monitor:
 
-Dashboard loading
-Large data tables
-Search
-Reports
-16. Security Testing
+Slow queries
+Index usage
+Connection limits
+Frontend Performance
 
-Security checks:
+Measure:
+
+Page load time
+Bundle size
+Rendering performance
+19. Security Testing
+
+Security tests include:
 
 Authentication
 Session handling
 Token validation
 Authorization
-Role enforcement
-Tenant isolation
+Role bypass attempts
+Tenant access attempts
 Input Security
-Validation
-Injection prevention
-Secrets
 
-Verify:
+Validate:
 
-No secrets in frontend bundles
-No exposed service keys
-17. Migration Testing
+SQL injection protection
+XSS prevention
+Malicious payload handling
+20. CI Quality Gates
 
-Every database migration must verify:
-
-Before:
-
-Existing Production Data
-
-After:
-
-Updated Schema
-
-+
-
-Existing Data Preserved
-
-Migration checklist:
-
-Test locally
-Review SQL
-Run on staging
-Deploy production
-18. Regression Testing
-
-Before releasing:
-
-Run:
-
-Authentication Tests
-
-↓
-
-Onboarding Tests
-
-↓
-
-Core Feature Tests
-
-↓
-
-Database Tests
-19. Testing Environments
-
-Testing happens across:
-
-Local Development
-
-↓
-
-Staging Environment
-
-↓
-
-Production Monitoring
-20. Continuous Integration Testing
-
-CI pipeline:
-
-Code Push
-
-↓
-
-Install Dependencies
-
-↓
+Every pull request must pass:
 
 Lint
 
@@ -440,76 +725,71 @@ Tests
 
 Build
 
+Failure blocks:
+
+Merge
+
 ↓
 
-Deploy
-21. Test Data Strategy
+Production Deployment
+21. Testing Tools
 
-Development uses:
+Recommended stack:
 
-Seed data
-Dummy organizations
-Test users
+Area	Tool
+Unit Testing	Vitest
+Component Testing	React Testing Library
+E2E Testing	Playwright
+API Testing	Playwright / Supertest
+Database Testing	Prisma Test Environment
+CI	GitHub Actions
+22. Feature Development Testing Workflow
 
-Example:
+Every feature follows:
 
-Demo Business
+Requirement
 
-Demo Admin
+↓
 
-Demo Member
+Test Cases
 
-Production:
+↓
 
-No fake data
-Controlled imports only
-22. Seed Testing
+Implementation
 
-Prisma seed must verify:
+↓
 
-Industry templates created
-Default records inserted
-Relationships valid
+Automated Tests
 
-Command:
+↓
 
-npm run db:seed
-23. Release Quality Checklist
+Review
 
-Before release:
+↓
 
-Code Quality
- ESLint passes
- TypeScript passes
- Build succeeds
-Functional
- Signup works
- Login works
- Onboarding works
- Dashboard loads
-Database
- Migration tested
- Seed tested
- Transactions verified
-Security
- Permissions tested
- Tenant isolation verified
+Deployment
+23. Definition of Done
+
+A feature is complete when:
+
+[ ] Code implemented
+
+[ ] Type checks pass
+
+[ ] Tests added
+
+[ ] Security reviewed
+
+[ ] Documentation updated
+
+[ ] Production verified
 24. Future Testing Improvements
 
-Future additions:
+Planned:
 
-Automated E2E pipeline
+Automated visual testing
 Load testing
 Security scanning
-Performance monitoring
-AI generated test cases
-Conclusion
-
-Project Atlas testing strategy ensures:
-
-Stable development velocity
-Safer releases
-Protected user data
-Reliable SaaS operations
-
-Testing is treated as a continuous development process rather than a final verification step.
+Mutation testing
+Continuous monitoring
+AI-assisted test generation
