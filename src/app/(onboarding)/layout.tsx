@@ -25,9 +25,13 @@ export default async function OnboardingLayout({ children }: { children: React.R
     },
   });
 
-  if (profile?.onboardingCompletedAt) {
-    const slug = profile.memberships[0]?.business?.slug;
-    redirect(slug ? `/dashboard/${slug}` : '/dashboard');
+  if (profile) {
+    const hasMembership = profile.memberships && profile.memberships.length > 0;
+    
+    if (profile.onboardingCompletedAt || hasMembership) {
+      const slug = profile.memberships[0]?.business?.slug;
+      redirect(slug ? `/dashboard/${slug}` : '/');
+    }
   }
 
   return (

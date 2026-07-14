@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { loginSchema } from '@/lib/validators/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 /**
  * POST /api/auth/login
@@ -9,6 +10,13 @@ import { loginSchema } from '@/lib/validators/auth';
  * Sets the session cookie automatically via the SSR client.
  */
 export async function POST(request: Request) {
+  // Rate limit: 10 login attempts per minute per IP
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const { allowed } = await checkRateLimit(`login_${ip}`, 10, 60 * 1000);
+  if (!allowed) {
+    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many login attempts. Please try again later.', 429);
+  }
+
   try {
     const body = await request.json();
     const result = loginSchema.safeParse(body);

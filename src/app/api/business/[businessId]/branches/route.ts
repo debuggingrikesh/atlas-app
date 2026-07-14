@@ -1,5 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
-import { requireBusinessMember } from '@/lib/auth/require-business-member';
+import { requirePermission } from '@/lib/auth/require-permission';
+import { PERMISSIONS } from '@/lib/permissions/permissions';
 import { createBranch } from '@/modules/business/lib/create-branch';
 import { createBranchSchema } from '@/lib/validators/business';
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -19,7 +20,8 @@ export async function POST(request: Request, { params }: Params) {
 
   const { businessId } = await params;
 
-  const { errorRes: memberError } = await requireBusinessMember(user.id, businessId, 'ADMIN');
+  // Requires 'branch.create' permission — held by OWNER and ADMIN system roles
+  const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.branch.create);
   if (memberError) return memberError;
 
   try {
@@ -56,7 +58,8 @@ export async function GET(_request: Request, { params }: Params) {
 
   const { businessId } = await params;
 
-  const { errorRes: memberError } = await requireBusinessMember(user.id, businessId);
+  // Requires basic 'business.read' permission — held by all members
+  const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.business.read);
   if (memberError) return memberError;
 
   try {

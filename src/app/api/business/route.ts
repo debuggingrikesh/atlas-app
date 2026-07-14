@@ -3,6 +3,7 @@ import { createBusiness } from '@/modules/business/lib/create-business';
 import { getUserBusinesses } from '@/modules/business/lib/get-user-businesses';
 import { createBusinessSchema } from '@/lib/validators/business';
 import { successResponse, errorResponse } from '@/lib/api/response';
+import { prisma } from '@/lib/db/prisma';
 
 /**
  * POST /api/business
@@ -22,6 +23,15 @@ export async function POST(request: Request) {
         result.error.issues[0]?.message ?? 'Invalid input.',
         400
       );
+    }
+
+    const template = await prisma.industryTemplate.findUnique({
+      where: { id: result.data.industryTemplateId },
+      select: { isActive: true },
+    });
+
+    if (!template || !template.isActive) {
+      return errorResponse('VALIDATION_ERROR', 'Invalid or inactive industry template.', 400);
     }
 
     const business = await createBusiness(user.id, result.data);

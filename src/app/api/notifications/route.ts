@@ -1,0 +1,40 @@
+import { requireAuth } from '@/lib/auth/require-auth';
+import { requirePermission } from '@/lib/auth/require-permission';
+import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { getNotifications } from '@/modules/notifications/lib/get-notifications';
+import { notificationPaginationSchema } from '@/modules/notifications/validators';
+import { successResponse, errorResponse } from '@/lib/api/response';
+
+export async function GET(request: Request) {
+  const { user, errorRes } = await requireAuth();
+  if (errorRes) return errorRes;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const queryData = {
+      businessId: searchParams.get('businessId') ?? undefined,
+      cursor: searchParams.get('cursor') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+    };
+
+    const result = notificationPaginationSchema.safeParse(queryData);
+    if (!result.success) {
+      return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid query', 400);
+    }
+
+    const { businessId, cursor, limit } = result.data;
+
+    const { errorRes: permError } = await requirePermission(user.id, businessId, PERMISSIONS.business.read);
+    if (permError) return permError;
+
+    const { items, nextCursor } = await getNotifications(user.id, businessId, {
+      cursor,
+      limit,
+    });
+
+    return successResponse({ items, nextCursor });
+  } catch (error) {
+    console.error('[notifications GET]', error);
+    return errorResponse('INTERNAL_ERROR', 'Failed to fetch notifications', 500);
+  }
+}

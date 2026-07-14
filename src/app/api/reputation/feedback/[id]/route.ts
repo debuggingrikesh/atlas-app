@@ -1,0 +1,47 @@
+import { requireAuth } from '@/lib/auth/require-auth';
+import { requirePermission } from '@/lib/auth/require-permission';
+import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { successResponse, errorResponse } from '@/lib/api/response';
+import { FeedbackService } from '@/modules/reputation/services/feedback-service';
+import { z } from 'zod';
+
+interface Params {
+  params: Promise<{ id: string }>;
+}
+
+const patchFeedbackSchema = z.object({
+  businessId: z.string().min(1),
+  status: z.enum(['UNREAD', 'REVIEWED', 'RESOLVED']),
+});
+
+export async function PATCH(request: Request, { params }: Params) {
+  const { user, errorRes: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const { id } = await params;
+
+  try {
+    const body = await request.json();
+    const result = patchFeedbackSchema.safeParse(body);
+
+    if (!result.success) {
+      return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid input.', 400);
+    }
+
+    const { businessId, status } = result.data;
+
+    // Must have reputation.manage or reputation.feedbackView permission
+    const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.manage);
+    if (memberError) return memberError;
+
+    const updated = await FeedbackService.updateFeedbackStatus(id, businessId, status);
+    if (!updated) {
+      return errorResponse('NOT_FOUND', 'Feedback not found or could not be updated.', 404);
+    }
+
+    return successResponse({ success: true });
+  } catch (err: unknown) {
+    console.error('[reputation/feedback/:id PATCH] error:', err);
+    return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
+  }
+}

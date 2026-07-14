@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { signUpSchema } from '@/lib/validators/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 /**
  * POST /api/auth/signup
@@ -10,6 +11,13 @@ import { signUpSchema } from '@/lib/validators/auth';
  * after email verification during onboarding.
  */
 export async function POST(request: Request) {
+  // Rate limit: 10 signup attempts per minute per IP
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const { allowed } = await checkRateLimit(`signup_${ip}`, 10, 60 * 1000);
+  if (!allowed) {
+    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many signup attempts. Please try again later.', 429);
+  }
+
   try {
     const body = await request.json();
     const result = signUpSchema.safeParse(body);

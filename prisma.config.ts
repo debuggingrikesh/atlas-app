@@ -6,6 +6,9 @@ export default defineConfig({
         seed: "tsx prisma/seed.ts",
     },
     datasource: {
-        url: process.env.DATABASE_URL,
+        // Prisma 7: this URL is used by migrate dev and prisma generate.
+        // At runtime, src/lib/db/prisma.ts uses the PrismaPg adapter with DATABASE_URL (pooler).
+        // DIRECT_URL (port 5432, no pgbouncer) is required for DDL migrations.
+        url: process.env.DIRECT_URL,
     },
 });

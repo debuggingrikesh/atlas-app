@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { LoginForm } from '@/modules/auth/components/LoginForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -15,7 +16,9 @@ export default function LoginPage() {
         <CardDescription>Sign in to your Project Atlas account.</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm />
+        <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </CardContent>
     </Card>
   );

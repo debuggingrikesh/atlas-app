@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { prisma } from '@/lib/db/prisma';
+import { getUserProfile } from '@/modules/auth/lib/get-user-profile';
+import { BusinessProvider } from '@/modules/business/components/BusinessProvider';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { TopNav } from '@/components/layout/TopNav';
 
 export default async function DashboardLayout({
   children,
@@ -19,39 +22,28 @@ export default async function DashboardLayout({
 
   // MVP: Bypass email verification check
 
-  const profile = await prisma.userProfile.findUnique({
-    where: { id: user.id },
-    select: { onboardingCompletedAt: true, fullName: true },
-  });
+  const profile = await getUserProfile(user.id);
+  
+  if (!profile) {
+    await supabase.auth.signOut();
+    redirect('/login');
+  }
 
-  if (!profile?.onboardingCompletedAt) {
+  const hasMembership = profile.businesses.length > 0;
+
+  if (!hasMembership) {
     redirect('/onboarding/step/1');
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Top navigation bar */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between px-4">
-          <span className="font-semibold tracking-tight">Project Atlas</span>
-          <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-muted-foreground sm:block">
-              {profile.fullName ?? user.email}
-            </span>
-            <form action="/api/auth/logout" method="POST">
-              <button
-                type="submit"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
+    <BusinessProvider initialBusinesses={profile.businesses}>
+      <div className="grid min-h-screen w-full md:grid-cols-[256px_1fr]">
+        <Sidebar />
+        <div className="flex flex-col">
+          <TopNav userFullName={profile.fullName ?? ''} userEmail={user.email ?? ''} />
+          <main className="flex-1 flex flex-col">{children}</main>
         </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-1">{children}</main>
-    </div>
+      </div>
+    </BusinessProvider>
   );
 }
