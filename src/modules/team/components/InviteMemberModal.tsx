@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -100,18 +100,12 @@ export function InviteMemberModal({
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={loading}
-            >
+            <LoadingButton type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
               Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Sending...' : 'Send Invite'}
-            </Button>
+            </LoadingButton>
+            <LoadingButton type="submit" disabled={loading} isLoading={loading} loadingText="Sending invitation...">
+              Send Invite
+            </LoadingButton>
           </div>
         </form>
       </div>

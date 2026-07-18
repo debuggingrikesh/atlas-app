@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -131,13 +131,12 @@ export function CreateBusinessModal({ open, onClose }: CreateBusinessModalProps)
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <LoadingButton type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
-            </Button>
-            <Button type="submit" disabled={loading || !form.name || !form.industryTemplateId}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            </LoadingButton>
+            <LoadingButton type="submit" disabled={!form.name || !form.industryTemplateId} isLoading={loading} loadingText="Creating business...">
               Create Business
-            </Button>
+            </LoadingButton>
           </div>
         </form>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -55,9 +55,9 @@ export function FeedbackForm({ onSubmit, isSubmitting }: FeedbackFormProps) {
         </div>
       </div>
 
-      <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-      </Button>
+      <LoadingButton type="submit" className="w-full" size="lg" disabled={isSubmitting} isLoading={isSubmitting} loadingText="Submitting...">
+        Submit Feedback
+      </LoadingButton>
     </form>
   );
 }

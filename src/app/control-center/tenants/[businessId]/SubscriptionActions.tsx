@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { changeSubscriptionPlan } from './actions';
 import { toast } from 'sonner';
 
@@ -22,29 +22,35 @@ export function SubscriptionActions({ businessId, currentPlanCode }: { businessI
 
   return (
     <div className="flex flex-col gap-3">
-      <Button 
+      <LoadingButton 
         variant={currentPlanCode === 'PRO' ? 'default' : 'outline'} 
-        disabled={loading !== null || currentPlanCode === 'PRO'}
+        disabled={currentPlanCode === 'PRO'}
+        isLoading={loading === 'PRO'}
+        loadingText="Updating..."
         onClick={() => handleUpdate('PRO')}
       >
-        {loading === 'PRO' ? 'Updating...' : 'Upgrade to PRO'}
-      </Button>
+        Upgrade to PRO
+      </LoadingButton>
 
-      <Button 
+      <LoadingButton 
         variant={currentPlanCode === 'TRIAL' ? 'default' : 'outline'} 
-        disabled={loading !== null || currentPlanCode === 'TRIAL'}
+        disabled={currentPlanCode === 'TRIAL'}
+        isLoading={loading === 'TRIAL'}
+        loadingText="Updating..."
         onClick={() => handleUpdate('TRIAL')}
       >
-        {loading === 'TRIAL' ? 'Updating...' : 'Set to TRIAL'}
-      </Button>
+        Set to TRIAL
+      </LoadingButton>
 
-      <Button 
+      <LoadingButton 
         variant={currentPlanCode === 'FREE' ? 'default' : 'outline'} 
-        disabled={loading !== null || currentPlanCode === 'FREE'}
+        disabled={currentPlanCode === 'FREE'}
+        isLoading={loading === 'FREE'}
+        loadingText="Updating..."
         onClick={() => handleUpdate('FREE')}
       >
-        {loading === 'FREE' ? 'Updating...' : 'Downgrade to FREE'}
-      </Button>
+        Downgrade to FREE
+      </LoadingButton>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -107,9 +107,9 @@ export function LoginForm() {
         </p>
       )}
 
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? 'Signing in…' : 'Sign in'}
-      </Button>
+      <LoadingButton type="submit" className="w-full" isLoading={pending} loadingText="Signing in...">
+        Sign in
+      </LoadingButton>
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}

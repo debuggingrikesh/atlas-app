@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -385,10 +386,9 @@ export function CampaignTable({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isSubmitting ? 'Saving...' : 'Save'}
-                </Button>
+                <LoadingButton type="submit" disabled={isSubmitting} isLoading={isSubmitting} loadingText="Saving...">
+                  Save
+                </LoadingButton>
               </div>
             </form>
           </Card>

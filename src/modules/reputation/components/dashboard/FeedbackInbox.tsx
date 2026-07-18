@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
+import { AILoadingState } from '@/components/ui/loading/AILoadingState';
 import { Badge } from '@/components/ui/badge';
-import { Star, CheckCircle, Eye, Sparkles, Inbox, Loader2 } from 'lucide-react';
+import { Star, CheckCircle, Eye, Sparkles, Inbox } from 'lucide-react';
 import { toast } from 'sonner';
 import { FeedbackIntelligenceCard } from './FeedbackIntelligenceCard';
 import { FeedbackAnalysisOutput } from '@/modules/ai/types/ai-types';
@@ -149,37 +150,33 @@ export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canMa
                   </Badge>
 
                   {canManage && feedback.status === 'UNREAD' && (
-                    <Button
+                    <LoadingButton
                       onClick={() => handleUpdateStatus(feedback.id, 'REVIEWED')}
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-1"
                       disabled={updatingStatus !== null}
+                      isLoading={updatingStatus === `${feedback.id}-REVIEWED`}
+                      loadingText="Updating..."
                     >
-                      {updatingStatus === `${feedback.id}-REVIEWED` ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Eye className="h-3 w-3" />
-                      )}
-                      {updatingStatus === `${feedback.id}-REVIEWED` ? 'Updating...' : 'Mark Reviewed'}
-                    </Button>
+                      <Eye className="h-3 w-3" />
+                      Mark Reviewed
+                    </LoadingButton>
                   )}
 
                   {canManage && feedback.status !== 'RESOLVED' && (
-                    <Button
+                    <LoadingButton
                       onClick={() => handleUpdateStatus(feedback.id, 'RESOLVED')}
                       variant="default"
                       size="sm"
                       className="flex items-center gap-1"
                       disabled={updatingStatus !== null}
+                      isLoading={updatingStatus === `${feedback.id}-RESOLVED`}
+                      loadingText="Resolving..."
                     >
-                      {updatingStatus === `${feedback.id}-RESOLVED` ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <CheckCircle className="h-3 w-3" />
-                      )}
-                      {updatingStatus === `${feedback.id}-RESOLVED` ? 'Resolving...' : 'Resolve'}
-                    </Button>
+                      <CheckCircle className="h-3 w-3" />
+                      Resolve
+                    </LoadingButton>
                   )}
                 </div>
               </div>
@@ -199,20 +196,18 @@ export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canMa
               <div className="text-xs text-muted-foreground flex items-center justify-between">
                 <span>Submitted on {new Date(feedback.createdAt).toLocaleString()}</span>
                 {isOwner && isPro && (
-                  <Button
+                  <LoadingButton
                     variant="outline"
                     size="sm"
                     className="flex items-center gap-1"
                     onClick={() => handleAnalyzeFeedback(feedback.id)}
                     disabled={generatingFor === feedback.id}
+                    isLoading={generatingFor === feedback.id}
+                    loadingText="Analyzing..."
                   >
-                    {generatingFor === feedback.id ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3 w-3" />
-                    )}
-                    {generatingFor === feedback.id ? 'Analyzing...' : 'Generate Analysis'}
-                  </Button>
+                    <Sparkles className="h-3 w-3" />
+                    Generate Analysis
+                  </LoadingButton>
                 )}
                 {isOwner && !isPro && (
                   <div className="text-xs font-medium text-primary px-3 py-1.5 bg-primary/10 rounded-md border border-primary/20 flex items-center">
@@ -226,8 +221,12 @@ export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canMa
               </div>
 
               {/* AI Intelligence Section */}
-              {feedback.analyses?.[0] && (
-                <FeedbackIntelligenceCard analysis={feedback.analyses[0].analysisData} />
+              {(generatingFor === feedback.id || feedback.analyses?.[0]) && (
+                <AILoadingState status={generatingFor === feedback.id ? 'loading' : 'idle'}>
+                  {feedback.analyses?.[0] && (
+                    <FeedbackIntelligenceCard analysis={feedback.analyses[0].analysisData} />
+                  )}
+                </AILoadingState>
               )}
             </Card>
           ))

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -84,9 +85,9 @@ export function Step4BranchForm({
         <Button type="button" variant="outline" className="flex-1" onClick={onBack} disabled={submitting}>
           ← Back
         </Button>
-        <Button type="submit" className="flex-1" disabled={submitting || branchName.trim().length < 2}>
-          {submitting ? 'Setting up your business…' : 'Complete setup →'}
-        </Button>
+        <LoadingButton type="submit" className="flex-1" disabled={branchName.trim().length < 2} isLoading={submitting} loadingText="Setting up your business...">
+          Complete setup →
+        </LoadingButton>
       </div>
     </form>
   );

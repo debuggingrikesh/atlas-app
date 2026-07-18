@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -93,10 +92,9 @@ export function CreateBranchForm({ businessId }: CreateBranchFormProps) {
         />
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading || !formData.name}>
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      <LoadingButton type="submit" className="w-full" disabled={!formData.name} isLoading={loading} loadingText="Creating branch...">
         Create Branch
-      </Button>
+      </LoadingButton>
     </form>
   );
 }

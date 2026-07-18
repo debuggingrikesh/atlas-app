@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -120,9 +120,9 @@ export function SignupForm() {
         </p>
       )}
 
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? 'Creating account…' : 'Create account'}
-      </Button>
+      <LoadingButton type="submit" className="w-full" isLoading={pending} loadingText="Creating account...">
+        Create account
+      </LoadingButton>
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}

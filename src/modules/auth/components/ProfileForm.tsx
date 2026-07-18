@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
@@ -248,9 +248,9 @@ export function ProfileForm({ initialFullName, initialAvatarUrl, email, roleName
       )}
 
       <div className="pt-2">
-        <Button type="submit" disabled={saving} className="w-full sm:w-auto">
-          {saving ? 'Saving…' : 'Save changes'}
-        </Button>
+        <LoadingButton type="submit" disabled={saving} isLoading={saving} loadingText="Saving..." className="w-full sm:w-auto">
+          Save changes
+        </LoadingButton>
       </div>
     </form>
   );

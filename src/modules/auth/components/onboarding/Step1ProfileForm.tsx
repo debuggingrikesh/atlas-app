@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 
 interface Step1FormProps {
   defaultValue?: string;
@@ -51,9 +50,9 @@ export function Step1ProfileForm({ defaultValue, onNext, submitting, error }: St
         </p>
       )}
 
-      <Button type="submit" className="w-full" disabled={fullName.trim().length < 2 || submitting}>
-        {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Continue →'}
-      </Button>
+      <LoadingButton type="submit" className="w-full" disabled={fullName.trim().length < 2} isLoading={submitting} loadingText="Saving...">
+        Continue →
+      </LoadingButton>
     </form>
   );
 }
