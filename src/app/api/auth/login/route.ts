@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { loginSchema } from '@/lib/validators/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { prisma } from '@/lib/db/prisma';
 
 /**
  * POST /api/auth/login
@@ -40,6 +41,18 @@ export async function POST(request: Request) {
     if (error) {
       // Return a generic error — do not reveal whether the email exists
       return errorResponse('UNAUTHORIZED', 'Invalid email or password.', 401);
+    }
+
+    // Check if the user is deactivated in our UserProfile database
+    const userProfile = await prisma.userProfile.findUnique({
+      where: { id: data.user.id },
+      select: { isActive: true },
+    });
+
+    if (userProfile && !userProfile.isActive) {
+      // Sign out from Supabase immediately to clear the session cookie
+      await supabase.auth.signOut();
+      return errorResponse('FORBIDDEN', 'Your account has been deactivated.', 403);
     }
 
     return successResponse({

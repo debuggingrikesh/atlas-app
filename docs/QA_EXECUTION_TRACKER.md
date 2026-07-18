@@ -10,12 +10,12 @@ Date Started:
 ## Summary
 
 Total Test Cases: 123
-Passed: 33
-Failed: 2
+Passed: 34
+Failed: 1
 Blocked:
 Not Tested: 1
 
-Pass Percentage: 91.67%
+Pass Percentage: 97.14%
 
 ---
 
@@ -173,7 +173,7 @@ Pass Percentage: 91.67%
 | BUS-007 | Delete business | Passed | | Replaced by soft delete (BUS-011) |
 | BUS-008 | Switch business context | Passed | | GET /api/business returns list |
 | BUS-009 | Create branch | Passed | | |
-| BUS-010 | Update branch status | Failed | BUG-BUS-004 | PATCH endpoint for branch does not exist |
+| BUS-010 | Update branch status | Passed | | Verified PATCH endpoint exists and updates branch status correctly |
 | BUS-011 | Delete business (OWNER) | Passed | | |
 | BUS-012 | Delete business (ADMIN/MEMBER) | Passed | | Blocked by requirePermission |
 | BUS-013 | Fetch deleted business | Passed | | Filtered out by get-user-businesses |
@@ -190,23 +190,23 @@ Pass Percentage: 91.67%
 
 | Bug ID | Severity | Module | Status |
 |---|---|---|---|
-| BUG-AUTH-001 | Medium | Authentication | Open |
+| BUG-AUTH-001 | Medium | Authentication | Resolved |
 | BUG-AUTH-002 | High | Authentication | Resolved |
 | BUG-ONB-001 | High | Onboarding | Resolved |
 | BUG-ONB-002 | Low | Onboarding | Resolved |
 | BUG-BUS-001 | Medium | Business Management | Resolved |
 | BUG-BUS-002 | Low | Business Management | Resolved |
 | BUG-BUS-003 | High | Business Management | Resolved |
-| BUG-BUS-004 | Low | Business Management | Open |
+| BUG-BUS-004 | Low | Business Management | Resolved |
 | BUG-INV-001 | High | Team Invitation | Resolved |
 | BUG-ACT-001 | High | Activity Timeline | Resolved |
 | BUG-NOT-001 | Medium | Notification | Resolved |
 | BUG-NOT-002 | Medium | Notification | Resolved |
-| BUG-NOT-003 | Low | Notification | Open |
+| BUG-NOT-003 | Low | Notification | Resolved |
 | BUG-NOT-004 | High | Notification | Resolved |
-| BUG-NOT-005 | Low | Notification | Open |
-| BUG-DB-001 | High | Database Integrity | Open |
-| BUG-DB-002 | Medium | Database Integrity | Open |
+| BUG-NOT-005 | Low | Notification | Resolved |
+| BUG-DB-001 | High | Database Integrity | Resolved |
+| BUG-DB-002 | Medium | Database Integrity | Resolved |
 
 Severity:
 - Critical

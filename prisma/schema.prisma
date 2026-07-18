@@ -130,7 +130,7 @@ model BusinessMember {
 
   user     UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
   business Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  rbacRole Role?       @relation(fields: [roleId], references: [id])
+  rbacRole Role?       @relation(fields: [roleId], references: [id], onDelete: SetNull)
 
   @@unique([userId, businessId])
   @@index([userId])
@@ -539,7 +539,7 @@ model UpgradeRequest {
 
   business      Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   requestedPlan Plan        @relation(fields: [requestedPlanId], references: [id])
-  requester     UserProfile @relation(fields: [requestedBy], references: [id])
+  requester     UserProfile @relation(fields: [requestedBy], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([requestedPlanId])
