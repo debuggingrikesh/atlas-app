@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { errorResponse } from '@/lib/api/response';
 import type { AuthUser } from '@/modules/auth/types';
 import { prisma } from '@/lib/db/prisma';
+import { PlatformRole, UserProfile } from '@prisma/client';
 
 /**
  * Validates the current Supabase session and returns the authenticated user.
@@ -49,4 +50,34 @@ export async function requireAuth(): Promise<
     },
     errorRes: null,
   };
+}
+
+export async function requirePlatformRole(allowedRoles: PlatformRole[]): Promise<
+  | { user: AuthUser; userProfile: UserProfile; errorRes: null }
+  | { user: null; userProfile: null; errorRes: ReturnType<typeof errorResponse> }
+> {
+  const { user, errorRes } = await requireAuth();
+  if (errorRes) return { user: null, userProfile: null, errorRes };
+
+  const userProfile = await prisma.userProfile.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!userProfile) {
+    return {
+      user: null,
+      userProfile: null,
+      errorRes: errorResponse('UNAUTHORIZED', 'Profile not found.', 401),
+    };
+  }
+
+  if (userProfile.platformRole === 'NONE' || !allowedRoles.includes(userProfile.platformRole)) {
+    return {
+      user: null,
+      userProfile: null,
+      errorRes: errorResponse('FORBIDDEN', 'Insufficient platform privileges.', 403),
+    };
+  }
+
+  return { user, userProfile, errorRes: null };
 }

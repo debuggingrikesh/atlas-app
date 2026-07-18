@@ -95,8 +95,9 @@ model UserProfile {
   onboardingStep        Int       @default(1)
   onboardingCompletedAt DateTime?
   onboardingData        Json?
-  isActive              Boolean   @default(true)
-  createdAt             DateTime  @default(now())
+  isActive              Boolean      @default(true)
+  platformRole          PlatformRole @default(NONE)
+  createdAt             DateTime     @default(now())
   updatedAt             DateTime  @updatedAt
 
   memberships     BusinessMember[]
@@ -141,6 +142,14 @@ enum MemberRole {
   OWNER
   ADMIN
   MEMBER
+}
+
+enum PlatformRole {
+  NONE
+  SUPER_ADMIN
+  FINANCE
+  SUPPORT
+  ANALYST
 }
 
 // ──────────────────────────────────────────
@@ -420,7 +429,6 @@ model FeedbackAnalysis {
   businessId    String
   feedbackId    String
   analysisData  Json     // Replaces generatedText string, structured analysis
-  toneUsed      String?  // Made optional as it's less relevant for intelligence
   status        String   @default("DRAFT") // DRAFT, APPROVED, COPIED
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

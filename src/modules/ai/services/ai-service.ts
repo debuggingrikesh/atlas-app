@@ -97,7 +97,6 @@ export class AIService {
             businessId,
             feedbackId,
             analysisData: parsedData,
-            toneUsed: settings?.tone || 'Professional',
             status: 'DRAFT'
           }
         });
