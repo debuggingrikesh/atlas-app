@@ -38,7 +38,7 @@ export default async function RootPage() {
     <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
       <div className="max-w-md space-y-6">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Project Atlas
+          Atlas
         </h1>
 
         <p className="text-muted-foreground">

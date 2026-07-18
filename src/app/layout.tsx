@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project Atlas",
+  title: "Atlas",
   description: "Business reputation management platform.",
 };
 

@@ -9,7 +9,7 @@ import { PERMISSIONS } from '@/lib/permissions/permissions';
 import { UpdateBusinessForm } from './UpdateBusinessForm';
 
 export const metadata: Metadata = {
-  title: 'Business Settings — Project Atlas',
+  title: 'Business Settings — Atlas',
   description: 'Manage your business details and preferences.',
 };
 

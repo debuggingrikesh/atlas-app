@@ -31,7 +31,7 @@ export function GoogleReviewCard() {
           <h3 className="font-semibold text-lg">Google Reviews</h3>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Sync your business locations, monitor reviews, and reply directly from Project Atlas.
+          Sync your business locations, monitor reviews, and reply directly from Atlas.
         </p>
       </div>
 

@@ -166,7 +166,7 @@ export async function createInvitation(
 
       const res = await sendEmail({
         to: normalizedEmail,
-        subject: `You've been invited to join ${business.name} on Project Atlas`,
+        subject: `You've been invited to join ${business.name} on Atlas`,
         html: emailHtml,
       });
 

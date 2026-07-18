@@ -11,7 +11,7 @@ export type ResolvedPermissions = {
 };
 
 /**
- * The single permission calculation source for Project Atlas.
+ * The single permission calculation source for Atlas.
  */
 export function resolvePermissions(
   membership: BusinessWithMembership | null | undefined

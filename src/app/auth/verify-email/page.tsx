@@ -8,7 +8,7 @@ import { buttonVariants } from '@/components/ui/button';
  * Currently bypassed during MVP testing.
  */
 export const metadata: Metadata = {
-  title: 'Verify your email — Project Atlas',
+  title: 'Verify your email — Atlas',
   description: 'Please check your inbox to verify your email address.',
 };
 
@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4 py-12">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Project Atlas</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Atlas</h1>
         <p className="mt-1 text-sm text-muted-foreground">Customer Experience Intelligence</p>
       </div>
       <Card className="w-full max-w-md shadow-lg text-center">

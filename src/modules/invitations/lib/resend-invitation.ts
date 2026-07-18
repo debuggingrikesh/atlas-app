@@ -91,7 +91,7 @@ export async function resendInvitation(
 
       const res = await sendEmail({
         to: invitation.email,
-        subject: `Reminder: You've been invited to join ${business.name} on Project Atlas`,
+        subject: `Reminder: You've been invited to join ${business.name} on Atlas`,
         html: emailHtml,
       });
 

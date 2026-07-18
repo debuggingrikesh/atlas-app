@@ -6,7 +6,7 @@ import { ProfileForm } from '@/modules/auth/components/ProfileForm';
 import { getActiveBusiness } from '@/lib/auth/get-active-business';
 
 export const metadata: Metadata = {
-  title: 'Profile Settings — Project Atlas',
+  title: 'Profile Settings — Atlas',
   description: 'Update your display name and avatar.',
 };
 

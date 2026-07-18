@@ -13,7 +13,7 @@ import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
 import { PERMISSIONS } from '@/lib/permissions/permissions';
 
 export const metadata: Metadata = {
-  title: 'Team Settings — Project Atlas',
+  title: 'Team Settings — Atlas',
   description: 'Manage your team members and roles.',
 };
 

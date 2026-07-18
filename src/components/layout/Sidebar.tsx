@@ -89,7 +89,7 @@ export function Sidebar() {
     <aside className="hidden w-64 flex-col border-r bg-muted/40 md:flex">
       <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="">Project Atlas</span>
+          <span className="">Atlas</span>
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">

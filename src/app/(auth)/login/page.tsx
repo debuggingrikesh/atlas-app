@@ -4,8 +4,8 @@ import { LoginForm } from '@/modules/auth/components/LoginForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const metadata: Metadata = {
-  title: 'Sign in — Project Atlas',
-  description: 'Sign in to your Project Atlas account to manage your customer feedback.',
+  title: 'Sign in — Atlas',
+  description: 'Sign in to your Atlas account to manage your customer feedback.',
 };
 
 export default function LoginPage() {
@@ -13,7 +13,7 @@ export default function LoginPage() {
     <Card className="w-full max-w-md shadow-lg">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>Sign in to your Project Atlas account.</CardDescription>
+        <CardDescription>Sign in to your Atlas account.</CardDescription>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading...</div>}>

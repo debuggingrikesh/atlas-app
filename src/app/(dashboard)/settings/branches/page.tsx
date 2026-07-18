@@ -10,7 +10,7 @@ import { CreateBranchForm } from './CreateBranchForm';
 import { BranchActions } from './BranchActions';
 
 export const metadata: Metadata = {
-  title: 'Branches — Project Atlas',
+  title: 'Branches — Atlas',
   description: 'Manage your business locations.',
 };
 

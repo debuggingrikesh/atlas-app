@@ -10,7 +10,7 @@ import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
 import { PERMISSIONS } from '@/lib/permissions/permissions';
 
 export const metadata: Metadata = {
-  title: 'Activity Timeline — Project Atlas',
+  title: 'Activity Timeline — Atlas',
   description: 'View the recent activity for your business.',
 };
 

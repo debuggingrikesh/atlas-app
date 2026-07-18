@@ -4,8 +4,8 @@ import { SignupForm } from '@/modules/auth/components/SignupForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const metadata: Metadata = {
-  title: 'Create an account — Project Atlas',
-  description: 'Create your Project Atlas account to get started.',
+  title: 'Create an account — Atlas',
+  description: 'Create your Atlas account to get started.',
 };
 
 export default function SignupPage() {

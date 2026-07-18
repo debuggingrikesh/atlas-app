@@ -113,7 +113,7 @@ export function MobileNav() {
       <SheetContent side="left" className="w-64 p-0">
         <div className="flex h-14 items-center border-b px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold" onClick={() => setOpen(false)}>
-            <span className="">Project Atlas</span>
+            <span className="">Atlas</span>
           </Link>
         </div>
         <div className="overflow-auto py-4">

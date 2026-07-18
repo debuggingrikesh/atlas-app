@@ -11,7 +11,7 @@ import { RoleActions } from '@/modules/roles/components/RoleActions';
 import { Badge } from '@/components/ui/badge';
 
 export const metadata: Metadata = {
-  title: 'Roles & Permissions — Project Atlas',
+  title: 'Roles & Permissions — Atlas',
   description: 'Manage roles and permissions for your business.',
 };
 

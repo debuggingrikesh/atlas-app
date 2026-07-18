@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { OnboardingWizard } from '@/modules/auth/components/onboarding/OnboardingWizard';
 
 export const metadata: Metadata = {
-  title: 'Set up your business — Project Atlas',
+  title: 'Set up your business — Atlas',
   description: 'Complete your business setup to start collecting customer feedback.',
 };
 
