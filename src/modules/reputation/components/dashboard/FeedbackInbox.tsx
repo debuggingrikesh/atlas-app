@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, CheckCircle, Eye, Sparkles, Inbox, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { FeedbackIntelligenceCard } from './FeedbackIntelligenceCard';
+import { FeedbackAnalysisOutput } from '@/modules/ai/types/ai-types';
 
 interface Feedback {
   id: string;
@@ -16,10 +18,9 @@ interface Feedback {
   customerPhone: string | null;
   status: string;
   createdAt: Date | string;
-  aiResponses?: {
+  analyses?: {
     id: string;
-    generatedText: string;
-    toneUsed: string;
+    analysisData: FeedbackAnalysisOutput;
     status: string;
   }[];
 }
@@ -27,11 +28,13 @@ interface Feedback {
 interface FeedbackInboxProps {
   initialFeedback: Feedback[];
   businessId: string;
+  businessSlug: string;
   canManage: boolean;
-  canGenerateAIResponse?: boolean;
+  isOwner: boolean;
+  isPro: boolean;
 }
 
-export function FeedbackInbox({ initialFeedback, businessId, canManage, canGenerateAIResponse }: FeedbackInboxProps) {
+export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canManage, isOwner, isPro }: FeedbackInboxProps) {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(initialFeedback);
   const [generatingFor, setGeneratingFor] = useState<string | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
@@ -59,98 +62,34 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
     }
   };
 
-  const handleGenerateAI = async (feedbackId: string) => {
+  const handleAnalyzeFeedback = async (feedbackId: string) => {
     setGeneratingFor(feedbackId);
     try {
-      const response = await fetch(`/api/reputation/feedback/${feedbackId}/generate-response`, {
+      const response = await fetch(`/api/reputation/feedback/${feedbackId}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ businessId }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to generate AI response');
+      if (!response.ok) throw new Error(data.error || 'Failed to analyze feedback');
 
-      // Update the specific feedback item with the new AI response
+      // Update the specific feedback item with the new AI intelligence
       setFeedbacks(prev => prev.map(f => {
         if (f.id === feedbackId) {
+          const analysisResult = data.data || data.response;
           return {
             ...f,
-            aiResponses: [data.data || { generatedText: data.generatedText }] // Handle both API response formats
+            analyses: [analysisResult]
           };
         }
         return f;
       }));
-      toast.success('AI draft generated successfully');
+      toast.success('Reputation Intelligence generated');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setGeneratingFor(null);
     }
-  };
-
-  const renderAIResponse = (feedback: Feedback) => {
-    const aiResponse = feedback.aiResponses?.[0];
-    if (!aiResponse) return null;
-
-    let parsedContent;
-    let isNegativeAnalysis = false;
-
-    try {
-      // Check if it's our JSON structure for negative reviews
-      if (aiResponse.generatedText.trim().startsWith('{')) {
-        parsedContent = JSON.parse(aiResponse.generatedText);
-        isNegativeAnalysis = !!parsedContent.sentiment;
-      }
-    } catch {
-      // It's a plain text positive response draft
-    }
-
-    if (isNegativeAnalysis && parsedContent) {
-      return (
-        <div className="mt-4 p-4 rounded-lg bg-orange-50/50 border border-orange-100">
-          <div className="text-sm font-semibold text-orange-900 mb-3 flex items-center gap-2">
-            <Sparkles className="h-4 w-4" /> AI Reputation Analysis
-          </div>
-          <div className="space-y-2 text-sm text-orange-900/90">
-            <div className="grid grid-cols-[120px_1fr] gap-1">
-              <span className="font-medium opacity-80">Sentiment:</span>
-              <span>{parsedContent.sentiment}</span>
-            </div>
-            <div className="grid grid-cols-[120px_1fr] gap-1">
-              <span className="font-medium opacity-80">Emotion:</span>
-              <span>{parsedContent.customerEmotion}</span>
-            </div>
-            <div className="grid grid-cols-[120px_1fr] gap-1">
-              <span className="font-medium opacity-80">Main Issue:</span>
-              <span>{parsedContent.mainIssue}</span>
-            </div>
-            <div className="grid grid-cols-[120px_1fr] gap-1">
-              <span className="font-medium opacity-80">Action:</span>
-              <span className="font-medium">{parsedContent.recommendedAction}</span>
-            </div>
-            
-            <div className="mt-4 pt-3 border-t border-orange-200/50">
-              <div className="font-medium opacity-80 mb-1">Suggested Reply:</div>
-              <div className="bg-white/60 p-3 rounded italic">
-                {parsedContent.suggestedResponse}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Default positive draft format
-    return (
-      <div className="mt-4 p-4 rounded-lg bg-blue-50/50 border border-blue-100">
-        <div className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
-          <Sparkles className="h-4 w-4" /> AI Suggested Reply
-        </div>
-        <div className="text-sm text-blue-900/90 whitespace-pre-wrap">
-          {aiResponse.generatedText}
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -259,12 +198,12 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
               {/* Date */}
               <div className="text-xs text-muted-foreground flex items-center justify-between">
                 <span>Submitted on {new Date(feedback.createdAt).toLocaleString()}</span>
-                {canGenerateAIResponse && (
+                {isOwner && isPro && (
                   <Button
                     variant="outline"
                     size="sm"
                     className="flex items-center gap-1"
-                    onClick={() => handleGenerateAI(feedback.id)}
+                    onClick={() => handleAnalyzeFeedback(feedback.id)}
                     disabled={generatingFor === feedback.id}
                   >
                     {generatingFor === feedback.id ? (
@@ -272,13 +211,24 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
                     ) : (
                       <Sparkles className="h-3 w-3" />
                     )}
-                    {generatingFor === feedback.id ? 'Generating...' : 'Regenerate AI Reply'}
+                    {generatingFor === feedback.id ? 'Analyzing...' : 'Generate Analysis'}
                   </Button>
+                )}
+                {isOwner && !isPro && (
+                  <div className="text-xs font-medium text-primary px-3 py-1.5 bg-primary/10 rounded-md border border-primary/20 flex items-center">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    <span>Reputation Intelligence is available on Pro.</span>
+                    <a href={`/dashboard/${businessSlug}/settings/subscription`} className="ml-2 underline font-semibold hover:text-primary/80">
+                      Upgrade
+                    </a>
+                  </div>
                 )}
               </div>
 
-              {/* AI Draft Section */}
-              {renderAIResponse(feedback)}
+              {/* AI Intelligence Section */}
+              {feedback.analyses?.[0] && (
+                <FeedbackIntelligenceCard analysis={feedback.analyses[0].analysisData} />
+              )}
             </Card>
           ))
         )}

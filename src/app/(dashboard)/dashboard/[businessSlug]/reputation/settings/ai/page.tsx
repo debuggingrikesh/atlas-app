@@ -15,7 +15,6 @@ export default function AISettingsPage() {
   const [brandDescription, setBrandDescription] = useState('');
   const [preferredLanguage, setPreferredLanguage] = useState('English');
   const [customInstructions, setCustomInstructions] = useState('');
-  const [autoGenerate, setAutoGenerate] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -31,7 +30,6 @@ export default function AISettingsPage() {
           setBrandDescription(data.brandDescription || '');
           setPreferredLanguage(data.preferredLanguage || 'English');
           setCustomInstructions(data.customInstructions || '');
-          setAutoGenerate(data.autoGenerate ?? true);
         }
       })
       .finally(() => setLoading(false));
@@ -50,8 +48,7 @@ export default function AISettingsPage() {
           tone,
           brandDescription,
           preferredLanguage,
-          customInstructions,
-          autoGenerate
+          customInstructions
         }),
       });
       if (!res.ok) {
@@ -72,8 +69,8 @@ export default function AISettingsPage() {
     <div className="container p-6 max-w-2xl space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>AI Response Assistant Settings</CardTitle>
-          <CardDescription>Configure how the AI will draft responses to customer feedback.</CardDescription>
+          <CardTitle>Reputation Intelligence Settings</CardTitle>
+          <CardDescription>Configure how the AI will analyze customer feedback and draft insights.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && <div className="text-red-500 text-sm">{error}</div>}
@@ -111,21 +108,6 @@ export default function AISettingsPage() {
               value={customInstructions}
               onChange={e => setCustomInstructions(e.target.value)}
               placeholder="e.g. Keep responses warm and student-focused."
-            />
-          </div>
-
-          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label className="text-base">Auto-Generate AI Responses</Label>
-              <div className="text-sm text-muted-foreground">
-                Automatically draft a response or analysis when a customer submits a written review.
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              checked={autoGenerate}
-              onChange={(e) => setAutoGenerate(e.target.checked)}
             />
           </div>
 

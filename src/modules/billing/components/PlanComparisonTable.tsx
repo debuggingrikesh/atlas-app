@@ -5,7 +5,7 @@ export function PlanComparisonTable() {
     { feature: 'Review Requests', free: '6 lifetime', pro: 'Unlimited' },
     { feature: 'QR Review Sharing', free: 'Yes', pro: 'Yes' },
     { feature: 'WhatsApp Sharing', free: 'Yes', pro: 'Yes' },
-    { feature: 'AI Responses', free: 'No', pro: 'Yes' },
+    { feature: 'Reputation Intelligence', free: 'No', pro: 'Yes' },
     { feature: 'Advanced Analytics', free: 'No', pro: 'Yes' },
   ];
 

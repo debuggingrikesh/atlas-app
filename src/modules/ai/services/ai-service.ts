@@ -1,8 +1,18 @@
 import { prisma } from '@/lib/db/prisma';
 import { GeminiProvider } from '../providers/gemini-provider';
-import { buildReputationPrompt, buildAnalysisPrompt } from '../prompts/reputation-prompts';
+import { buildAnalysisPrompt } from '../prompts/reputation-prompts';
 import { EntitlementService } from '@/modules/billing/services/entitlement-service';
 import { UsageService } from '@/modules/reputation/services/usage-service';
+import { z } from 'zod';
+
+const FeedbackAnalysisSchema = z.object({
+  sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Very Negative']),
+  mainIssue: z.string().default(''),
+  customerEmotion: z.string().default(''),
+  recommendedAction: z.string().default(''),
+  suggestedResponse: z.string().default(''),
+  confidenceScore: z.number().min(0).max(1).default(0.95),
+});
 
 export class AIService {
   static async getSettings(businessId: string) {
@@ -11,7 +21,7 @@ export class AIService {
     });
   }
 
-  static async updateSettings(businessId: string, data: { tone?: string; brandDescription?: string; preferredLanguage?: string; customInstructions?: string; autoGenerate?: boolean }) {
+  static async updateSettings(businessId: string, data: { tone?: string; brandDescription?: string; preferredLanguage?: string; customInstructions?: string }) {
     return prisma.businessAISettings.upsert({
       where: { businessId },
       update: data,
@@ -22,7 +32,7 @@ export class AIService {
     });
   }
 
-  static async generateResponse(businessId: string, feedbackId: string) {
+  static async analyzeFeedback(businessId: string, feedbackId: string) {
     // 1. Fetch Feedback
     const feedback = await prisma.customerFeedback.findUnique({
       where: { id: feedbackId },
@@ -43,17 +53,17 @@ export class AIService {
     try {
       return await prisma.$transaction(async (tx) => {
         // 3. Check Entitlement
-        const canAccess = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_RESPONSE');
+        const canAccess = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_ANALYSIS');
         if (!canAccess) {
           throw new Error('AI generation is a paid feature. Please upgrade your subscription.');
         }
 
-        const featureLimit = await EntitlementService.getFeatureLimit(businessId, 'AI_REPUTATION_RESPONSE');
+        const featureLimit = await EntitlementService.getFeatureLimit(businessId, 'AI_REPUTATION_ANALYSIS');
 
         // 4. Check Usage Limit (atomically)
         const usageResult = await UsageService.checkAndIncrementUsage(
           businessId,
-          'AI_REPUTATION_RESPONSE',
+          'AI_REPUTATION_ANALYSIS',
           featureLimit,
           tx
         );
@@ -62,8 +72,7 @@ export class AIService {
           throw new Error(usageResult.error || 'You have reached your AI generation limit.');
         }
 
-        // 5. Generate response or analysis
-        const isPositive = feedback.rating >= 4;
+        // 5. Generate structured analysis
         const promptInput = {
           businessName: feedback.business.name,
           industry: 'Business', // Defaulting, in a real system we might join IndustryTemplate
@@ -75,55 +84,40 @@ export class AIService {
           customInstructions: settings?.customInstructions
         };
 
-        const prompt = isPositive
-          ? buildReputationPrompt(promptInput)
-          : buildAnalysisPrompt(promptInput);
+        const prompt = buildAnalysisPrompt(promptInput);
+        // 5. Generate AI analysis
+        const { data: rawJson, usageMetadata } = await GeminiProvider.generateJSON(prompt);
 
-        const generatedText = await GeminiProvider.generateText(prompt);
+        // 6. Validate with Zod
+        const parsedData = FeedbackAnalysisSchema.parse(rawJson);
 
-        // 6. Store AIResponse
-        const aiResponse = await tx.aIResponse.create({
+        // 7. Store FeedbackAnalysis
+        const analysisResult = await tx.feedbackAnalysis.create({
           data: {
             businessId,
             feedbackId,
-            generatedText,
+            analysisData: parsedData,
             toneUsed: settings?.tone || 'Professional',
             status: 'DRAFT'
           }
         });
 
-        return { response: aiResponse };
+        // 8. Track AI Usage Foundation
+        await tx.aIUsageLog.create({
+          data: {
+            businessId,
+            model: 'gemini-2.5-flash',
+            inputTokens: usageMetadata?.promptTokenCount ?? null,
+            outputTokens: usageMetadata?.candidatesTokenCount ?? null,
+          }
+        });
+
+        return { response: analysisResult };
       });
     } catch (err: unknown) {
-      return { error: err instanceof Error ? err.message : 'Failed to generate response.', status: 400 };
+      console.error('[AIService.analyzeFeedback] failed:', err);
+      return { error: err instanceof Error ? err.message : 'Failed to analyze feedback.', status: 400 };
     }
   }
 
-  /**
-   * Automatically generate an AI response or analysis for a given feedback item,
-   * if the business has autoGenerate enabled and the feedback has a comment.
-   * This is meant to be called asynchronously and not block the main request.
-   */
-  static async autoGenerateForFeedback(businessId: string, feedbackId: string) {
-    try {
-      const feedback = await prisma.customerFeedback.findUnique({
-        where: { id: feedbackId },
-      });
-
-      if (!feedback || !feedback.comment || feedback.comment.trim() === '') {
-        return; // Only generate for reviews with written feedback
-      }
-
-      const settings = await this.getSettings(businessId);
-      if (settings && !settings.autoGenerate) {
-        return; // Auto-generation disabled by business
-      }
-
-      // We still use the main generateResponse function to ensure we check entitlements
-      // and update usage correctly.
-      await this.generateResponse(businessId, feedbackId);
-    } catch (err) {
-      console.error('[AIService.autoGenerateForFeedback] failed:', err);
-    }
-  }
 }

@@ -13,8 +13,29 @@ const getGenAI = () => {
   return aiInstance;
 };
 
+export interface UsageMetadata {
+  promptTokenCount?: number;
+  candidatesTokenCount?: number;
+  totalTokenCount?: number;
+}
+
 export class GeminiProvider {
-  static async generateText(prompt: string, maxRetries = 3): Promise<string> {
+  static async generateJSON(prompt: string, maxRetries = 3): Promise<{ data: unknown, usageMetadata?: UsageMetadata }> {
+    const { text: rawText, usageMetadata } = await this.generateText(prompt, maxRetries, 'application/json');
+    try {
+      // Clean up markdown block if Gemini accidentally wraps it
+      let cleaned = rawText.trim();
+      if (cleaned.startsWith('```json')) cleaned = cleaned.replace(/^```json/, '');
+      if (cleaned.startsWith('```')) cleaned = cleaned.replace(/^```/, '');
+      if (cleaned.endsWith('```')) cleaned = cleaned.replace(/```$/, '');
+      return { data: JSON.parse(cleaned.trim()), usageMetadata };
+    } catch {
+      console.error('[GeminiProvider] Failed to parse JSON response:', rawText);
+      throw new Error('AI returned invalid JSON data.');
+    }
+  }
+
+  static async generateText(prompt: string, maxRetries = 3, mimeType?: string): Promise<{ text: string, usageMetadata?: UsageMetadata }> {
     let ai;
     try {
       ai = getGenAI();
@@ -37,7 +58,8 @@ export class GeminiProvider {
           contents: prompt,
           config: {
             temperature: 0.7,
-            maxOutputTokens: 250,
+            maxOutputTokens: 500,
+            ...(mimeType ? { responseMimeType: mimeType } : {})
           },
         });
         
@@ -47,7 +69,10 @@ export class GeminiProvider {
           throw new Error('No text generated from Gemini');
         }
 
-        return response.text.trim();
+        return { 
+          text: response.text.trim(), 
+          usageMetadata: response.usageMetadata as UsageMetadata | undefined 
+        };
       } catch (err: unknown) {
         clearTimeout(timeout);
         

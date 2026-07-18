@@ -1,8 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { ReputationSettingsService } from './reputation-settings-service';
-import { AIService } from '../../ai/services/ai-service';
-import { after } from 'next/server';
 import crypto from 'crypto';
 
 export class FeedbackService {
@@ -79,10 +77,8 @@ export class FeedbackService {
 
     // 5. Persist feedback and mark request as COMPLETED in a single transaction
     try {
-      let createdFeedbackId: string | undefined;
-
       await prisma.$transaction(async (tx) => {
-        const feedback = await ReputationRepository.createFeedback({
+        await ReputationRepository.createFeedback({
           businessId: request.businessId,
           branchId: request.branchId,
           requestId: request.id,
@@ -93,8 +89,6 @@ export class FeedbackService {
           customerPhone: data.customerPhone || request.customerPhone,
           status: feedbackStatus,
         }, tx);
-
-        createdFeedbackId = feedback.id;
 
         await ReputationRepository.updateRequestStatus(request.id, 'COMPLETED', tx);
 
@@ -108,13 +102,6 @@ export class FeedbackService {
           }
         });
       });
-
-      if (createdFeedbackId) {
-        // Use next/server's after() to ensure reliable fire-and-forget in serverless
-        after(() => {
-          AIService.autoGenerateForFeedback(request.businessId, createdFeedbackId as string);
-        });
-      }
 
       return actionResult;
     } catch {
@@ -157,8 +144,6 @@ export class FeedbackService {
 
     // 4. Create request and feedback in a single transaction
     try {
-      let createdFeedbackId: string | undefined;
-
       await prisma.$transaction(async (tx) => {
         // Generate a unique token for the auto-created request
         const token = crypto.randomBytes(16).toString('hex');
@@ -176,7 +161,7 @@ export class FeedbackService {
           completedAt: new Date(),
         }, tx);
 
-        const feedback = await ReputationRepository.createFeedback({
+        await ReputationRepository.createFeedback({
           businessId: campaign.businessId,
           branchId: campaign.branchId,
           requestId: request.id,
@@ -188,8 +173,6 @@ export class FeedbackService {
           status: feedbackStatus,
         }, tx);
 
-        createdFeedbackId = feedback.id;
-
         await tx.auditLog.create({
           data: {
             action: 'customer_feedback.received',
@@ -200,13 +183,6 @@ export class FeedbackService {
           }
         });
       });
-
-      if (createdFeedbackId) {
-        // Use next/server's after() to ensure reliable fire-and-forget in serverless
-        after(() => {
-          AIService.autoGenerateForFeedback(campaign.businessId, createdFeedbackId as string);
-        });
-      }
 
       return actionResult;
     } catch (err) {

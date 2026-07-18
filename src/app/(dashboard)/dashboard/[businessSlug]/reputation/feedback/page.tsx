@@ -6,6 +6,7 @@ import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
 import { PERMISSIONS } from '@/lib/permissions/permissions';
 import { ReputationRepository } from '@/modules/reputation/repositories/reputation-repository';
 import { FeedbackInbox } from '@/modules/reputation/components/dashboard/FeedbackInbox';
+import { EntitlementService } from '@/modules/billing/services/entitlement-service';
 
 interface PageProps {
   params: Promise<{ businessSlug: string }>;
@@ -56,6 +57,8 @@ export default async function FeedbackInboxPage({ params }: PageProps) {
 
   const businessId = membership.businessId;
   const canManage = perms.hasPermission(PERMISSIONS.reputation.manage);
+  const isOwner = membership.role === 'OWNER';
+  const isPro = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_ANALYSIS');
 
   // Fetch private customer feedback
   const feedbackResult = await ReputationRepository.getFeedback(businessId, 1, 50);
@@ -65,10 +68,11 @@ export default async function FeedbackInboxPage({ params }: PageProps) {
     ...f,
     createdAt: f.createdAt.toISOString(),
     updatedAt: f.updatedAt.toISOString(),
-    aiResponses: f.aiResponses?.map(ai => ({
-      ...ai,
-      createdAt: ai.createdAt.toISOString(),
-      updatedAt: ai.updatedAt.toISOString(),
+    analyses: f.analyses?.map(ai => ({
+      id: ai.id,
+      analysisData: typeof ai.analysisData === 'object' ? ai.analysisData : JSON.parse(ai.analysisData as string),
+      status: ai.status,
+      createdAt: ai.createdAt.toISOString()
     })) || [],
   }));
 
@@ -84,8 +88,10 @@ export default async function FeedbackInboxPage({ params }: PageProps) {
       <FeedbackInbox
         initialFeedback={serializedFeedback}
         businessId={businessId}
+        businessSlug={businessSlug}
         canManage={canManage}
-        canGenerateAIResponse={perms.hasPermission(PERMISSIONS.reputation.aiResponseGenerate)}
+        isOwner={isOwner}
+        isPro={isPro}
       />
     </div>
   );

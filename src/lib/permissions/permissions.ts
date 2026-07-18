@@ -41,7 +41,7 @@ export const PERMISSIONS = {
     settingsManage: "reputation.settings_manage",
     requestCreate: "reputation.request_create",
     feedbackView: "reputation.feedback_view",
-    aiResponseGenerate: "reputation.ai_response_generate",
+    aiAnalysisGenerate: "reputation.ai_analysis_generate",
     aiSettingsManage: "reputation.ai_settings_manage"
   }
 } as const;
@@ -69,6 +69,5 @@ export const ASSIGNABLE_PERMISSIONS = [
   PERMISSIONS.reputation.settingsManage,
   PERMISSIONS.reputation.requestCreate,
   PERMISSIONS.reputation.feedbackView,
-  PERMISSIONS.reputation.aiResponseGenerate,
   PERMISSIONS.reputation.aiSettingsManage
 ];

@@ -18,7 +18,6 @@ export const SYSTEM_ROLE_PERMISSIONS: Record<'OWNER' | 'ADMIN' | 'MEMBER', strin
     PERMISSIONS.reputation.settingsManage,
     PERMISSIONS.reputation.requestCreate,
     PERMISSIONS.reputation.feedbackView,
-    PERMISSIONS.reputation.aiResponseGenerate,
     PERMISSIONS.reputation.aiSettingsManage,
   ],
   MEMBER: [

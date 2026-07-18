@@ -51,7 +51,9 @@ model Business {
   customerFeedback   CustomerFeedback[]
   featureUsage       BusinessFeatureUsage[]
   aiSettings         BusinessAISettings?
-  aiResponses        AIResponse[]
+  analyses           FeedbackAnalysis[]
+  aiUsageLogs        AIUsageLog[]
+  businessInsights   BusinessInsight[]
   subscription       BusinessSubscription?
   upgradeRequests    UpgradeRequest[]
 
@@ -371,7 +373,7 @@ model CustomerFeedback {
   business Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
   branch   Branch?       @relation(fields: [branchId], references: [id], onDelete: Cascade)
   request  ReviewRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  aiResponses AIResponse[]
+  analyses FeedbackAnalysis[]
 
   @@index([businessId])
 }
@@ -405,7 +407,6 @@ model BusinessAISettings {
   brandDescription   String?
   preferredLanguage  String   @default("English")
   customInstructions String?
-  autoGenerate       Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -414,12 +415,12 @@ model BusinessAISettings {
   @@index([businessId])
 }
 
-model AIResponse {
+model FeedbackAnalysis {
   id            String   @id @default(cuid())
   businessId    String
   feedbackId    String
-  generatedText String   @db.Text
-  toneUsed      String
+  analysisData  Json     // Replaces generatedText string, structured analysis
+  toneUsed      String?  // Made optional as it's less relevant for intelligence
   status        String   @default("DRAFT") // DRAFT, APPROVED, COPIED
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -429,6 +430,35 @@ model AIResponse {
 
   @@index([businessId])
   @@index([feedbackId])
+  @@map("AIResponse") // Map to existing table to prevent dropping existing records during migration
+}
+
+model AIUsageLog {
+  id           String   @id @default(cuid())
+  businessId   String
+  model        String
+  inputTokens  Int?
+  outputTokens Int?
+  createdAt    DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+}
+
+model BusinessInsight {
+  id                 String   @id @default(cuid())
+  businessId         String
+  overallSentiment   String
+  topComplaints      Json?
+  topPraise          Json?
+  recommendedActions Json?
+  reputationTrend    String?
+  createdAt          DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
 }
 
 // ──────────────────────────────────────────

@@ -123,7 +123,7 @@ export class ReputationRepository {
       prisma.customerFeedback.findMany({
         where: { businessId },
         include: {
-          aiResponses: {
+          analyses: {
             orderBy: { createdAt: 'desc' },
             take: 1
           }

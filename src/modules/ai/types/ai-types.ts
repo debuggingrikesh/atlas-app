@@ -1,6 +1,6 @@
 export type AITone = 'Professional' | 'Friendly' | 'Casual' | 'Luxury';
 
-export interface GenerateResponseInput {
+export interface AnalyzeFeedbackInput {
   businessName: string;
   industry: string;
   customerRating: number;
@@ -11,6 +11,11 @@ export interface GenerateResponseInput {
   customInstructions?: string | null;
 }
 
-export interface GenerateResponseOutput {
-  generatedText: string;
+export interface FeedbackAnalysisOutput {
+  sentiment: 'Positive' | 'Neutral' | 'Negative' | 'Very Negative';
+  mainIssue: string;
+  customerEmotion: string;
+  recommendedAction: string;
+  suggestedResponse: string;
+  confidenceScore: number;
 }
