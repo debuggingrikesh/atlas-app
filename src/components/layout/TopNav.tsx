@@ -1,6 +1,5 @@
 'use client';
 
-import { Menu } from 'lucide-react';
 import { NotificationBell } from '@/modules/notifications/components/NotificationBell';
 import { BusinessSwitcher } from './BusinessSwitcher';
 import { UserMenu } from './UserMenu';

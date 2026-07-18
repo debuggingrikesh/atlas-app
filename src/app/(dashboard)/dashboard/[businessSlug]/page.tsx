@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { DashboardReputationSummary } from '@/modules/dashboard/components/DashboardReputationSummary';
+import type { BusinessWithMembership } from '@/modules/business/types';
 
 interface Props {
   params: Promise<{ businessSlug: string }>;
@@ -57,6 +58,12 @@ export default async function DashboardPage({ params }: Props) {
     notFound();
   }
 
+  const businessWithMembership: BusinessWithMembership = {
+    ...membership.business,
+    role: membership.role,
+    rbacRole: membership.rbacRole,
+  };
+
   const { business } = membership;
 
   return (
@@ -101,7 +108,7 @@ export default async function DashboardPage({ params }: Props) {
             </div>
           </div>
         }>
-          <DashboardReputationSummary business={business as unknown as any} businessSlug={businessSlug} />
+          <DashboardReputationSummary business={businessWithMembership} businessSlug={businessSlug} />
         </Suspense>
       </div>
     </div>

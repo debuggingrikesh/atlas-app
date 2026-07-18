@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
@@ -100,13 +100,15 @@ export function MobileNav() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <button
-          className="shrink-0 md:hidden p-2 rounded-md hover:bg-muted focus:outline-none"
-          aria-label="Toggle navigation menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+      <SheetTrigger
+        render={
+          <button
+            className="shrink-0 md:hidden p-2 rounded-md hover:bg-muted focus:outline-none"
+            aria-label="Toggle navigation menu"
+          />
+        }
+      >
+        <Menu className="h-5 w-5" />
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
         <div className="flex h-14 items-center border-b px-4">

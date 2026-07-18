@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Trash, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { toast } from 'sonner';
 
 interface RoleActionsProps {
   businessId: string;
@@ -47,9 +46,9 @@ export function RoleActions({ businessId, roleId, roleName }: RoleActionsProps) 
   };
 
   return (
-    <Button 
-      variant="destructive" 
-      size="sm" 
+    <Button
+      variant="destructive"
+      size="sm"
       onClick={handleDelete}
       disabled={isDeleting}
     >
