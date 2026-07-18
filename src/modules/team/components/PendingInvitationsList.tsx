@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PendingInvitation {
@@ -58,33 +59,33 @@ export function PendingInvitationsList({
 
   return (
     <div className="mt-8">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Pending Invitations</h3>
-      <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
+      <h3 className="text-lg font-medium text-foreground mb-4">Pending Invitations</h3>
+      <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expires</th>
                 {canManageInvitations && (
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {invitations.map((inv) => (
                 <tr key={inv.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{inv.email}</span>
+                    <span className="text-sm text-foreground">{inv.email}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-secondary text-secondary-foreground">
                       {inv.role.name}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       {new Date(inv.expiresAt).toLocaleDateString()}
                     </span>
                   </td>
@@ -96,16 +97,18 @@ export function PendingInvitationsList({
                         disabled={loading !== null}
                         onClick={() => handleAction(inv.id, 'resend')}
                       >
-                        {loading === `resend-${inv.id}` ? '...' : 'Resend'}
+                        {loading === `resend-${inv.id}` && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+                        {loading === `resend-${inv.id}` ? 'Resending...' : 'Resend'}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         disabled={loading !== null}
                         onClick={() => handleAction(inv.id, 'cancel')}
                       >
-                        {loading === `cancel-${inv.id}` ? '...' : 'Cancel'}
+                        {loading === `cancel-${inv.id}` && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+                        {loading === `cancel-${inv.id}` ? 'Cancelling...' : 'Cancel'}
                       </Button>
                     </td>
                   )}

@@ -33,7 +33,7 @@ export async function PATCH(request: Request) {
 
   try {
     const body = await request.json();
-    const { businessId, tone, brandDescription, preferredLanguage, customInstructions } = body;
+    const { businessId, tone, brandDescription, preferredLanguage, customInstructions, autoGenerate } = body;
 
     if (!businessId) {
       return errorResponse('VALIDATION_ERROR', 'businessId is required in body.', 400);
@@ -47,6 +47,7 @@ export async function PATCH(request: Request) {
       brandDescription,
       preferredLanguage,
       customInstructions,
+      autoGenerate,
     });
 
     return successResponse(updated);

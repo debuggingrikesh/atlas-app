@@ -77,7 +77,7 @@ export function CreateBusinessModal({ open, onClose }: CreateBusinessModalProps)
       aria-modal="true"
       aria-labelledby="create-business-modal-title"
     >
-      <div className="relative w-full max-w-md rounded-xl border bg-background p-6 shadow-xl">
+      <div className="relative w-full max-w-md rounded-xl border bg-background p-6 shadow-xl max-h-[85vh] overflow-y-auto">
         <div className="flex items-start justify-between mb-5">
           <div>
             <h2 id="create-business-modal-title" className="text-lg font-semibold">

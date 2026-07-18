@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -39,7 +40,7 @@ export function InviteMemberModal({
 
       const data = await res.json();
       if (res.ok) {
-        toast.success(`Invitation sent! Raw token (for MVP dev testing): ${data.data.rawToken}`);
+        toast.success('Invitation sent successfully!');
         setIsOpen(false);
         window.location.reload();
       } else {
@@ -62,10 +63,10 @@ export function InviteMemberModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Invite a Team Member</h3>
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-background rounded-lg shadow-lg w-full max-w-md max-h-[85vh] overflow-y-auto">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Invite a Team Member</h3>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -108,6 +109,7 @@ export function InviteMemberModal({
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? 'Sending...' : 'Send Invite'}
             </Button>
           </div>

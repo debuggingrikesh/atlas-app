@@ -122,6 +122,12 @@ export class ReputationRepository {
     const [data, total] = await Promise.all([
       prisma.customerFeedback.findMany({
         where: { businessId },
+        include: {
+          aiResponses: {
+            orderBy: { createdAt: 'desc' },
+            take: 1
+          }
+        },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,

@@ -65,6 +65,11 @@ export default async function FeedbackInboxPage({ params }: PageProps) {
     ...f,
     createdAt: f.createdAt.toISOString(),
     updatedAt: f.updatedAt.toISOString(),
+    aiResponses: f.aiResponses?.map(ai => ({
+      ...ai,
+      createdAt: ai.createdAt.toISOString(),
+      updatedAt: ai.updatedAt.toISOString(),
+    })) || [],
   }));
 
   return (

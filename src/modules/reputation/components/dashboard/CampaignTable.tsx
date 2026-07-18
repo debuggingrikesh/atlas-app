@@ -13,7 +13,8 @@ import {
   QrCode,
   MessageCircle,
   Download,
-  FolderOpen
+  FolderOpen,
+  Loader2
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
@@ -48,6 +49,7 @@ export function CampaignTable({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Form states
   const [name, setName] = useState('');
@@ -146,6 +148,7 @@ export function CampaignTable({
   const handleToggleStatus = async (campaign: Campaign) => {
     if (!canManage) return;
 
+    setTogglingId(campaign.id);
     const newStatus = campaign.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
     try {
       const response = await fetch(`/api/reputation/campaigns/${campaign.id}`, {
@@ -163,6 +166,8 @@ export function CampaignTable({
       toast.success(`Campaign ${newStatus === 'ACTIVE' ? 'resumed' : 'paused'} successfully`);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Failed to toggle status.');
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -297,8 +302,11 @@ export function CampaignTable({
                             variant="ghost"
                             size="icon"
                             title={campaign.status === 'ACTIVE' ? 'Pause Campaign' : 'Resume Campaign'}
+                            disabled={togglingId === campaign.id}
                           >
-                            {campaign.status === 'ACTIVE' ? (
+                            {togglingId === campaign.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : campaign.status === 'ACTIVE' ? (
                               <Pause className="h-4 w-4" />
                             ) : (
                               <Play className="h-4 w-4" />
@@ -326,7 +334,7 @@ export function CampaignTable({
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <Card className="w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto">
             <h3 className="text-lg font-bold">
               {editingCampaign ? 'Edit Campaign' : 'Create Campaign'}
             </h3>
@@ -378,6 +386,7 @@ export function CampaignTable({
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isSubmitting ? 'Saving...' : 'Save'}
                 </Button>
               </div>
@@ -388,7 +397,7 @@ export function CampaignTable({
       {/* QR Code Modal */}
       {isQrModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-sm p-6 space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
+          <Card className="w-full max-w-sm p-6 space-y-6 text-center animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto">
             <div>
               <h3 className="text-lg font-bold">Campaign QR Code</h3>
               <p className="text-xs text-muted-foreground mt-1">

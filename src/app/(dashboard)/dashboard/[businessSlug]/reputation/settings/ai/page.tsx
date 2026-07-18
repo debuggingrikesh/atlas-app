@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBusiness } from '@/modules/business/components/BusinessProvider';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AISettingsPage() {
   const { currentBusiness } = useBusiness();
@@ -13,6 +15,7 @@ export default function AISettingsPage() {
   const [brandDescription, setBrandDescription] = useState('');
   const [preferredLanguage, setPreferredLanguage] = useState('English');
   const [customInstructions, setCustomInstructions] = useState('');
+  const [autoGenerate, setAutoGenerate] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -28,6 +31,7 @@ export default function AISettingsPage() {
           setBrandDescription(data.brandDescription || '');
           setPreferredLanguage(data.preferredLanguage || 'English');
           setCustomInstructions(data.customInstructions || '');
+          setAutoGenerate(data.autoGenerate ?? true);
         }
       })
       .finally(() => setLoading(false));
@@ -46,17 +50,17 @@ export default function AISettingsPage() {
           tone,
           brandDescription,
           preferredLanguage,
-          customInstructions
+          customInstructions,
+          autoGenerate
         }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Failed to save settings');
       }
-      alert('AI Settings saved successfully!');
+      toast.success('AI settings saved successfully');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred.');
-      setSaving(false);
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setSaving(false);
     }
@@ -110,7 +114,23 @@ export default function AISettingsPage() {
             />
           </div>
 
+          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Auto-Generate AI Responses</Label>
+              <div className="text-sm text-muted-foreground">
+                Automatically draft a response or analysis when a customer submits a written review.
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              checked={autoGenerate}
+              onChange={(e) => setAutoGenerate(e.target.checked)}
+            />
+          </div>
+
           <Button onClick={handleSave} disabled={saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {saving ? 'Saving...' : 'Save AI Settings'}
           </Button>
         </CardContent>

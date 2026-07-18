@@ -405,6 +405,7 @@ model BusinessAISettings {
   brandDescription   String?
   preferredLanguage  String   @default("English")
   customInstructions String?
+  autoGenerate       Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ASSIGNABLE_PERMISSIONS } from '@/lib/permissions/permissions';
-import { Pencil } from 'lucide-react';
+import { Pencil, Loader2 } from 'lucide-react';
 
 interface RoleEditorModalProps {
   businessId: string;
@@ -129,7 +129,7 @@ export function RoleEditorModal({ businessId, role }: RoleEditorModalProps) {
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Role Name</Label>
               <Input
@@ -198,6 +198,7 @@ export function RoleEditorModal({ businessId, role }: RoleEditorModalProps) {
             </Button>
             {!isOwner && (
               <Button type="submit" disabled={isLoading || !name.trim()}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Role'}
               </Button>
             )}

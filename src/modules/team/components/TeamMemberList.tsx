@@ -95,20 +95,20 @@ export function TeamMemberList({
   });
 
   return (
-    <div className="bg-white border rounded-lg shadow-sm overflow-hidden mb-6">
+    <div className="bg-card border rounded-lg shadow-sm overflow-hidden mb-6">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-border">
+        <thead className="bg-muted/50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">User</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
             {canManageRoles && (
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Change Role</th>
             )}
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-card divide-y divide-border">
           {members.map((member) => {
             const roleName = member.rbacRole?.name || member.role;
             const isOwnerMember = roleName === 'OWNER';
@@ -120,12 +120,12 @@ export function TeamMemberList({
               <tr key={member.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-900">{member.user.fullName || 'No name'}</span>
-                    <span className="text-sm text-gray-500">{member.user.email}</span>
+                    <span className="text-sm font-medium text-foreground">{member.user.fullName || 'No name'}</span>
+                    <span className="text-sm text-muted-foreground">{member.user.email}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary/10 text-primary">
                     {roleName}
                   </span>
                 </td>
@@ -165,7 +165,7 @@ export function TeamMemberList({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     disabled={isOwnerMember || isSelf || removing === member.id || !canRemoveMembers}
                     onClick={() => handleRemove(member.id)}
                   >

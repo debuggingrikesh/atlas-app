@@ -20,10 +20,17 @@ export async function POST(
 
   try {
     const { id } = await params;
-    const body = await request.json();
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return errorResponse('VALIDATION_ERROR', 'Request body must be valid JSON with a businessId field.', 400);
+    }
+
     const { businessId } = body;
 
-    if (!businessId) {
+    if (!businessId || typeof businessId !== 'string') {
       return errorResponse('VALIDATION_ERROR', 'businessId is required in body.', 400);
     }
 
