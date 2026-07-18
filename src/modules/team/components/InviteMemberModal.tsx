@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 interface Role {
   id: string;
@@ -38,15 +39,15 @@ export function InviteMemberModal({
 
       const data = await res.json();
       if (res.ok) {
-        alert(`Invitation sent!\nRaw token (for MVP dev testing): ${data.data.rawToken}`);
+        toast.success(`Invitation sent! Raw token (for MVP dev testing): ${data.data.rawToken}`);
         setIsOpen(false);
         window.location.reload();
       } else {
-        alert(data.error?.message || 'Failed to send invitation');
+        toast.error(data.error?.message || 'Failed to send invitation');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred');
+      toast.error('An error occurred');
     } finally {
       setLoading(false);
     }

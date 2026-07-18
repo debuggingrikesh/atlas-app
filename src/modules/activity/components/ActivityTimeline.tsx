@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ActivityItem } from './ActivityItem';
+import { toast } from 'sonner';
+import { Activity } from 'lucide-react';
 import type { ActivityItem as ActivityItemType } from '@/modules/activity/types';
 
 interface ActivityTimelineProps {
@@ -28,11 +30,11 @@ export function ActivityTimeline({ businessId, initialItems, initialNextCursor }
         setItems((prev) => [...prev, ...data.data.items]);
         setNextCursor(data.data.nextCursor);
       } else {
-        alert(data.error?.message || 'Failed to load more activity.');
+        toast.error(data.error?.message || 'Failed to load more activity.');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred while fetching activity.');
+      toast.error('An error occurred while fetching activity.');
     } finally {
       setLoading(false);
     }
@@ -40,8 +42,14 @@ export function ActivityTimeline({ businessId, initialItems, initialNextCursor }
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-10 bg-white border rounded-lg shadow-sm">
-        <p className="text-sm text-gray-500">No activity recorded yet.</p>
+      <div className="text-center py-12 flex flex-col items-center justify-center bg-white border rounded-lg shadow-sm">
+        <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+          <Activity className="h-8 w-8 text-muted-foreground/70" />
+        </div>
+        <h3 className="text-lg font-medium text-foreground mb-1">No activity yet</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Once your business starts receiving reviews and interactions, they will appear here.
+        </p>
       </div>
     );
   }

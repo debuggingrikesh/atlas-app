@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { ReputationSettingsService } from './reputation-settings-service';
+import crypto from 'crypto';
 
 export class FeedbackService {
   static async getFeedback(businessId: string, page: number, limit: number) {
@@ -24,6 +25,20 @@ export class FeedbackService {
     }
 
     return { request };
+  }
+
+  static async getCampaignDetailsByPublicId(publicId: string) {
+    const campaign = await ReputationRepository.getCampaignByPublicId(publicId);
+    
+    if (!campaign) {
+      return { error: 'Invalid campaign link.', status: 404 };
+    }
+    
+    if (campaign.status !== 'ACTIVE') {
+      return { error: 'This campaign is currently inactive.', status: 400 };
+    }
+
+    return { campaign };
   }
 
   static async submitPublicReview(token: string, data: {
@@ -97,5 +112,82 @@ export class FeedbackService {
   static async updateFeedbackStatus(id: string, businessId: string, status: string) {
     const updated = await ReputationRepository.updateFeedbackStatus(id, businessId, status);
     return updated.count > 0;
+  }
+
+  static async submitCampaignReview(publicId: string, data: {
+    rating: number;
+    comment?: string;
+    customerName?: string;
+    customerEmail?: string;
+    customerPhone?: string;
+  }) {
+    // 1. Find campaign
+    const campaign = await ReputationRepository.getCampaignByPublicId(publicId);
+    
+    if (!campaign) {
+      return { error: 'Invalid campaign link.', status: 404 };
+    }
+
+    if (campaign.status !== 'ACTIVE') {
+      return { error: 'This campaign is currently inactive.', status: 400 };
+    }
+
+    // 2. Load settings
+    const settings = await ReputationSettingsService.getSettings(campaign.businessId);
+
+    // 3. Determine feedback status and action based on threshold
+    const isPositive = data.rating >= settings.googleRedirectRating;
+    const feedbackStatus = isPositive ? 'REDIRECTED' : 'UNREAD';
+    const actionResult = isPositive
+      ? { action: 'GOOGLE_REDIRECT', redirectUrl: campaign.googleReviewUrl }
+      : { action: 'INTERNAL_FEEDBACK_SAVED' };
+
+    // 4. Create request and feedback in a single transaction
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Generate a unique token for the auto-created request
+        const token = crypto.randomBytes(16).toString('hex');
+        
+        const request = await ReputationRepository.createReviewRequest({
+          businessId: campaign.businessId,
+          branchId: campaign.branchId,
+          campaignId: campaign.id,
+          token,
+          status: 'COMPLETED', // created already completed
+          source: 'PUBLIC_LINK',
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+          completedAt: new Date(),
+        }, tx);
+
+        await ReputationRepository.createFeedback({
+          businessId: campaign.businessId,
+          branchId: campaign.branchId,
+          requestId: request.id,
+          rating: data.rating,
+          comment: data.comment,
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+          status: feedbackStatus,
+        }, tx);
+
+        await tx.auditLog.create({
+          data: {
+            action: 'customer_feedback.received',
+            entityType: 'CustomerFeedback',
+            entityId: request.id,
+            businessId: campaign.businessId,
+            metadata: { rating: data.rating, isPositive, source: 'PUBLIC_LINK' },
+          }
+        });
+      });
+
+      return actionResult;
+    } catch (err) {
+      console.error('[FeedbackService.submitCampaignReview] Error:', err);
+      return { error: 'Failed to submit feedback.', status: 500 };
+    }
   }
 }

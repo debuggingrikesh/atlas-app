@@ -4,12 +4,12 @@ import { FeedbackService } from '@/modules/reputation/services/feedback-service'
 import { ReviewPage } from '@/modules/reputation/components/review/ReviewPage';
 
 interface PageProps {
-  params: Promise<{ token: string }>;
+  params: Promise<{ publicId: string }>;
 }
 
-export default async function PublicReviewPage({ params }: PageProps) {
-  const { token } = await params;
-  const result = await FeedbackService.getReviewRequestDetails(token);
+export default async function PublicCampaignPage({ params }: PageProps) {
+  const { publicId } = await params;
+  const result = await FeedbackService.getCampaignDetailsByPublicId(publicId);
 
   // Render a full-page layout for the message
   const renderMessage = (title: string, description: string) => (
@@ -27,31 +27,28 @@ export default async function PublicReviewPage({ params }: PageProps) {
     </div>
   );
 
-  if (result.error || !result.request) {
+  if (result.error || !result.campaign) {
     if (result.status === 404) {
-      return renderMessage('Invalid Link', 'This review link is no longer available or does not exist.');
+      return renderMessage('Invalid Link', 'This campaign link is no longer available or does not exist.');
     }
-    if (result.status === 400 && result.error.includes('processed')) {
-      return renderMessage('Already Reviewed', 'This review request has already been processed.');
-    }
-    if (result.status === 400 && result.error.includes('expired')) {
-      return renderMessage('Link Expired', 'This review link has expired.');
+    if (result.status === 400 && result.error.includes('inactive')) {
+      return renderMessage('Campaign Inactive', 'This campaign is currently inactive.');
     }
     return renderMessage('Error', 'An unexpected error occurred. Please try again.');
   }
 
-  const { business, campaign } = result.request;
+  const { business, name: campaignName } = result.campaign;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4">
       <ReviewPage 
-        submitUrl={`/api/public/reviews/${token}`}
+        submitUrl={`/api/public/campaigns/${publicId}`}
         business={{
           name: business.name,
           logoUrl: business.logoUrl,
         }}
         campaign={{
-          name: campaign.name,
+          name: campaignName,
         }}
       />
     </div>

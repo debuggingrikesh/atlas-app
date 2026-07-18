@@ -11,7 +11,7 @@ export function generateInvitationEmailHtml({
   roleName,
   rawToken,
 }: InvitationEmailProps) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   const invitationLink = `${appUrl}/invitations/${rawToken}`;
   const inviterText = inviterName ? `**${inviterName}**` : 'Someone';
 

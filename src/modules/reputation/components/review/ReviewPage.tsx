@@ -7,7 +7,7 @@ import { FeedbackForm } from './FeedbackForm';
 import { ThankYouScreen } from './ThankYouScreen';
 
 interface ReviewPageProps {
-  token: string;
+  submitUrl: string;
   business: {
     name: string;
     logoUrl?: string | null;
@@ -17,7 +17,7 @@ interface ReviewPageProps {
   };
 }
 
-export function ReviewPage({ token, business }: ReviewPageProps) {
+export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
   const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function ReviewPage({ token, business }: ReviewPageProps) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/public/reviews/${token}`, {
+      const response = await fetch(submitUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating, ...data }),

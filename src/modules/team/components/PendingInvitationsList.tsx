@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface PendingInvitation {
   id: string;
@@ -36,16 +37,18 @@ export function PendingInvitationsList({
       
       if (res.ok) {
         if (action === 'resend') {
-          alert('Invitation resent successfully (Check console/server logs for raw token).');
+          toast.success('Invitation resent successfully.');
+        } else {
+          toast.success('Invitation cancelled.');
         }
         window.location.reload();
       } else {
         const error = await res.json();
-        alert(error.error?.message || `Failed to ${action} invitation`);
+        toast.error(error.error?.message || `Failed to ${action} invitation`);
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred');
+      toast.error('An error occurred');
     } finally {
       setLoading(null);
     }
@@ -57,58 +60,60 @@ export function PendingInvitationsList({
     <div className="mt-8">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Pending Invitations</h3>
       <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
-              {canManageInvitations && (
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {invitations.map((inv) => (
-              <tr key={inv.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{inv.email}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    {inv.role.name}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-500">
-                    {new Date(inv.expiresAt).toLocaleDateString()}
-                  </span>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
                 {canManageInvitations && (
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={loading !== null}
-                      onClick={() => handleAction(inv.id, 'resend')}
-                    >
-                      {loading === `resend-${inv.id}` ? '...' : 'Resend'}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                      disabled={loading !== null}
-                      onClick={() => handleAction(inv.id, 'cancel')}
-                    >
-                      {loading === `cancel-${inv.id}` ? '...' : 'Cancel'}
-                    </Button>
-                  </td>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 )}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {invitations.map((inv) => (
+                <tr key={inv.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm text-gray-900">{inv.email}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      {inv.role.name}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm text-gray-500">
+                      {new Date(inv.expiresAt).toLocaleDateString()}
+                    </span>
+                  </td>
+                  {canManageInvitations && (
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={loading !== null}
+                        onClick={() => handleAction(inv.id, 'resend')}
+                      >
+                        {loading === `resend-${inv.id}` ? '...' : 'Resend'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                        disabled={loading !== null}
+                        onClick={() => handleAction(inv.id, 'cancel')}
+                      >
+                        {loading === `cancel-${inv.id}` ? '...' : 'Cancel'}
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

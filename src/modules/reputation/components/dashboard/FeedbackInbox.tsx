@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, CheckCircle, Eye, Sparkles } from 'lucide-react';
+import { Star, CheckCircle, Eye, Sparkles, Inbox } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Feedback {
   id: string;
@@ -43,8 +44,9 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
       if (!response.ok) throw new Error('Failed to update feedback status');
 
       setFeedbacks(prev => prev.map(f => f.id === feedbackId ? { ...f, status: newStatus } : f));
+      toast.success(`Feedback marked as ${newStatus}`);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred.');
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     }
   };
 
@@ -58,8 +60,9 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
       if (!response.ok) throw new Error(data.error || 'Failed to generate AI response');
 
       setAiDrafts(prev => ({ ...prev, [feedbackId]: data.generatedText }));
+      toast.success('AI draft generated successfully');
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred.');
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setGeneratingFor(null);
     }
@@ -71,8 +74,14 @@ export function FeedbackInbox({ initialFeedback, businessId, canManage, canGener
 
       <div className="space-y-4">
         {feedbacks.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground border rounded-xl bg-card">
-            No customer feedback in your inbox.
+          <div className="p-12 flex flex-col items-center justify-center text-center text-muted-foreground border rounded-xl bg-card">
+            <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+              <Inbox className="h-8 w-8 text-muted-foreground/70" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">Your inbox is empty</h3>
+            <p className="text-sm max-w-sm">
+              When customers submit feedback through your campaigns, it will appear here.
+            </p>
           </div>
         ) : (
           feedbacks.map((feedback) => (

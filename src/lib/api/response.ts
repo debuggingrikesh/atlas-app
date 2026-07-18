@@ -10,6 +10,7 @@ export type ApiErrorResponse = {
   error: {
     code: string;
     message: string;
+    requestId?: string;
   };
 };
 
@@ -25,17 +26,46 @@ export function successResponse<T>(data: T, status = 200): NextResponse<ApiSucce
   );
 }
 
+import { logger } from '@/lib/logger';
+
 export function errorResponse(
   code: string,
   message: string,
-  status = 400
+  status = 400,
+  requestId?: string
 ): NextResponse<ApiErrorResponse> {
+  // Global Error Logging for 5xx errors or explicit exceptions
+  if (status >= 500) {
+    logger.error({
+      message: `API Error [${code}]`,
+      code,
+      errorMessage: message,
+      status,
+      requestId,
+    });
+  } else {
+    logger.warn({
+      message: `API Warning [${code}]`,
+      code,
+      errorMessage: message,
+      status,
+      requestId,
+    });
+  }
+
+  // Hide internal error details in production for 500s
+  const isProduction = process.env.NODE_ENV === 'production';
+  const publicMessage = (status >= 500 && isProduction) 
+    ? 'An unexpected error occurred. Please try again later.'
+    : message;
+
   return NextResponse.json(
     {
       success: false,
       error: {
         code,
-        message,
+        message: publicMessage,
+        ...(requestId ? { requestId } : {})
       },
     },
     { status }

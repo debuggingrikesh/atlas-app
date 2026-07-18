@@ -50,6 +50,17 @@ export class ReputationRepository {
     });
   }
 
+  static async getCampaignByPublicId(publicId: string) {
+    return prisma.reviewCampaign.findUnique({
+      where: { publicId },
+      include: {
+        business: {
+          select: { name: true, logoUrl: true }
+        }
+      }
+    });
+  }
+
   static async updateCampaign(id: string, businessId: string, data: Prisma.ReviewCampaignUpdateInput) {
     return prisma.reviewCampaign.updateMany({
       where: { id, businessId },

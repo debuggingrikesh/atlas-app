@@ -12,9 +12,11 @@ import {
   Plus,
   QrCode,
   MessageCircle,
-  Download
+  Download,
+  FolderOpen
 } from 'lucide-react';
 import QRCode from 'qrcode';
+import { toast } from 'sonner';
 
 interface Campaign {
   id: string;
@@ -53,7 +55,7 @@ export function CampaignTable({
   const [googleReviewUrl, setGoogleReviewUrl] = useState('');
 
   // QR & Link Generation states
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [qrCampaign, setQrCampaign] = useState<Campaign | null>(null);
@@ -119,7 +121,7 @@ export function CampaignTable({
           googleReviewUrl: googleReviewUrl || null,
           branch: branchId ? { name: branches.find(b => b.id === branchId)?.name || '' } : null,
         } : c));
-        alert('Campaign updated successfully');
+        toast.success('Campaign updated successfully');
       } else {
         const newCampaign = result.data.campaign;
         setCampaigns(prev => [
@@ -130,12 +132,12 @@ export function CampaignTable({
           },
           ...prev
         ]);
-        alert('Campaign created successfully');
+        toast.success('Campaign created successfully');
       }
 
       setIsModalOpen(false);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred.');
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setIsSubmitting(false);
     }
@@ -158,61 +160,32 @@ export function CampaignTable({
       if (!response.ok) throw new Error('Failed to update status');
 
       setCampaigns(prev => prev.map(c => c.id === campaign.id ? { ...c, status: newStatus } : c));
+      toast.success(`Campaign ${newStatus === 'ACTIVE' ? 'resumed' : 'paused'} successfully`);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to toggle status.');
+      toast.error(err instanceof Error ? err.message : 'Failed to toggle status.');
     }
   };
 
-  const generateReviewLink = async (campaign: Campaign, source: 'MANUAL' | 'WHATSAPP' | 'QR') => {
-    const response = await fetch('/api/reputation/requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        businessId,
-        campaignId: campaign.id,
-        customerName: 'Quick Customer',
-        source,
-      }),
-    });
-
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      if (response.status === 402 || result.error?.message?.includes('limit')) {
-        throw new Error('You have used all 6 free review requests. Upgrade your plan to continue.');
-      }
-      throw new Error(result.error?.message || 'Failed to generate review link. Limit might be reached.');
-    }
-
-    const token = result.data.request.token;
+  const getCampaignLink = (campaign: Campaign) => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/r/${token}`;
+    return `${origin}/c/${campaign.publicId}`;
   };
 
   const handleCopyLink = async (campaign: Campaign) => {
     try {
-      setIsGenerating(true);
-      const link = await generateReviewLink(campaign, 'MANUAL');
+      const link = getCampaignLink(campaign);
       await navigator.clipboard.writeText(link);
-      alert(`Review link generated and copied to clipboard!\n${link}`);
+      toast.success('Review link copied to clipboard!');
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to copy link.');
-    } finally {
-      setIsGenerating(false);
+      toast.error(err instanceof Error ? err.message : 'Failed to copy link.');
     }
   };
 
-  const handleGenerateQr = async (campaign: Campaign) => {
-    try {
-      setIsGenerating(true);
-      const link = await generateReviewLink(campaign, 'QR');
-      setQrCampaign(campaign);
-      setQrValue(link);
-      setIsQrModalOpen(true);
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to generate QR Code.');
-    } finally {
-      setIsGenerating(false);
-    }
+  const handleGenerateQr = (campaign: Campaign) => {
+    const link = getCampaignLink(campaign);
+    setQrCampaign(campaign);
+    setQrValue(link);
+    setIsQrModalOpen(true);
   };
 
   const handleDownloadQr = () => {
@@ -226,18 +199,11 @@ export function CampaignTable({
     document.body.removeChild(a);
   };
 
-  const handleShareWhatsApp = async (campaign: Campaign) => {
-    try {
-      setIsGenerating(true);
-      const link = await generateReviewLink(campaign, 'WHATSAPP');
-      const rawMessage = `Thank you for choosing ${businessName}. We would love your feedback: ${link}`;
-      const encodedText = encodeURIComponent(rawMessage);
-      window.open(`https://wa.me/?text=${encodedText}`, '_blank');
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to generate WhatsApp link.');
-    } finally {
-      setIsGenerating(false);
-    }
+  const handleShareWhatsApp = (campaign: Campaign) => {
+    const link = getCampaignLink(campaign);
+    const rawMessage = `Thank you for choosing ${businessName}. We would love your feedback: ${link}`;
+    const encodedText = encodeURIComponent(rawMessage);
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank');
   };
 
   return (
@@ -254,8 +220,20 @@ export function CampaignTable({
 
       <Card className="overflow-hidden">
         {campaigns.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            No campaigns found. Click &quot;Create Campaign&quot; to get started.
+          <div className="p-12 flex flex-col items-center justify-center text-center text-muted-foreground">
+            <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+              <FolderOpen className="h-8 w-8 text-muted-foreground/70" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-1">No campaigns yet</h3>
+            <p className="text-sm max-w-sm mb-4">
+              Campaigns help you track and manage review requests. Click &quot;Create Campaign&quot; to get started.
+            </p>
+            {canManage && (
+              <Button onClick={handleOpenCreate} size="sm" variant="outline" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create Campaign
+              </Button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Role {
   id: string;
@@ -49,14 +50,15 @@ export function TeamMemberList({
         method: 'DELETE',
       });
       if (res.ok) {
+        toast.success('Member removed');
         router.refresh();
       } else {
         const error = await res.json();
-        alert(error.error?.message || 'Failed to remove member');
+        toast.error(error.error?.message || 'Failed to remove member');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred');
+      toast.error('An error occurred');
     } finally {
       setRemoving(null);
     }
@@ -75,6 +77,7 @@ export function TeamMemberList({
       if (!res.ok) {
         throw new Error(data.error?.message || 'Failed to update role.');
       }
+      toast.success('Role updated successfully');
       router.refresh();
     } catch (err: unknown) {
       setRoleErrors((prev) => ({
@@ -93,7 +96,8 @@ export function TeamMemberList({
 
   return (
     <div className="bg-white border rounded-lg shadow-sm overflow-hidden mb-6">
-      <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
@@ -171,8 +175,9 @@ export function TeamMemberList({
               </tr>
             );
           })}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

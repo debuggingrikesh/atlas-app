@@ -4,6 +4,10 @@ import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  // Generate request ID
+  const requestId = crypto.randomUUID();
+  request.headers.set('x-request-id', requestId);
 
   // Skip middleware logic for API routes, static assets, and the auth callback
   if (
@@ -11,11 +15,14 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname === '/auth/callback'
   ) {
-    return NextResponse.next({ request });
+    const response = NextResponse.next({ request });
+    response.headers.set('x-request-id', requestId);
+    return response;
   }
 
   // Always refresh the Supabase session first
   const response = await updateSession(request);
+  response.headers.set('x-request-id', requestId);
 
   // Read the current user from Supabase (edge-compatible — no DB call)
   const supabase = createServerClient(

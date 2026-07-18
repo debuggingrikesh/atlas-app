@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface RoleActionsProps {
   businessId: string;
@@ -31,12 +33,13 @@ export function RoleActions({ businessId, roleId, roleName }: RoleActionsProps) 
         throw new Error(data.error?.message || 'Failed to delete role');
       }
 
+      toast.success('Role deleted successfully');
       router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
-        alert(err.message);
+        toast.error(err.message);
       } else {
-        alert('An unexpected error occurred');
+        toast.error('An unexpected error occurred');
       }
     } finally {
       setIsDeleting(false);
