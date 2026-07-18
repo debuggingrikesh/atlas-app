@@ -2,14 +2,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 import { createServerClient } from '@supabase/ssr';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Generate request ID
   const requestId = crypto.randomUUID();
   request.headers.set('x-request-id', requestId);
 
-  // Skip middleware logic for API routes, static assets, and the auth callback
+  // Skip proxy logic for API routes, static assets, and the auth callback
   if (
     pathname.startsWith('/api/') || 
     pathname.startsWith('/_next/') ||

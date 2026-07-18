@@ -10,7 +10,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Server-side auth verification (defence in depth — middleware also checks this)
+  // Server-side auth verification (defence in depth — proxy also checks this)
   const supabase = await createClient();
   const {
     data: { user },

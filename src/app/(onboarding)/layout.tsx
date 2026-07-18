@@ -8,7 +8,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
     data: { user },
   } = await supabase.auth.getUser();
 
-  // These should already be caught by middleware, but defence in depth:
+  // These should already be caught by proxy, but defence in depth:
   if (!user) redirect('/login');
   // MVP: Bypass email verification check
 
