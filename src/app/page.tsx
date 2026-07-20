@@ -17,7 +17,7 @@ export default async function RootPage() {
     if (!profile) {
       const supabaseClient = await createClient();
       await supabaseClient.auth.signOut();
-      redirect('/login');
+      redirect('/auth/login');
     }
 
     const hasMembership =
@@ -37,24 +37,29 @@ export default async function RootPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
       <div className="max-w-md space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Atlas
-        </h1>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Atlas
+          </h1>
+          <p className="font-medium text-foreground">
+            Business Operations Platform
+          </p>
+        </div>
 
         <p className="text-muted-foreground">
-          Sign in to manage your business reputation, teams, and workflows.
+          Manage your business, reputation, AI tools, customers, and workflows.
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
-            href="/login"
+            href="/auth/login"
             className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-6 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             Sign In
           </Link>
 
           <Link
-            href="/signup"
+            href="/auth/signup"
             className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
           >
             Create Account

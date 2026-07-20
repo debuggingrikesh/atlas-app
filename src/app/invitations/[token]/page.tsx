@@ -72,9 +72,9 @@ export default async function InvitationPage({ params }: PageProps) {
     const emailParam = encodeURIComponent(invitation.email);
     
     if (existingUser) {
-      redirect(`/login?email=${emailParam}&returnTo=${returnUrl}`);
+      redirect(`/auth/login?email=${emailParam}&returnTo=${returnUrl}`);
     } else {
-      redirect(`/signup?email=${emailParam}&returnTo=${returnUrl}`);
+      redirect(`/auth/signup?email=${emailParam}&returnTo=${returnUrl}`);
     }
   }
 

@@ -23,7 +23,7 @@ export default async function TeamSettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) redirect('/auth/login');
 
   const profile = await getUserProfile(user.id);
   // Dashboard layout already guarantees profile and memberships exist.

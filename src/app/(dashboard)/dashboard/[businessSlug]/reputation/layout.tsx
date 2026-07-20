@@ -20,7 +20,7 @@ export default async function ReputationLayout({ children, params }: Props) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   // Fetch business member to verify and resolve permissions

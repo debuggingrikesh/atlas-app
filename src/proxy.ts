@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
 
 
   // ── Auth pages: redirect away if already authenticated ────────────────────
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage = pathname === '/auth/login' || pathname === '/auth/signup';
   if (isAuthenticated && isAuthPage) {
     // Redirect to onboarding; the onboarding layout/dashboard layout
     // will handle the DB checks and redirect to dashboard if complete.
@@ -58,7 +58,7 @@ export async function proxy(request: NextRequest) {
   // ── Onboarding routes: require authenticated ───────────────────
   if (pathname.startsWith('/onboarding')) {
     if (!isAuthenticated) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/auth/login', request.url));
     }
     // DB-level check (already-completed onboarding) is handled in the
     // onboarding Server Component layout to avoid Edge/Prisma incompatibility.
@@ -68,7 +68,7 @@ export async function proxy(request: NextRequest) {
   // ── Dashboard routes: require authenticated ────────────────────
   if (pathname.startsWith('/dashboard')) {
     if (!isAuthenticated) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/auth/login', request.url));
     }
     // DB-level check (onboarding complete, membership) is handled in the
     // dashboard Server Component layout for the same reason.

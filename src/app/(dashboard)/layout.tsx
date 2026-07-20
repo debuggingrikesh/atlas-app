@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   // MVP: Bypass email verification check
@@ -26,7 +26,7 @@ export default async function DashboardLayout({
   
   if (!profile) {
     await supabase.auth.signOut();
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   const hasMembership = profile.businesses.length > 0;

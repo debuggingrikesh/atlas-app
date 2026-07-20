@@ -113,7 +113,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link href={`/signup${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''}`} className="font-medium underline underline-offset-4 hover:text-foreground">
+        <Link href={`/auth/signup${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''}`} className="font-medium underline underline-offset-4 hover:text-foreground">
           Create one
         </Link>
       </p>

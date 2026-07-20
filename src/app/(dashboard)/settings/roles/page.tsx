@@ -21,7 +21,7 @@ export default async function RolesSettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) redirect('/auth/login');
 
   const profile = await getUserProfile(user.id);
   const activeBusiness = (await getActiveBusiness(profile!.businesses))!;
