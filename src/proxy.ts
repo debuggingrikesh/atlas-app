@@ -2,11 +2,21 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 import { createServerClient } from '@supabase/ssr';
 
+function getOrGenerateRequestId(request: NextRequest): string {
+  const incomingId = request.headers.get('x-request-id');
+  const uuidv4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  
+  if (incomingId && uuidv4Regex.test(incomingId)) {
+    return incomingId;
+  }
+  return crypto.randomUUID();
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Generate request ID
-  const requestId = crypto.randomUUID();
+  // Generate or accept valid request ID
+  const requestId = getOrGenerateRequestId(request);
   request.headers.set('x-request-id', requestId);
 
   // Skip proxy logic for API routes, static assets, and the auth callback

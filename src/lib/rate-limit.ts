@@ -11,7 +11,7 @@ const getRedis = () => {
   });
 };
 
-const redis = getRedis();
+export const redis = getRedis();
 
 /**
  * Distributed rate limiter using Upstash Redis and @upstash/ratelimit.

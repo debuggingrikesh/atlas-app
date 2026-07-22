@@ -17,23 +17,46 @@ export type ApiErrorResponse = {
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 export function successResponse<T>(data: T, status = 200): NextResponse<ApiSuccessResponse<T>> {
+  let requestId: string | undefined = undefined;
+  try {
+    const h = headers() as any;
+    if (h && typeof h.get === 'function') {
+      requestId = h.get('x-request-id') || undefined;
+    }
+  } catch {}
+
   return NextResponse.json(
     {
       success: true,
       data,
     },
-    { status }
+    { 
+      status,
+      headers: requestId ? { 'x-request-id': requestId } : undefined
+    }
   );
 }
 
 import { logger } from '@/lib/logger';
+import { headers } from 'next/headers';
 
 export function errorResponse(
   code: string,
   message: string,
   status = 400,
-  requestId?: string
+  explicitRequestId?: string
 ): NextResponse<ApiErrorResponse> {
+  let requestId = explicitRequestId;
+  
+  if (!requestId) {
+    try {
+      const h = headers() as any;
+      if (h && typeof h.get === 'function') {
+        requestId = h.get('x-request-id') || undefined;
+      }
+    } catch {}
+  }
+
   // Global Error Logging for 5xx errors or explicit exceptions
   if (status >= 500) {
     logger.error({
@@ -68,6 +91,9 @@ export function errorResponse(
         ...(requestId ? { requestId } : {})
       },
     },
-    { status }
+    { 
+      status,
+      headers: requestId ? { 'x-request-id': requestId } : undefined
+    }
   );
 }
