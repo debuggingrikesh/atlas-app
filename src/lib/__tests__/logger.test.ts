@@ -35,7 +35,8 @@ describe('Logger Sentry Integration', () => {
 
   it('captures error messages correctly', () => {
     logger.error('Something went wrong');
-    expect(Sentry.captureMessage).toHaveBeenCalledWith('Something went wrong', 'error');
+    expect(Sentry.captureException).toHaveBeenCalledWith(expect.any(Error));
+    expect((Sentry.captureException as any).mock.calls[0][0].message).toBe('Something went wrong');
   });
 
   it('attaches user context and request ID', () => {

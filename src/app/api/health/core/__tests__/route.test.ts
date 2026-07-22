@@ -12,6 +12,13 @@ vi.mock('@/lib/api/response', () => ({
   errorResponse: vi.fn((code, msg, status) => ({ status, error: msg })),
 }));
 
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
 const mockProcessEnv = { ...process.env };
 
 describe('App Core Route Authentication', () => {

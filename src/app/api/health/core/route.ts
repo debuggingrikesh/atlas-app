@@ -1,4 +1,5 @@
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logger } from "@/lib/logger";
 import { CORE_INFO } from "@atlas/core/metadata";
 import packageJson from "../../../../../package.json";
 import { headers } from "next/headers";
@@ -17,6 +18,7 @@ export async function GET() {
   const expectedToken = process.env.INTERNAL_INTEGRITY_SECRET;
 
   if (!expectedToken) {
+    logger.error("App endpoint misconfigured: missing INTERNAL_INTEGRITY_SECRET");
     return errorResponse("INTERNAL_ERROR", "Server misconfigured. Missing internal secret.", 500);
   }
 
