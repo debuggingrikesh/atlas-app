@@ -2,7 +2,7 @@ import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { prisma } from '@/lib/db/prisma';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 
 interface Params {
   params: Promise<{ businessId: string }>;

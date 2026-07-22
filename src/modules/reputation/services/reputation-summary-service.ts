@@ -1,6 +1,6 @@
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import type { BusinessWithMembership } from '@/modules/business/types';
 
 import { cache } from 'react';

@@ -5,7 +5,7 @@ import { FeedbackService } from '../src/modules/reputation/services/feedback-ser
 import { ReputationSummaryService } from '../src/modules/reputation/services/reputation-summary-service';
 import { ReputationRepository } from '../src/modules/reputation/repositories/reputation-repository';
 import { resolvePermissions } from '../src/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '../src/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import * as crypto from 'crypto';
 
 async function runQa() {

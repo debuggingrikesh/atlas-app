@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { getBusiness } from '@/modules/business/lib/get-business';
 import { updateBusiness } from '@/modules/business/lib/update-business';
 import { updateBusinessSchema } from '@/lib/validators/business';

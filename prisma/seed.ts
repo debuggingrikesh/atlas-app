@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { SYSTEM_ROLE_PERMISSIONS } from '../src/lib/permissions/system-roles';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,

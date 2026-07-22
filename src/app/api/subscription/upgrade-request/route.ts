@@ -1,7 +1,7 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { UpgradeRequestService } from '@/modules/billing/services/upgrade-request-service';
 
 export async function POST(request: Request) {

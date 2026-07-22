@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { createBranch } from '@/modules/business/lib/create-branch';
 import { createBranchSchema } from '@/lib/validators/business';
 import { successResponse, errorResponse } from '@/lib/api/response';

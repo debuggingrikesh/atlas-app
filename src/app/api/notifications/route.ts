@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { getNotifications } from '@/modules/notifications/lib/get-notifications';
 import { notificationPaginationSchema } from '@/modules/notifications/validators';
 import { successResponse, errorResponse } from '@/lib/api/response';

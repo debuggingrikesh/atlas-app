@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db/prisma';
 /**
  * POST /api/business
  * Creates a new business for the authenticated user.
+ * Note: This is a user-scoped endpoint (pre-tenant), so it does not require a businessId check.
  */
 export async function POST(request: Request) {
   const { user, errorRes } = await requireAuth();
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
 /**
  * GET /api/business
  * Lists all businesses the authenticated user is a member of.
+ * Note: This is a user-scoped endpoint (pre-tenant).
  */
 export async function GET() {
   const { user, errorRes } = await requireAuth();

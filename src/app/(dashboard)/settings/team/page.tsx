@@ -10,7 +10,7 @@ import { PendingInvitationsList } from '@/modules/team/components/PendingInvitat
 import { InviteMemberModal } from '@/modules/team/components/InviteMemberModal';
 import { getActiveBusiness } from '@/lib/auth/get-active-business';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 
 export const metadata: Metadata = {
   title: 'Team Settings — Atlas',

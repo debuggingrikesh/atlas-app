@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { getActivityFeed } from '@/modules/activity/lib/get-activity-feed';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { safeParse } from '@atlas/core/validation';

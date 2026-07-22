@@ -5,7 +5,7 @@ import { generateUniqueSlug } from '@/modules/business/lib/generate-slug';
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 
-import { SYSTEM_ROLE_PERMISSIONS } from '@/lib/permissions/system-roles';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
 
 /**
  * POST /api/onboarding/complete

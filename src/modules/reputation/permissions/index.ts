@@ -1,4 +1,4 @@
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 
 export const REPUTATION_PERMISSIONS = {
   VIEW: PERMISSIONS.reputation.view,

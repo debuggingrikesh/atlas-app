@@ -12,6 +12,7 @@ const draftSchema = z.object({
 /**
  * GET /api/onboarding/draft
  * Fetches the user's current onboarding draft state.
+ * Note: This is a user-scoped endpoint, not tenant-isolated.
  */
 export async function GET() {
   const { user, errorRes } = await requireAuth();
@@ -36,6 +37,7 @@ export async function GET() {
 /**
  * POST /api/onboarding/draft
  * Upserts the user's onboarding progress.
+ * Note: This is a user-scoped endpoint, not tenant-isolated.
  */
 export async function POST(request: Request) {
   const { user, errorRes } = await requireAuth();

@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { createInvitationSchema } from '@/modules/invitations/validators';
 import { createInvitation } from '@/modules/invitations/lib/create-invitation';
 import { getInvitations } from '@/modules/invitations/lib/get-invitations';

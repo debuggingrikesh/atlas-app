@@ -15,13 +15,15 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@atlas/core": "git+https://github.com/debuggingrikesh/atlas-core.git#34cd989dcc41701b230e9d1eafb926e9b6d66d30",
+    "@atlas/core": "git+https://github.com/debuggingrikesh/atlas-core.git#b15f81816168937919e38d9adae7e6ef87435492",
     "@base-ui/react": "^1.6.0",
     "@google/genai": "^2.11.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.110.2",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.24.0",

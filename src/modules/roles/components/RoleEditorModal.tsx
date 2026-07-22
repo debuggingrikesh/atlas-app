@@ -16,7 +16,7 @@ import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ASSIGNABLE_PERMISSIONS } from '@/lib/permissions/permissions';
+import { ASSIGNABLE_PERMISSIONS } from '@atlas/core/auth';
 import { Pencil } from 'lucide-react';
 
 interface RoleEditorModalProps {
@@ -98,14 +98,14 @@ export function RoleEditorModal({ businessId, role }: RoleEditorModalProps) {
 
   // Group permissions logically for the UI
   const groupedPermissions: Record<string, string[]> = {
-    Business: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('business.')),
-    Branches: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('branch.')),
-    Members: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('member.')),
-    Roles: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('role.')),
-    Activity: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('activity.')),
-    Notifications: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('notification.')),
-    Profile: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('profile.')),
-    Settings: ASSIGNABLE_PERMISSIONS.filter(p => p.startsWith('settings.')),
+    Business: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('business.')),
+    Branches: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('branch.')),
+    Members: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('member.')),
+    Roles: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('role.')),
+    Activity: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('activity.')),
+    Notifications: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('notification.')),
+    Profile: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('profile.')),
+    Settings: ASSIGNABLE_PERMISSIONS.filter((p: string) => p.startsWith('settings.')),
   };
 
   return (

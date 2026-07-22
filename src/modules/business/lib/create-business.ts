@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db/prisma';
 import { generateUniqueSlug } from './generate-slug';
 import type { CreateBusinessInput, Business } from '@/modules/business/types';
 
-import { SYSTEM_ROLE_PERMISSIONS } from '@/lib/permissions/system-roles';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
 
 type CreateBusinessResult = Business & {
   memberId: string;

@@ -1,6 +1,6 @@
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { FeedbackService } from '@/modules/reputation/services/feedback-service';
 

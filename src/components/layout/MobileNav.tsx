@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@/lib/permissions/permissions';
+import { PERMISSIONS } from '@atlas/core/auth';
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
