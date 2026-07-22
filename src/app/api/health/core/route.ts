@@ -1,15 +1,41 @@
-import { successResponse } from "@/lib/api/response";
+import { successResponse, errorResponse } from "@/lib/api/response";
 import { CORE_INFO } from "@atlas/core/metadata";
 import packageJson from "../../../../../package.json";
-import { requirePlatformRole } from "@/lib/auth/require-auth";
+import { headers } from "next/headers";
+import crypto from "crypto";
 
 export async function GET() {
-  // Only SUPER_ADMIN can check platform integrity
-  const { errorRes } = await requirePlatformRole(['SUPER_ADMIN']);
-  if (errorRes) return errorRes;
+  const h = headers() as any;
+  const authHeader = h.get("authorization");
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return errorResponse("UNAUTHORIZED", "Missing or invalid authorization header.", 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  const expectedToken = process.env.INTERNAL_INTEGRITY_SECRET;
+
+  if (!expectedToken) {
+    return errorResponse("INTERNAL_ERROR", "Server misconfigured. Missing internal secret.", 500);
+  }
+
+  // Constant-time comparison
+  let isValid = false;
+  try {
+    const a = Buffer.from(token);
+    const b = Buffer.from(expectedToken);
+    if (a.length === b.length) {
+      isValid = crypto.timingSafeEqual(a, b);
+    }
+  } catch (e) {
+    isValid = false;
+  }
+
+  if (!isValid) {
+    return errorResponse("FORBIDDEN", "Invalid integrity secret.", 403);
+  }
 
   const configuredCore = packageJson.dependencies?.["@atlas/core"];
-  
   let configuredSha = "unknown";
   if (configuredCore && configuredCore.includes("#")) {
     configuredSha = configuredCore.split("#")[1];
