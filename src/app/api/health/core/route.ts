@@ -5,8 +5,9 @@ import { headers } from "next/headers";
 import crypto from "crypto";
 
 export async function GET() {
-  const h = headers() as any;
-  const authHeader = h.get("authorization");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const headersList = (await headers()) as any;
+  const authHeader = headersList.get("authorization");
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return errorResponse("UNAUTHORIZED", "Missing or invalid authorization header.", 401);

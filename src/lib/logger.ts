@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import type { LogLevel, LogPayload } from '@atlas/core/observability';
+import * as Sentry from '@sentry/nextjs';
 
 const SENSITIVE_KEYS = new Set([
   'password', 'token', 'authorization', 'cookie', 'secret',
@@ -45,6 +46,58 @@ class Logger {
     }
   }
 
+  private captureSentry(level: Sentry.SeverityLevel, logData: Record<string, unknown>, error?: Error) {
+    const isError = level === 'error' || level === 'fatal';
+    
+    // Ignore expected operational errors
+    const errorMessage = error?.message || String(logData.message || '');
+    const code = logData.code || (logData.context as Record<string, unknown>)?.code;
+    const status = logData.status || (logData.context as Record<string, unknown>)?.status;
+    
+    if (
+      status === 404 ||
+      status === 400 ||
+      status === 422 ||
+      code === 'VALIDATION_ERROR' ||
+      code === 'NOT_FOUND' ||
+      errorMessage.toLowerCase().includes('cancelled') ||
+      errorMessage.toLowerCase().includes('health') ||
+      errorMessage.toLowerCase().includes('readiness')
+    ) {
+      return;
+    }
+
+    Sentry.withScope((scope) => {
+      // Tags
+      if (logData.requestId) scope.setTag('requestId', String(logData.requestId));
+      if (logData.code) scope.setTag('code', String(logData.code));
+      if (logData.service) scope.setTag('service', String(logData.service));
+      
+      // User Context
+      const userContext: Record<string, string> = {};
+      if (logData.userId) userContext.id = String(logData.userId);
+      if (logData.businessId) userContext.businessId = String(logData.businessId);
+      if (logData.tenantId) userContext.tenantId = String(logData.tenantId);
+      if (logData.role) userContext.role = String(logData.role);
+      
+      if (Object.keys(userContext).length > 0) {
+        scope.setUser(userContext);
+      }
+
+      // Extra context
+      scope.setExtras(logData);
+
+      if (error) {
+        Sentry.captureException(error);
+      } else if (isError) {
+        // If it's an error level but no Error object was provided
+        Sentry.captureException(new Error(errorMessage || 'Unknown Error'));
+      } else {
+        Sentry.captureMessage(errorMessage, level);
+      }
+    });
+  }
+
   private log(level: LogLevel, payload: LogPayload | string, ...args: unknown[]) {
     const timestamp = new Date().toISOString();
     const message = typeof payload === 'string' ? payload : payload.message;
@@ -53,13 +106,14 @@ class Logger {
     let requestId: string | undefined = undefined;
     try {
       // Workaround for sync/async headers in Next.js transitions
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const h = headers() as any;
       if (h && typeof h.get === 'function') {
         requestId = h.get('x-request-id') || undefined;
       }
     } catch {}
     
-    let redactedContext = redact(context) as Record<string, unknown>;
+    const redactedContext = redact(context) as Record<string, unknown>;
     
     const logData = {
       timestamp,
@@ -90,18 +144,32 @@ class Logger {
 
   warn(payload: LogPayload | string, ...args: unknown[]) {
     this.log('warn', payload, ...args);
+    
+    if (process.env.ENABLE_SENTRY === 'true' || process.env.NODE_ENV === 'production') {
+      const logData = typeof payload === 'string' ? { message: payload } : payload;
+      this.captureSentry('warning', logData);
+    }
   }
 
   error(payload: LogPayload | string | Error, ...args: unknown[]) {
+    let logData: Record<string, unknown> = {};
+    let errorObj: Error | undefined;
+
     if (payload instanceof Error) {
-      const errorData = { 
+      errorObj = payload;
+      logData = { 
         message: payload.message, 
         errorName: payload.name,
         stack: payload.stack 
       };
-      this.log('error', errorData, ...args);
+      this.log('error', logData as LogPayload, ...args);
     } else {
+      logData = typeof payload === 'string' ? { message: payload } : payload;
       this.log('error', payload, ...args);
+    }
+
+    if (process.env.ENABLE_SENTRY === 'true' || process.env.NODE_ENV === 'production') {
+      this.captureSentry('error', logData, errorObj);
     }
   }
 }
