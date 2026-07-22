@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -75,16 +76,18 @@ export async function PATCH(request: Request, { params }: Params) {
         const removed = oldPerms.filter((p) => !newPerms.includes(p));
 
         if (added.length > 0 || removed.length > 0) {
-          await tx.auditLog.create({
-            data: {
-              action: 'role.permissions_updated',
-              entityType: 'Role',
-              entityId: roleId,
-              actorId: user.id,
-              businessId,
-              metadata: { roleName: updated.name, added, removed },
-            },
-          });
+          await AuditService.record({
+        action: 'role.permissions_updated' as any,
+        resourceType: 'Role' as any,
+        resourceId: roleId,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'role.permissions_updated'}`,
+        metadata: { roleName: updated.name, added, removed },
+            
+      }, tx)
         }
       }
 
@@ -164,16 +167,18 @@ export async function DELETE(request: Request, { params }: Params) {
         where: { id: roleId },
       });
 
-      await tx.auditLog.create({
-        data: {
-          action: 'role.deleted',
-          entityType: 'Role',
-          entityId: roleId,
-          actorId: user.id,
-          businessId,
-          metadata: { name: role.name, usersMoved: role.members.length },
-        },
-      });
+      await AuditService.record({
+        action: 'role.deleted' as any,
+        resourceType: 'Role' as any,
+        resourceId: roleId,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'role.deleted'}`,
+        metadata: { name: role.name, usersMoved: role.members.length },
+        
+      }, tx)
     });
 
     return successResponse({ success: true });

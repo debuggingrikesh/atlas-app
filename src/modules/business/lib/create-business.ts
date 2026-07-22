@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { generateUniqueSlug } from './generate-slug';
 import type { CreateBusinessInput, Business } from '@/modules/business/types';
@@ -90,45 +91,51 @@ export async function createBusiness(
 
     // 5. Audit log: role.created (for all three system roles)
     for (const roleName of roleNames) {
-      await tx.auditLog.create({
-        data: {
-          action: 'role.created',
-          entityType: 'Role',
-          entityId: createdRoles[roleName],
-          actorId: userId,
-          businessId: business.id,
-          metadata: {
+      await AuditService.record({
+        action: 'role.created' as any,
+        resourceType: 'Role' as any,
+        resourceId: createdRoles[roleName],
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'role.created'}`,
+        metadata: {
             roleName,
             isSystem: true,
             permissions: SYSTEM_ROLE_PERMISSIONS[roleName],
           },
-        },
-      });
+        
+      }, tx)
     }
 
     // 6. Audit log: business.created
-    await tx.auditLog.create({
-      data: {
-        action: 'business.created',
-        entityType: 'Business',
-        entityId: business.id,
-        actorId: userId,
+    await AuditService.record({
+        action: 'business.created' as any,
+        resourceType: 'Business' as any,
+        resourceId: business.id,
+        actorType: 'USER',
+        actorUserId: userId,
         businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'business.created'}`,
         metadata: { name: business.name, slug: business.slug },
-      },
-    });
+      
+      }, tx)
 
     // 7. Audit log: business_member.created
-    await tx.auditLog.create({
-      data: {
-        action: 'business_member.created',
-        entityType: 'BusinessMember',
-        entityId: member.id,
-        actorId: userId,
+    await AuditService.record({
+        action: 'business_member.created' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: member.id,
+        actorType: 'USER',
+        actorUserId: userId,
         businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'business_member.created'}`,
         metadata: { role: 'OWNER', roleId: createdRoles['OWNER'], userId },
-      },
-    });
+      
+      }, tx)
 
     return { ...business, memberId: member.id };
   });

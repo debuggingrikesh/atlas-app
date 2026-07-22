@@ -52,6 +52,7 @@ describe('Logger Sentry Integration', () => {
     // the callback gives a mock scope
     const scopeMock = withScopeMock.mock.calls[0][0];
     const dummyScope = { setTag: vi.fn(), setUser: vi.fn(), setExtras: vi.fn() };
+    // @ts-expect-error test mock typing
     scopeMock(dummyScope as unknown as Sentry.Scope);
 
     expect(dummyScope.setTag).toHaveBeenCalledWith('requestId', 'req_abc');

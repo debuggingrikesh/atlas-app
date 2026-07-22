@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { UpdateBusinessInput } from '@/lib/validators/business';
 import type { Business } from '@/modules/business/types';
@@ -47,13 +48,15 @@ export async function updateBusiness(
     const business = await tx.business.findUniqueOrThrow({ where: { id: businessId } });
 
     // 2. Audit log with detailed changes
-    await tx.auditLog.create({
-      data: {
-        action: 'business.updated',
-        entityType: 'Business',
-        entityId: business.id,
-        actorId: userId,
+    await AuditService.record({
+        action: 'business.updated' as any,
+        resourceType: 'Business' as any,
+        resourceId: business.id,
+        actorType: 'USER',
+        actorUserId: userId,
         businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'business.updated'}`,
         metadata: { 
           changes: input,
           previous: {
@@ -62,8 +65,8 @@ export async function updateBusiness(
             logoUrl: currentBusiness.logoUrl,
           }
         },
-      },
-    });
+      
+      }, tx)
 
     // 3. Notify business Owners and Admins
     const admins = await tx.businessMember.findMany({

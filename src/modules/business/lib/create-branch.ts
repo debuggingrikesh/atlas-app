@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { CreateBranchInput, Branch } from '@/modules/business/types';
 
@@ -18,16 +19,18 @@ export async function createBranch(
       },
     });
 
-    await tx.auditLog.create({
-      data: {
-        action: 'branch.created',
-        entityType: 'Branch',
-        entityId: branch.id,
-        actorId: userId,
+    await AuditService.record({
+        action: 'branch.created' as any,
+        resourceType: 'Branch' as any,
+        resourceId: branch.id,
+        actorType: 'USER',
+        actorUserId: userId,
         businessId: input.businessId,
+        severity: 'INFO',
+        summary: `System event ${'branch.created'}`,
         metadata: { name: branch.name, address: branch.address },
-      },
-    });
+      
+      }, tx)
 
     return branch;
   });

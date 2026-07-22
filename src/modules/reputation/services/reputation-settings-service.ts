@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { prisma } from '@/lib/db/prisma';
@@ -23,16 +24,18 @@ export class ReputationSettingsService {
     const settings = await ReputationRepository.updateSettings(businessId, data);
     
     // Create AuditLog
-    await prisma.auditLog.create({
-      data: {
-        action: 'reputation.settings.updated',
-        entityType: 'ReputationSettings',
-        entityId: settings.id,
-        actorId: userId,
-        businessId,
-        metadata: data as Prisma.InputJsonValue,
-      }
-    });
+    await AuditService.record({
+        action: 'reputation.settings.updated' as any,
+        resourceType: 'ReputationSettings' as any,
+        resourceId: settings.id,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'reputation.settings.updated'}`,
+        metadata: data as unknown as Record<string, unknown>,
+      
+      }, undefined)
 
     return settings;
   }

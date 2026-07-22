@@ -1,6 +1,6 @@
-import type { AuditLog } from '@prisma/client';
+import type { AuditEvent } from '@prisma/client';
 
-export type ActivityItem = AuditLog & {
+export type ActivityItem = AuditEvent & {
   actor: {
     id: string;
     email: string;

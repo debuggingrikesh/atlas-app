@@ -7,15 +7,15 @@ export async function getActivityFeed(
 ): Promise<{ items: ActivityItem[]; nextCursor?: string }> {
   const { cursor, limit } = options;
 
-  // 1. Fetch AuditLog entries rigorously filtered by businessId
-  const logs = await prisma.auditLog.findMany({
+  // 1. Fetch AuditEvent entries rigorously filtered by businessId
+  const logs = await prisma.auditEvent.findMany({
     where: { businessId },
     take: limit + 1, // Fetch one extra to determine if there is a next page
     ...(cursor && {
       cursor: { id: cursor },
       skip: 1, // Skip the cursor itself
     }),
-    orderBy: { createdAt: 'desc' },
+    orderBy: { occurredAt: 'desc' },
   });
 
   let nextCursor: string | undefined = undefined;
@@ -25,7 +25,7 @@ export async function getActivityFeed(
   }
 
   // 2. Extract actor IDs
-  const actorIds = Array.from(new Set(logs.map((log) => log.actorId).filter(Boolean))) as string[];
+  const actorIds = Array.from(new Set(logs.map((log) => log.actorUserId).filter(Boolean))) as string[];
 
   // 3. Fetch UserProfiles
   let userProfiles: Record<string, { id: string; email: string; fullName: string | null; avatarUrl: string | null }> = {};
@@ -43,7 +43,7 @@ export async function getActivityFeed(
   // 4. Map to ActivityItem
   const items: ActivityItem[] = logs.map((log) => ({
     ...log,
-    actor: log.actorId ? (userProfiles[log.actorId] ?? null) : null,
+    actor: log.actorUserId ? (userProfiles[log.actorUserId] ?? null) : null,
   }));
 
   return { items, nextCursor };

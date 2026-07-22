@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { completeOnboardingSchema } from '@/lib/validators/business';
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -136,69 +137,79 @@ export async function POST(request: Request) {
 
       // 7. AuditLog: role.created (for each system role)
       for (const roleName of roleNames) {
-        await tx.auditLog.create({
-          data: {
-            action: 'role.created',
-            entityType: 'Role',
-            entityId: createdRoles[roleName],
-            actorId: user.id,
-            businessId: business.id,
-            metadata: {
+        await AuditService.record({
+        action: 'role.created' as any,
+        resourceType: 'Role' as any,
+        resourceId: createdRoles[roleName],
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'role.created'}`,
+        metadata: {
               roleName,
               isSystem: true,
               permissions: SYSTEM_ROLE_PERMISSIONS[roleName],
             },
-          },
-        });
+          
+      }, tx)
       }
 
       // 8. AuditLog: UserProfile created
-      await tx.auditLog.create({
-        data: {
-          action: 'user_profile.created',
-          entityType: 'UserProfile',
-          entityId: profile.id,
-          actorId: user.id,
-          businessId: business.id,
-          metadata: { email: user.email, fullName },
-        },
-      });
+      await AuditService.record({
+        action: 'user_profile.created' as any,
+        resourceType: 'UserProfile' as any,
+        resourceId: profile.id,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'user_profile.created'}`,
+        metadata: { email: user.email, fullName },
+        
+      }, tx)
 
       // 9. AuditLog: Business created
-      await tx.auditLog.create({
-        data: {
-          action: 'business.created',
-          entityType: 'Business',
-          entityId: business.id,
-          actorId: user.id,
-          businessId: business.id,
-          metadata: { name: business.name, slug: business.slug },
-        },
-      });
+      await AuditService.record({
+        action: 'business.created' as any,
+        resourceType: 'Business' as any,
+        resourceId: business.id,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'business.created'}`,
+        metadata: { name: business.name, slug: business.slug },
+        
+      }, tx)
 
       // 10. AuditLog: BusinessMember created
-      await tx.auditLog.create({
-        data: {
-          action: 'business_member.created',
-          entityType: 'BusinessMember',
-          entityId: member.id,
-          actorId: user.id,
-          businessId: business.id,
-          metadata: { role: 'OWNER', roleId: createdRoles['OWNER'] },
-        },
-      });
+      await AuditService.record({
+        action: 'business_member.created' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: member.id,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'business_member.created'}`,
+        metadata: { role: 'OWNER', roleId: createdRoles['OWNER'] },
+        
+      }, tx)
 
       // 11. AuditLog: Branch created
-      await tx.auditLog.create({
-        data: {
-          action: 'branch.created',
-          entityType: 'Branch',
-          entityId: branch.id,
-          actorId: user.id,
-          businessId: business.id,
-          metadata: { name: branch.name, address: branch.address },
-        },
-      });
+      await AuditService.record({
+        action: 'branch.created' as any,
+        resourceType: 'Branch' as any,
+        resourceId: branch.id,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: business.id,
+        severity: 'INFO',
+        summary: `System event ${'branch.created'}`,
+        metadata: { name: branch.name, address: branch.address },
+        
+      }, tx)
 
       // 12. Mark onboarding complete
       await tx.userProfile.update({

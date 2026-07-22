@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { createNotification } from '@/modules/notifications/lib/create-notification';
 import { NOTIFICATION_EVENTS } from '@/lib/constants/notification-events';
@@ -50,38 +51,42 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
     });
 
     // 4. Audit: permission.assigned
-    await tx.auditLog.create({
-      data: {
-        action: 'permission.assigned',
-        entityType: 'BusinessMember',
-        entityId: memberId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'permission.assigned' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: memberId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'permission.assigned'}`,
         metadata: {
           previousRoleId: current.roleId,
           newRoleId: roleId,
           newRoleName: newRole.name,
           targetUserId: current.userId,
         },
-      },
-    });
+      
+      }, tx)
 
     // 5. Audit: member.role.updated
-    await tx.auditLog.create({
-      data: {
-        action: 'member.role.updated',
-        entityType: 'BusinessMember',
-        entityId: memberId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'member.role.updated' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: memberId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'member.role.updated'}`,
         metadata: {
           previousRoleId: current.roleId,
           newRoleId: roleId,
           newRoleName: newRole.name,
           targetUserId: current.userId,
         },
-      },
-    });
+      
+      }, tx)
 
     // 6. Notify the affected member
     // Check to prevent notifying the user if they are changing their own role (though usually blocked by UI/API rules)

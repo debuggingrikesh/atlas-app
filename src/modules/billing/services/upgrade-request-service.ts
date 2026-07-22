@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 
 export class UpgradeRequestService {
@@ -80,20 +81,22 @@ export class UpgradeRequestService {
       });
 
       // 4. Create Audit Log
-      await tx.auditLog.create({
-        data: {
-          action: 'subscription.upgrade_approved',
-          entityType: 'BusinessSubscription',
-          entityId: request.businessId,
-          actorId: adminActorId,
-          businessId: request.businessId,
-          metadata: {
+      await AuditService.record({
+        action: 'subscription.upgrade_approved' as any,
+        resourceType: 'BusinessSubscription' as any,
+        resourceId: request.businessId,
+        actorType: 'USER',
+        actorUserId: adminActorId,
+        businessId: request.businessId,
+        severity: 'INFO',
+        summary: `System event ${'subscription.upgrade_approved'}`,
+        metadata: {
             requestId,
             planId: request.requestedPlanId,
             planCode: request.requestedPlan.code
           }
-        }
-      });
+        
+      }, tx)
 
       return updatedRequest;
     });
@@ -124,18 +127,20 @@ export class UpgradeRequestService {
       });
 
       // 3. Create Audit Log
-      await tx.auditLog.create({
-        data: {
-          action: 'subscription.upgrade_rejected',
-          entityType: 'BusinessSubscription',
-          entityId: request.businessId,
-          actorId: adminActorId,
-          businessId: request.businessId,
-          metadata: {
+      await AuditService.record({
+        action: 'subscription.upgrade_rejected' as any,
+        resourceType: 'BusinessSubscription' as any,
+        resourceId: request.businessId,
+        actorType: 'USER',
+        actorUserId: adminActorId,
+        businessId: request.businessId,
+        severity: 'INFO',
+        summary: `System event ${'subscription.upgrade_rejected'}`,
+        metadata: {
             requestId
           }
-        }
-      });
+        
+      }, tx)
 
       return updatedRequest;
     });

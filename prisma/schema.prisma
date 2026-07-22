@@ -156,20 +156,40 @@ enum PlatformRole {
 // AuditLog
 // ──────────────────────────────────────────
 
-model AuditLog {
-  id         String   @id @default(cuid())
-  action     String
-  entityType String
-  entityId   String
-  actorId    String?
-  businessId String?
-  metadata   Json?
-  createdAt  DateTime @default(now())
+model AuditEvent {
+  id               String   @id @default(cuid())
+  occurredAt       DateTime @default(now())
 
-  @@index([entityType, entityId])
-  @@index([actorId])
+  action           String
+  resourceType     String
+  resourceId       String?
+
+  actorType        String   @default("USER")
+  actorUserId      String?
+  actorRole        String?
+
+  businessId       String?
+  tenantId         String?
+
+  requestId        String?
+  sourceService    String   @default("atlas-app")
+  severity         String   @default("INFO")
+
+  summary          String
+  metadata         Json?
+
+  previousState    Json?
+  newState         Json?
+
+  ipAddressHash    String?
+  userAgentSummary String?
+
+  @@index([action, resourceType])
+  @@index([actorUserId])
   @@index([businessId])
-  @@index([createdAt])
+  @@index([occurredAt])
+  @@index([requestId])
+  @@map("AuditLog")
 }
 
 // ──────────────────────────────────────────

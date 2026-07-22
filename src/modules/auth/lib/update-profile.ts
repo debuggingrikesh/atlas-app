@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { UpdateProfileInput } from '@/lib/validators/auth';
 import type { UserProfile } from '@/modules/auth/types';
@@ -34,16 +35,18 @@ export async function updateProfile(
     });
 
     // 2. Audit log
-    await tx.auditLog.create({
-      data: {
-        action: 'user.profile.updated',
-        entityType: 'UserProfile',
-        entityId: userId,
-        actorId: userId,
-        // businessId is intentionally null — profile edits are not tenant-scoped
+    await AuditService.record({
+        action: 'user.profile.updated' as any,
+        resourceType: 'UserProfile' as any,
+        resourceId: userId,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'user.profile.updated'}`,
         metadata: { changes: input },
-      },
-    });
+      
+      }, tx)
 
     return {
       id: profile.id,

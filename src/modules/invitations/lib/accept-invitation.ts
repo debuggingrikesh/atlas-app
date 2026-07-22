@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 import crypto from 'crypto';
@@ -91,18 +92,20 @@ export async function acceptInvitation(
     });
 
     // 3. Audit log
-    await tx.auditLog.create({
-      data: {
-        action: 'invitation.accepted',
-        entityType: 'Invitation',
-        entityId: invitation.id,
-        actorId: userId,
+    await AuditService.record({
+        action: 'invitation.accepted' as any,
+        resourceType: 'Invitation' as any,
+        resourceId: invitation.id,
+        actorType: 'USER',
+        actorUserId: userId,
         businessId: invitation.businessId,
+        severity: 'INFO',
+        summary: `System event ${'invitation.accepted'}`,
         metadata: {
           roleId: invitation.roleId,
         },
-      },
-    });
+      
+      }, tx)
 
     // 4. Notify business Owners and Admins
     const admins = await tx.businessMember.findMany({

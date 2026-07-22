@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { UsageService } from '@/modules/reputation/services/usage-service';
@@ -60,16 +61,18 @@ export class ReviewRequestService {
         }, tx);
 
         // 6. Create AuditLog
-        await tx.auditLog.create({
-          data: {
-            action: 'review_request.created',
-            entityType: 'ReviewRequest',
-            entityId: reviewReq.id,
-            actorId: userId,
-            businessId,
-            metadata: { campaignId: campaign.id, customerEmail: data.customerEmail },
-          }
-        });
+        await AuditService.record({
+        action: 'review_request.created' as any,
+        resourceType: 'ReviewRequest' as any,
+        resourceId: reviewReq.id,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'review_request.created'}`,
+        metadata: { campaignId: campaign.id, customerEmail: data.customerEmail },
+          
+      }, tx)
 
         return reviewReq;
       });

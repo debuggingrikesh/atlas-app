@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 
@@ -26,18 +27,20 @@ export async function cancelInvitation(
       data: { status: 'CANCELLED' },
     });
 
-    await tx.auditLog.create({
-      data: {
-        action: 'invitation.cancelled',
-        entityType: 'Invitation',
-        entityId: invitationId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'invitation.cancelled' as any,
+        resourceType: 'Invitation' as any,
+        resourceId: invitationId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'invitation.cancelled'}`,
         metadata: {
           email: invitation.email,
         },
-      },
-    });
+      
+      }, tx)
   });
 
   return { errorRes: null };

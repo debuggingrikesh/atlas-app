@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 import crypto from 'crypto';
@@ -53,18 +54,20 @@ export async function resendInvitation(
       include: { role: true },
     });
 
-    await tx.auditLog.create({
-      data: {
-        action: 'invitation.resent',
-        entityType: 'Invitation',
-        entityId: invitationId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'invitation.resent' as any,
+        resourceType: 'Invitation' as any,
+        resourceId: invitationId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'invitation.resent'}`,
         metadata: {
           email: updated.email,
         },
-      },
-    });
+      
+      }, tx)
 
     return updated;
   });

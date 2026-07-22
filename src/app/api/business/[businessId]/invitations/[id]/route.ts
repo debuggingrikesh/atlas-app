@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -41,16 +42,18 @@ export async function DELETE(request: Request, { params }: Params) {
         data: { status: 'CANCELLED' },
       });
 
-      await tx.auditLog.create({
-        data: {
-          action: 'invitation.cancelled',
-          entityType: 'Invitation',
-          entityId: invitationId,
-          actorId: user.id,
-          businessId,
-          metadata: { email: invitation.email },
-        },
-      });
+      await AuditService.record({
+        action: 'invitation.cancelled' as any,
+        resourceType: 'Invitation' as any,
+        resourceId: invitationId,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'invitation.cancelled'}`,
+        metadata: { email: invitation.email },
+        
+      }, tx)
     });
 
     return successResponse({ success: true }, 200);

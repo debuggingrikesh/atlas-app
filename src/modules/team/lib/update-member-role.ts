@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 import type { MemberRole } from '@prisma/client';
@@ -104,20 +105,22 @@ export async function updateMemberRole(
       throw new Error('409: Conflict. The member was updated by someone else.');
     }
 
-    await tx.auditLog.create({
-      data: {
-        action: 'member.role_updated',
-        entityType: 'BusinessMember',
-        entityId: memberId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'member.role_updated' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: memberId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'member.role_updated'}`,
         metadata: {
           previousRole: targetMember.rbacRole?.name || 'UNKNOWN',
           newRole: newRole.name,
           memberEmail: targetMember.user.email,
         },
-      },
-    });
+      
+      }, tx)
 
     await createNotification(
       {

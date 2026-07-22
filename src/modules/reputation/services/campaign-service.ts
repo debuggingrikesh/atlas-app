@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { prisma } from '@/lib/db/prisma';
@@ -18,16 +19,18 @@ export class CampaignService {
       publicId,
     });
 
-    await prisma.auditLog.create({
-      data: {
-        action: 'review_campaign.created',
-        entityType: 'ReviewCampaign',
-        entityId: campaign.id,
-        actorId: userId,
-        businessId,
-        metadata: data as Prisma.InputJsonValue,
-      }
-    });
+    await AuditService.record({
+        action: 'review_campaign.created' as any,
+        resourceType: 'ReviewCampaign' as any,
+        resourceId: campaign.id,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'review_campaign.created'}`,
+        metadata: data as unknown as Record<string, unknown>,
+      
+      }, undefined)
 
     return campaign;
   }
@@ -49,16 +52,18 @@ export class CampaignService {
     const campaigns = await ReputationRepository.updateCampaign(id, businessId, data);
     
     if (campaigns.count > 0) {
-      await prisma.auditLog.create({
-        data: {
-          action: 'review_campaign.updated',
-          entityType: 'ReviewCampaign',
-          entityId: id,
-          actorId: userId,
-          businessId,
-          metadata: data as Prisma.InputJsonValue,
-        }
-      });
+      await AuditService.record({
+        action: 'review_campaign.updated' as any,
+        resourceType: 'ReviewCampaign' as any,
+        resourceId: id,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'review_campaign.updated'}`,
+        metadata: data as unknown as Record<string, unknown>,
+        
+      }, undefined)
     }
 
     return campaigns.count > 0;

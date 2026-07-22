@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -54,14 +55,16 @@ export async function PATCH(request: Request, { params }: Params) {
         },
       });
 
-      await tx.auditLog.create({
-        data: {
-          action: 'branch.updated',
-          entityType: 'Branch',
-          entityId: branchId,
-          actorId: user.id,
-          businessId,
-          metadata: {
+      await AuditService.record({
+        action: 'branch.updated' as any,
+        resourceType: 'Branch' as any,
+        resourceId: branchId,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'branch.updated'}`,
+        metadata: {
             changes: result.data,
             previous: {
               name: existing.name,
@@ -69,8 +72,8 @@ export async function PATCH(request: Request, { params }: Params) {
               isActive: existing.isActive,
             },
           },
-        },
-      });
+        
+      }, tx)
 
       return updated;
     });

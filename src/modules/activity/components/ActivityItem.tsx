@@ -7,7 +7,7 @@ import type { ActivityItem as ActivityItemType } from '@/modules/activity/types'
 export function ActivityItem({ item }: { item: ActivityItemType }) {
   const actorName = item.actor?.fullName || item.actor?.email || 'System';
   const actionText = formatActivityAction(item.action);
-  const timeAgo = formatRelativeTime(item.createdAt);
+  const timeAgo = formatRelativeTime(item.occurredAt);
 
   const renderRichContent = () => {
     // metadata is a JSON field in Prisma, which translates to any / Prisma.JsonValue. 

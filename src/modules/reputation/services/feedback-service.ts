@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { ReputationSettingsService } from './reputation-settings-service';
@@ -92,15 +93,18 @@ export class FeedbackService {
 
         await ReputationRepository.updateRequestStatus(request.id, 'COMPLETED', tx);
 
-        await tx.auditLog.create({
-          data: {
-            action: 'customer_feedback.received',
-            entityType: 'CustomerFeedback',
-            entityId: request.id,
-            businessId: request.businessId,
-            metadata: { rating: data.rating, isPositive },
-          }
-        });
+        await AuditService.record({
+        action: 'customer_feedback.received' as any,
+        resourceType: 'CustomerFeedback' as any,
+        resourceId: request.id,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: request.businessId,
+        severity: 'INFO',
+        summary: `System event ${'customer_feedback.received'}`,
+        metadata: { rating: data.rating, isPositive },
+          
+      }, tx)
       });
 
       return actionResult;
@@ -173,15 +177,18 @@ export class FeedbackService {
           status: feedbackStatus,
         }, tx);
 
-        await tx.auditLog.create({
-          data: {
-            action: 'customer_feedback.received',
-            entityType: 'CustomerFeedback',
-            entityId: request.id,
-            businessId: campaign.businessId,
-            metadata: { rating: data.rating, isPositive, source: 'PUBLIC_LINK' },
-          }
-        });
+        await AuditService.record({
+        action: 'customer_feedback.received' as any,
+        resourceType: 'CustomerFeedback' as any,
+        resourceId: request.id,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: campaign.businessId,
+        severity: 'INFO',
+        summary: `System event ${'customer_feedback.received'}`,
+        metadata: { rating: data.rating, isPositive, source: 'PUBLIC_LINK' },
+          
+      }, tx)
       });
 
       return actionResult;

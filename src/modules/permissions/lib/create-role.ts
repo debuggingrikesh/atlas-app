@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { RoleWithPermissions } from '@/modules/permissions/types';
 
@@ -52,20 +53,22 @@ export async function createRole(options: CreateRoleOptions): Promise<RoleWithPe
     }
 
     // 3. Audit log: role.created
-    await tx.auditLog.create({
-      data: {
-        action: 'role.created',
-        entityType: 'Role',
-        entityId: role.id,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'role.created' as any,
+        resourceType: 'Role' as any,
+        resourceId: role.id,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'role.created'}`,
         metadata: {
           roleName: name,
           isSystem,
           permissions: permissionKeys,
         },
-      },
-    });
+      
+      }, tx)
 
     return {
       id: role.id,

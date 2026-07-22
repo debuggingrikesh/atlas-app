@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -98,16 +99,18 @@ export async function DELETE(request: Request, { params }: Params) {
         data: { deletedAt: new Date() },
       });
 
-      await tx.auditLog.create({
-        data: {
-          action: 'business.deleted',
-          entityType: 'Business',
-          entityId: businessId,
-          actorId: user.id,
-          businessId,
-          metadata: { deletedAt: new Date() },
-        },
-      });
+      await AuditService.record({
+        action: 'business.deleted' as any,
+        resourceType: 'Business' as any,
+        resourceId: businessId,
+        actorType: 'USER',
+        actorUserId: user.id,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'business.deleted'}`,
+        metadata: { deletedAt: new Date() },
+        
+      }, tx)
     });
 
     return successResponse({ success: true }, 200);

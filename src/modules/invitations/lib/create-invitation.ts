@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 import crypto from 'crypto';
@@ -106,19 +107,21 @@ export async function createInvitation(
       include: { role: true },
     });
 
-    await tx.auditLog.create({
-      data: {
-        action: 'invitation.created',
-        entityType: 'Invitation',
-        entityId: invite.id,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'invitation.created' as any,
+        resourceType: 'Invitation' as any,
+        resourceId: invite.id,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'invitation.created'}`,
         metadata: {
           email: normalizedEmail,
           roleId,
         },
-      },
-    });
+      
+      }, tx)
 
     // 6. Check if invited user exists
     const invitedUser = await tx.userProfile.findUnique({

@@ -1,3 +1,4 @@
+import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 
@@ -27,19 +28,21 @@ export async function removeMember(
       where: { id: memberId },
     });
 
-    await tx.auditLog.create({
-      data: {
-        action: 'member.removed',
-        entityType: 'BusinessMember',
-        entityId: memberId,
-        actorId,
-        businessId,
+    await AuditService.record({
+        action: 'member.removed' as any,
+        resourceType: 'BusinessMember' as any,
+        resourceId: memberId,
+        actorType: 'USER',
+        actorUserId: undefined,
+        businessId: undefined,
+        severity: 'INFO',
+        summary: `System event ${'member.removed'}`,
         metadata: {
           removedUserId: member.userId,
           removedUserEmail: member.user.email,
         },
-      },
-    });
+      
+      }, tx)
   });
 
   return { errorRes: null };
