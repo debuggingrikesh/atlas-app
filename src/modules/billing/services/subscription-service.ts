@@ -1,5 +1,5 @@
 import { BillingRepository } from '../repositories/billing-repository';
-import { BusinessSubscriptionWithDetails } from '../types/billing-types';
+import type { BusinessSubscriptionWithDetails } from '@atlas/core/contracts/billing';
 
 export class SubscriptionService {
   /**
