@@ -2,8 +2,10 @@ import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@/lib/permissions/permissions';
 import { getActivityFeed } from '@/modules/activity/lib/get-activity-feed';
-import { activityFeedQuerySchema } from '@/modules/activity/validators';
 import { successResponse, errorResponse } from '@/lib/api/response';
+import { safeParse } from '@atlas/core/validation';
+import { CursorPaginationSchema } from '@atlas/core/domain';
+import type { PageInfo } from '@atlas/core/domain';
 
 interface Params {
   params: Promise<{ businessId: string }>;
@@ -24,12 +26,12 @@ export async function GET(request: Request, { params }: Params) {
     const { searchParams } = new URL(request.url);
     const queryData = {
       cursor: searchParams.get('cursor') ?? undefined,
-      limit: searchParams.get('limit') ?? undefined,
+      limit: searchParams.has('limit') ? Number(searchParams.get('limit')) : undefined,
     };
 
-    const result = activityFeedQuerySchema.safeParse(queryData);
+    const result = safeParse(CursorPaginationSchema, queryData);
     if (!result.success) {
-      return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid query parameters.', 400);
+      return errorResponse('VALIDATION_ERROR', result.issues[0]?.message ?? 'Invalid query parameters.', 400);
     }
 
     const { items, nextCursor } = await getActivityFeed(businessId, {
@@ -37,7 +39,18 @@ export async function GET(request: Request, { params }: Params) {
       limit: result.data.limit,
     });
 
-    return successResponse({ items, nextCursor });
+    // Explicit mapping to Core pagination response metadata internally
+    const pageInfo: PageInfo = {
+      hasNextPage: !!nextCursor,
+      hasPreviousPage: !!result.data.cursor,
+      endCursor: nextCursor,
+    };
+
+    // Safest correction: Preserve the existing response payload exactly
+    return successResponse({
+      items,
+      nextCursor: pageInfo.endCursor,
+    });
   } catch (err) {
     console.error('[activity GET] Error:', err);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch activity feed.', 500);
