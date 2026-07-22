@@ -15,7 +15,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@atlas/core": "git+https://github.com/debuggingrikesh/atlas-core.git#b15f81816168937919e38d9adae7e6ef87435492",
+    "@atlas/core": "github:debuggingrikesh/atlas-core#ba4e3322e0e8ab85e94b871edbc44b1e94cc92bf",
     "@base-ui/react": "^1.6.0",
     "@google/genai": "^2.11.0",
     "@prisma/adapter-pg": "^7.8.0",
