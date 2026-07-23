@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UsageService } from '../services/usage-service';
 
 describe('Usage Enforcement', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mockTx: any = {
     businessFeatureUsage: {
       findUnique: vi.fn(),

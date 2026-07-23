@@ -73,7 +73,7 @@ export class ReviewRequestService {
         businessId: undefined,
         severity: 'INFO',
         summary: `System event ${'review_request.created'}`,
-        metadata: { campaignId: campaign.id, customerEmail: data.customerEmail },
+        metadata: { campaignId: campaign.id },
           
       }, tx)
 

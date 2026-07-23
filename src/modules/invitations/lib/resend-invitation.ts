@@ -67,9 +67,7 @@ export async function resendInvitation(
         businessId: undefined,
         severity: 'INFO',
         summary: `System event ${'invitation.resent'}`,
-        metadata: {
-          email: updated.email,
-        },
+        metadata: {},
       
       }, tx)
 

@@ -54,7 +54,6 @@ export class AIService {
     const settings = await AIService.getSettings(businessId);
 
     try {
-      return await prisma.$transaction(async (tx) => {
         // 3. Check Entitlement
         const canAccess = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_ANALYSIS');
         if (!canAccess) {
@@ -63,39 +62,62 @@ export class AIService {
 
         const featureLimit = await EntitlementService.getFeatureLimit(businessId, 'AI_REPUTATION_ANALYSIS');
 
-        // 4. Check Usage Limit (atomically)
-        const usageResult = await UsageService.checkAndIncrementUsage(
-          businessId,
-          'AI_REPUTATION_ANALYSIS',
-          featureLimit,
-          tx
-        );
+        // 4. Check Usage Limit (atomically) in a short-lived transaction
+        const usageResult = await prisma.$transaction(async (tx) => {
+          return UsageService.checkAndIncrementUsage(
+            businessId,
+            'AI_REPUTATION_ANALYSIS',
+            featureLimit,
+            tx
+          );
+        });
 
         if (!usageResult.allowed) {
           throw new Error(usageResult.error || 'You have reached your AI generation limit.');
         }
 
-        // 5. Generate structured analysis
-        const promptInput = {
-          businessName: feedback.business.name,
-          industry: 'Business', // Defaulting, in a real system we might join IndustryTemplate
-          customerRating: feedback.rating,
-          customerFeedback: feedback.comment,
-          brandVoice: settings?.brandDescription,
-          tone: settings?.tone || 'Professional',
-          preferredLanguage: settings?.preferredLanguage || 'English',
-          customInstructions: settings?.customInstructions
-        };
+        let rawJson: any;
+        let usageMetadata: any;
+        let parsedData: any;
 
-        const prompt = buildAnalysisPrompt(promptInput);
-        // 5. Generate AI analysis
-        const { data: rawJson, usageMetadata } = await GeminiProvider.generateJSON(prompt);
+        try {
+          // 5. Generate structured analysis OUTSIDE the transaction
+          const promptInput = {
+            businessName: feedback.business.name,
+            industry: 'Business', // Defaulting, in a real system we might join IndustryTemplate
+            customerRating: feedback.rating,
+            customerFeedback: feedback.comment,
+            brandVoice: settings?.brandDescription,
+            tone: settings?.tone || 'Professional',
+            preferredLanguage: settings?.preferredLanguage || 'English',
+            customInstructions: settings?.customInstructions
+          };
 
-        // 6. Validate with Zod
-        const parsedData = FeedbackAnalysisSchema.parse(rawJson);
+          const prompt = buildAnalysisPrompt(promptInput);
+          const result = await GeminiProvider.generateJSON(prompt);
+          rawJson = result.data;
+          usageMetadata = result.usageMetadata;
 
-        // 7. Store FeedbackAnalysis
-        const analysisResult = await tx.feedbackAnalysis.create({
+          // 6. Validate with Zod
+          parsedData = FeedbackAnalysisSchema.parse(rawJson);
+        } catch (err: any) {
+          // Compensate usage on network or parsing failure
+          await prisma.businessFeatureUsage.updateMany({
+            where: {
+              businessId,
+              feature: 'AI_REPUTATION_ANALYSIS',
+              count: { gt: 0 }
+            },
+            data: {
+              count: { decrement: 1 }
+            }
+          });
+          throw err;
+        }
+
+        // 7. Store FeedbackAnalysis and Usage log in a final short transaction
+        return await prisma.$transaction(async (tx) => {
+          const analysisResult = await tx.feedbackAnalysis.create({
           data: {
             businessId,
             feedbackId,
@@ -114,8 +136,8 @@ export class AIService {
           }
         });
 
-        return { response: analysisResult };
-      });
+          return { response: analysisResult };
+        });
     } catch (err: any) {
       logger.error({
         message: 'Feedback analysis failed',

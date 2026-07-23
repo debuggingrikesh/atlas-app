@@ -121,7 +121,6 @@ export async function createInvitation(
         severity: 'INFO',
         summary: `System event ${'invitation.created'}`,
         metadata: {
-          email: normalizedEmail,
           roleId,
         },
       

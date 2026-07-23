@@ -130,7 +130,7 @@ export async function acceptInvitation(
           businessId: invitation.businessId,
           type: NOTIFICATION_EVENTS.INVITATION_ACCEPTED,
           title: 'Invitation Accepted',
-          message: `${userEmail} has accepted their invitation and joined the business.`,
+          message: 'A new user has accepted their invitation and joined the business.',
           metadata: { newMemberId: userId },
         },
         tx
