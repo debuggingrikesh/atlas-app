@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -91,7 +92,7 @@ export async function POST(request: Request, { params }: Params) {
 
     return successResponse({ role }, 201);
   } catch (err) {
-    console.error('[roles POST] Error:', err);
+    logger.error({ message: 'API Error', context: '[roles POST] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to create role.', 500);
   }
 }

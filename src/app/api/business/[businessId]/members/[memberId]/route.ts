@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -30,7 +31,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
     return successResponse({ success: true });
   } catch (err) {
-    console.error('[members DELETE] Error:', err);
+    logger.error({ message: 'API Error', context: '[members DELETE] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to remove member.', 500);
   }
 }
@@ -60,7 +61,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
     return successResponse({ success: true });
   } catch (err) {
-    console.error('[members PATCH] Error:', err);
+    logger.error({ message: 'API Error', context: '[members PATCH] Error:', route: 'API' }, err);
     if (err instanceof Error && err.message.includes('409: Conflict')) {
       return errorResponse('CONFLICT', 'The member was updated by someone else. Please refresh and try again.', 409);
     }

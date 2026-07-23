@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -45,7 +46,7 @@ export async function POST(request: Request, { params }: Params) {
 
     return successResponse({ branch }, 201);
   } catch (err) {
-    console.error('[branches POST] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[branches POST] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to create branch. Please try again.', 500);
   }
 }
@@ -72,7 +73,7 @@ export async function GET(_request: Request, { params }: Params) {
 
     return successResponse({ branches });
   } catch (err) {
-    console.error('[branches GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[branches GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

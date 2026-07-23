@@ -2,6 +2,7 @@
 
 import { BillingRepository } from '../repositories/billing-repository';
 import type { BusinessSubscriptionWithDetails } from '@atlas/core/contracts/billing';
+import { logger } from '@/lib/logger';
 
 export class SubscriptionService {
   /**
@@ -10,7 +11,7 @@ export class SubscriptionService {
   static async assignFreePlan(businessId: string): Promise<BusinessSubscriptionWithDetails | null> {
     const freePlan = await BillingRepository.getPlanByCode('FREE');
     if (!freePlan) {
-      console.error('[SubscriptionService] FREE plan not found in database.');
+      logger.error({ message: 'FREE plan not found in database', feature: 'billing' });
       return null;
     }
 

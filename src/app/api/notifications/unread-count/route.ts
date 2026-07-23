@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     const count = await getUnreadCount(user.id, businessId);
     return successResponse({ count });
   } catch (error) {
-    console.error('[unread-count GET]', error);
+    logger.error({ message: 'API Error', context: '[unread-count GET]', route: 'API' }, error);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch unread count', 500);
   }
 }

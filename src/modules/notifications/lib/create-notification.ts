@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 import { NOTIFICATION_EVENTS } from '@/lib/constants/notification-events';
+import { logger } from '@/lib/logger';
 
 export type CreateNotificationInput = {
   userId: string;
@@ -37,7 +38,7 @@ export async function createNotification(
       });
 
       if (!membership) {
-        console.warn(`[createNotification] User ${input.userId} does not belong to Business ${input.businessId}. Skipping notification.`);
+        logger.warn({ message: 'User does not belong to business, skipping notification', userId: input.userId, businessId: input.businessId, feature: 'notifications' });
         return;
       }
     }
@@ -55,7 +56,7 @@ export async function createNotification(
     });
 
     if (existing) {
-      console.warn(`[createNotification] Duplicate notification suppressed for user ${input.userId}.`);
+      logger.warn({ message: 'Duplicate notification suppressed', userId: input.userId, feature: 'notifications' });
       return;
     }
 
@@ -71,7 +72,7 @@ export async function createNotification(
       },
     });
   } catch (error) {
-    console.error(`[createNotification] Failed to create notification:`, error);
+    logger.error({ message: 'Failed to create notification', feature: 'notifications' }, error instanceof Error ? error.message : String(error));
     // If we are in a transaction, we must rethrow to ensure rollback occurs
     if (tx) {
       throw error;

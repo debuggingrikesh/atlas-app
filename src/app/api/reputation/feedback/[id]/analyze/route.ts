@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -58,10 +59,10 @@ export async function POST(
     return successResponse(result.response);
   } catch (err) {
     if (err instanceof Error && err.name === 'RateLimitConfigError') {
-      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      logger.error({ message: 'API Error', context: `[RateLimiter] Configuration error: ${err.message}`, route: 'API' });
       return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
     }
-    console.error('[analyze POST] error:', err);
+    logger.error({ message: 'API Error', context: '[analyze POST] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

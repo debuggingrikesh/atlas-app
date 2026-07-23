@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -31,7 +32,7 @@ export async function GET() {
       data: profile?.onboardingData ?? null,
     });
   } catch (err) {
-    console.error('[onboarding/draft GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[onboarding/draft GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch draft.', 500);
   }
 }
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
 
     return successResponse({ step: profile.onboardingStep, data: profile.onboardingData });
   } catch (err) {
-    console.error('[onboarding/draft POST] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[onboarding/draft POST] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to save draft.', 500);
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
 
     return successResponse({ request: response.request }, 201);
   } catch (err) {
-    console.error('[reputation/requests POST] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/requests POST] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

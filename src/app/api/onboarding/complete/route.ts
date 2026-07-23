@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -232,7 +233,7 @@ export async function POST(request: Request) {
       201
     );
   } catch (err) {
-    console.error('[onboarding/complete] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[onboarding/complete] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to complete onboarding. Please try again.', 500);
   }
 }

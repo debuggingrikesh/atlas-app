@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
     const settings = await ReputationSettingsService.getSettings(businessId);
     return successResponse({ settings });
   } catch (err) {
-    console.error('[reputation/settings GET] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/settings GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -53,7 +54,7 @@ export async function PATCH(request: Request) {
     const settings = await ReputationSettingsService.updateSettings(user.id, businessId, result.data);
     return successResponse({ settings });
   } catch (err) {
-    console.error('[reputation/settings PATCH] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/settings PATCH] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

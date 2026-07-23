@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -31,7 +32,7 @@ export async function GET(request: Request, { params }: Params) {
       }
     });
   } catch (err) {
-    console.error('[public/reviews/:token GET] error:', err);
+    logger.error({ message: 'API Error', context: '[public/reviews/:token GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -63,7 +64,7 @@ export async function POST(request: Request, { params }: Params) {
     try {
       turnstileSecret = getTurnstileEnv().TURNSTILE_SECRET_KEY;
     } catch (err) {
-      console.error('[public/reviews/:token POST] TURNSTILE_SECRET_KEY is not configured', err);
+      logger.error({ message: 'API Error', context: '[public/reviews/:token POST] TURNSTILE_SECRET_KEY is not configured', route: 'API' }, err);
       return errorResponse('INTERNAL_ERROR', 'Security configuration error.', 500);
     }
 
@@ -80,7 +81,7 @@ export async function POST(request: Request, { params }: Params) {
     const turnstileResult = await turnstileResponse.json();
 
     if (!turnstileResult.success) {
-      console.warn('[public/reviews/:token POST] Turnstile validation failed:', turnstileResult);
+      logger.warn({ message: 'API Error', context: '[public/reviews/:token POST] Turnstile validation failed:', route: 'API' }, turnstileResult);
       return errorResponse('VALIDATION_ERROR', 'Security check failed. Please try again.', 400);
     }
 
@@ -93,10 +94,10 @@ export async function POST(request: Request, { params }: Params) {
     return successResponse(response);
   } catch (err) {
     if (err instanceof Error && err.name === 'RateLimitConfigError') {
-      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      logger.error({ message: 'API Error', context: `[RateLimiter] Configuration error: ${err.message}`, route: 'API' });
       return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
     }
-    console.error('[public/reviews/:token POST] error:', err);
+    logger.error({ message: 'API Error', context: '[public/reviews/:token POST] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

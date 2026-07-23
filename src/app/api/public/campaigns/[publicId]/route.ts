@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -30,7 +31,7 @@ export async function GET(request: Request, { params }: Params) {
       }
     });
   } catch (err) {
-    console.error('[public/campaigns/:publicId GET] error:', err);
+    logger.error({ message: 'API Error', context: '[public/campaigns/:publicId GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -62,10 +63,10 @@ export async function POST(request: Request, { params }: Params) {
     return successResponse(response);
   } catch (err) {
     if (err instanceof Error && err.name === 'RateLimitConfigError') {
-      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      logger.error({ message: 'API Error', context: `[RateLimiter] Configuration error: ${err.message}`, route: 'API' });
       return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
     }
-    console.error('[public/campaigns/:publicId POST] error:', err);
+    logger.error({ message: 'API Error', context: '[public/campaigns/:publicId POST] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

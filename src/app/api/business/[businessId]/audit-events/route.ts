@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -49,7 +50,7 @@ export async function GET(request: Request, { params }: Params) {
 
     return successResponse({ events, nextCursor });
   } catch (err) {
-    console.error('[business/:id/audit-events GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[business/:id/audit-events GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

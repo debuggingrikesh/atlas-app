@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
     const settings = await AIService.getSettings(businessId);
     return successResponse(settings || { tone: 'Professional', preferredLanguage: 'English' });
   } catch (err: any) {
-    console.error('[ai-settings GET] error:', err);
+    logger.error({ message: 'API Error', context: '[ai-settings GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -53,7 +54,7 @@ export async function PATCH(request: Request) {
 
     return successResponse(updated);
   } catch (err: any) {
-    console.error('[ai-settings PATCH] error:', err);
+    logger.error({ message: 'API Error', context: '[ai-settings PATCH] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

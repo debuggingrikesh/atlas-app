@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { getActiveTemplates } from '@/modules/industry/lib/get-templates';
@@ -21,7 +22,7 @@ export async function GET() {
 
     return response;
   } catch (err) {
-    console.error('[industry/templates GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[industry/templates GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

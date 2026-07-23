@@ -10,6 +10,7 @@ import { NOTIFICATION_EVENTS } from '@/lib/constants/notification-events';
 import type { CreateInvitationInput, Invitation } from '../types';
 import { sendEmail } from '@/lib/email/send-email';
 import { generateInvitationEmailHtml } from '@/lib/email/templates/invitation';
+import { logger } from '@/lib/logger';
 
 /**
  * Creates a new invitation for a business.
@@ -185,7 +186,7 @@ export async function createInvitation(
       }
     }
   } catch (err) {
-    console.error('[Invitation] Unexpected error during email dispatch:', err);
+    logger.error({ message: 'Unexpected error during email dispatch', feature: 'invitations', invitationId: invitation.id }, err instanceof Error ? err.message : String(err));
     return {
       invitation,
       rawToken: null,

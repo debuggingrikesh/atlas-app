@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -22,7 +23,7 @@ export async function GET() {
     }
     return successResponse({ profile });
   } catch (err) {
-    console.error('[users/profile GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[users/profile GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -52,7 +53,7 @@ export async function PATCH(request: Request) {
     const profile = await updateProfile(user.id, user.email!, result.data);
     return successResponse({ profile });
   } catch (err) {
-    console.error('[users/profile PATCH] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[users/profile PATCH] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

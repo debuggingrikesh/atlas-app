@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -61,7 +62,7 @@ export async function DELETE(request: Request, { params }: Params) {
 
     return successResponse({ success: true }, 200);
   } catch (err) {
-    console.error('[invitations/:id DELETE] Error:', err);
+    logger.error({ message: 'API Error', context: '[invitations/:id DELETE] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to cancel invitation.', 500);
   }
 }

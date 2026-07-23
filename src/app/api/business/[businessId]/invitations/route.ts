@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -41,7 +42,7 @@ export async function POST(request: Request, { params }: Params) {
       201
     );
   } catch (err) {
-    console.error('[invitations POST] Error:', err);
+    logger.error({ message: 'API Error', context: '[invitations POST] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to create invitation.', 500);
   }
 }
@@ -61,7 +62,7 @@ export async function GET(_request: Request, { params }: Params) {
     const invitations = await getInvitations(businessId);
     return successResponse({ invitations });
   } catch (err) {
-    console.error('[invitations GET] Error:', err);
+    logger.error({ message: 'API Error', context: '[invitations GET] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch invitations.', 500);
   }
 }

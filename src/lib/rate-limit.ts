@@ -4,6 +4,8 @@ import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
 import { getRateLimitEnv } from './env.server';
+import { RateLimitConfigError } from './errors';
+export { RateLimitConfigError };
 
 let _redis: Redis | null = null;
 let _redisInitialized = false;
@@ -24,12 +26,6 @@ export const getRedis = () => {
   return _redis;
 };
 
-export class RateLimitConfigError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'RateLimitConfigError';
-  }
-}
 
 /**
  * Distributed rate limiter using Upstash Redis and @upstash/ratelimit.

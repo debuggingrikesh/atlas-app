@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -36,7 +37,7 @@ export async function GET(_request: Request, { params }: Params) {
     }
     return successResponse({ business });
   } catch (err) {
-    console.error('[business/:id GET] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[business/:id GET] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -72,7 +73,7 @@ export async function PATCH(request: Request, { params }: Params) {
     const business = await updateBusiness(user.id, businessId, result.data);
     return successResponse({ business });
   } catch (err) {
-    console.error('[business/:id PATCH] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[business/:id PATCH] Unexpected error:', route: 'API' }, err);
     if (err instanceof Error && err.message.includes('409: Conflict')) {
       return errorResponse('CONFLICT', 'The business was updated by someone else. Please refresh and try again.', 409);
     }
@@ -118,7 +119,7 @@ export async function DELETE(request: Request, { params }: Params) {
 
     return successResponse({ success: true }, 200);
   } catch (err) {
-    console.error('[business/:id DELETE] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[business/:id DELETE] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

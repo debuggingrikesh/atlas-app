@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -83,7 +84,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
     return successResponse({ branch });
   } catch (err) {
-    console.error('[branches PATCH] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[branches PATCH] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to update branch.', 500);
   }
 }

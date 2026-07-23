@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -26,7 +27,7 @@ export async function GET() {
       profile,
     });
   } catch (err) {
-    console.error('[me] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[me] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

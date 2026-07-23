@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { createClient } from '@/lib/supabase/server';
@@ -14,13 +15,13 @@ export async function POST() {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error('[logout] Supabase error:', error.message);
+      logger.error({ message: 'API Error', context: '[logout] Supabase error:', route: 'API' }, error.message);
       return errorResponse('INTERNAL_ERROR', 'Failed to sign out. Please try again.', 500);
     }
 
     return successResponse({ message: 'Signed out successfully.' });
   } catch (err) {
-    console.error('[logout] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[logout] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

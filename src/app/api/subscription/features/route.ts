@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -16,7 +17,7 @@ export async function GET() {
 
     return successResponse({ plans });
   } catch (err: any) {
-    console.error('[subscription/features GET] error:', err);
+    logger.error({ message: 'API Error', context: '[subscription/features GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

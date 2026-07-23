@@ -5,6 +5,7 @@ import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { ReputationSettingsService } from './reputation-settings-service';
+import { logger } from '@/lib/logger';
 import crypto from 'crypto';
 
 export class FeedbackService {
@@ -111,7 +112,8 @@ export class FeedbackService {
       });
 
       return actionResult;
-    } catch {
+    } catch (err) {
+      logger.error({ message: 'Failed to submit public review', feature: 'reputation' }, err instanceof Error ? err.message : String(err));
       return { error: 'Failed to submit feedback.', status: 500 };
     }
   }
@@ -196,7 +198,7 @@ export class FeedbackService {
 
       return actionResult;
     } catch (err) {
-      console.error('[FeedbackService.submitCampaignReview] Error:', err);
+      logger.error({ message: 'Failed to submit campaign review', feature: 'reputation', campaignId: campaign.id }, err instanceof Error ? err.message : String(err));
       return { error: 'Failed to submit feedback.', status: 500 };
     }
   }

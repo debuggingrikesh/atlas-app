@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
@@ -99,7 +100,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
     return successResponse({ role: updatedRole });
   } catch (err) {
-    console.error('[roles PATCH] Error:', err);
+    logger.error({ message: 'API Error', context: '[roles PATCH] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to update role.', 500);
   }
 }
@@ -186,7 +187,7 @@ export async function DELETE(request: Request, { params }: Params) {
 
     return successResponse({ success: true });
   } catch (err) {
-    console.error('[roles DELETE] Error:', err);
+    logger.error({ message: 'API Error', context: '[roles DELETE] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to delete role.', 500);
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
 
     return successResponse({ items, nextCursor });
   } catch (error) {
-    console.error('[notifications GET]', error);
+    logger.error({ message: 'API Error', context: '[notifications GET]', route: 'API' }, error);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch notifications', 500);
   }
 }

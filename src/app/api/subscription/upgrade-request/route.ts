@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     return successResponse({ request: result.request }, 201);
   } catch (err: any) {
-    console.error('[subscription/upgrade-request POST] error:', err);
+    logger.error({ message: 'API Error', context: '[subscription/upgrade-request POST] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

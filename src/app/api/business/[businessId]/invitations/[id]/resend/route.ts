@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -32,7 +33,7 @@ export async function POST(_request: Request, { params }: Params) {
       ...(isDev && rawToken ? { rawToken } : {})
     });
   } catch (err) {
-    console.error('[invitations resend POST] Error:', err);
+    logger.error({ message: 'API Error', context: '[invitations resend POST] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to resend invitation.', 500);
   }
 }

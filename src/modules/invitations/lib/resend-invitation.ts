@@ -9,6 +9,7 @@ import type { Invitation } from '../types';
 
 import { sendEmail } from '@/lib/email/send-email';
 import { generateInvitationEmailHtml } from '@/lib/email/templates/invitation';
+import { logger } from '@/lib/logger';
 
 export async function resendInvitation(
   actorId: string,
@@ -110,7 +111,7 @@ export async function resendInvitation(
       }
     }
   } catch (err) {
-    console.error('[Invitation] Unexpected error during email dispatch:', err);
+    logger.error({ message: 'Unexpected error during email dispatch', feature: 'invitations', invitationId: invitation.id }, err instanceof Error ? err.message : String(err));
     return {
       invitation,
       rawToken: null,

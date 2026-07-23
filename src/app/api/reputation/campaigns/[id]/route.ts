@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -34,7 +35,7 @@ export async function GET(request: Request, { params }: Params) {
     }
     return successResponse({ campaign });
   } catch (err) {
-    console.error('[reputation/campaigns/:id GET] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/campaigns/:id GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
@@ -69,7 +70,7 @@ export async function PATCH(request: Request, { params }: Params) {
     const campaign = await CampaignService.getCampaignById(id, businessId);
     return successResponse({ campaign });
   } catch (err) {
-    console.error('[reputation/campaigns/:id PATCH] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/campaigns/:id PATCH] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

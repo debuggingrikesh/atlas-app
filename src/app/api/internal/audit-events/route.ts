@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { NextResponse } from 'next/server';
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ events });
   } catch (error) {
-    console.error('[Internal Audit API] Error fetching audit events', error);
+    logger.error({ message: 'API Error', context: '[Internal Audit API] Error fetching audit events', route: 'API' }, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

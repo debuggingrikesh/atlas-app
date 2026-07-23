@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -43,7 +44,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
     return successResponse({ success: true });
   } catch (err: any) {
-    console.error('[reputation/feedback/:id PATCH] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/feedback/:id PATCH] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

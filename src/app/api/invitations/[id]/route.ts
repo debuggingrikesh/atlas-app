@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -44,7 +45,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
     return successResponse({ success: true });
   } catch (err) {
-    console.error('[invitations DELETE] Error:', err);
+    logger.error({ message: 'API Error', context: '[invitations DELETE] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to cancel invitation.', 500);
   }
 }

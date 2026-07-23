@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -29,7 +30,7 @@ export async function PATCH(request: Request) {
 
     return successResponse({ count });
   } catch (error) {
-    console.error('[notifications read-all PATCH]', error);
+    logger.error({ message: 'API Error', context: '[notifications read-all PATCH]', route: 'API' }, error);
     return errorResponse('INTERNAL_ERROR', 'Failed to mark notifications as read', 500);
   }
 }

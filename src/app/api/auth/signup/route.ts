@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { createClient } from '@/lib/supabase/server';
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
           200
         );
       }
-      console.error('[signup] Supabase error:', error.message);
+      logger.error({ message: 'API Error', context: '[signup] Supabase error:', route: 'API' }, error.message);
       return errorResponse('INTERNAL_ERROR', 'Failed to create account. Please try again.', 500);
     }
 
@@ -61,10 +62,10 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     if (err instanceof Error && err.name === 'RateLimitConfigError') {
-      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      logger.error({ message: 'API Error', context: `[RateLimiter] Configuration error: ${err.message}`, route: 'API' });
       return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
     }
-    console.error('[signup] Unexpected error:', err);
+    logger.error({ message: 'API Error', context: '[signup] Unexpected error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }

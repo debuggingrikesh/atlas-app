@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -16,7 +17,7 @@ export async function POST() {
     const { count } = await pruneNotifications();
     return successResponse({ count });
   } catch (error) {
-    console.error('[notifications prune POST]', error);
+    logger.error({ message: 'API Error', context: '[notifications prune POST]', route: 'API' }, error);
     return errorResponse('INTERNAL_ERROR', 'Failed to prune notifications', 500);
   }
 }

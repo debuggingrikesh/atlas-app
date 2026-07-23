@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -25,7 +26,7 @@ export async function PATCH(request: Request, { params }: Params) {
         return errorResponse('UNAUTHORIZED', error.message, 403);
       }
     }
-    console.error('[mark-read PATCH]', error);
+    logger.error({ message: 'API Error', context: '[mark-read PATCH]', route: 'API' }, error);
     return errorResponse('INTERNAL_ERROR', 'Failed to mark notification as read', 500);
   }
 }

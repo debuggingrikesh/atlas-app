@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -54,7 +55,7 @@ export async function GET(request: Request, { params }: Params) {
       nextCursor: pageInfo.endCursor,
     });
   } catch (err) {
-    console.error('[activity GET] Error:', err);
+    logger.error({ message: 'API Error', context: '[activity GET] Error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch activity feed.', 500);
   }
 }

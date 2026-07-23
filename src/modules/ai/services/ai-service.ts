@@ -5,6 +5,7 @@ import { GeminiProvider } from '../providers/gemini-provider';
 import { buildAnalysisPrompt } from '../prompts/reputation-prompts';
 import { EntitlementService } from '@/modules/billing/services/entitlement-service';
 import { UsageService } from '@/modules/reputation/services/usage-service';
+import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
 const FeedbackAnalysisSchema = z.object({
@@ -116,7 +117,12 @@ export class AIService {
         return { response: analysisResult };
       });
     } catch (err: any) {
-      console.error('[AIService.analyzeFeedback] failed:', err);
+      logger.error({
+        message: 'Feedback analysis failed',
+        businessId,
+        feedbackId,
+        feature: 'ai'
+      }, err instanceof Error ? err.message : String(err));
       return { error: err instanceof Error ? err.message : 'Failed to analyze feedback.', status: 400 };
     }
   }

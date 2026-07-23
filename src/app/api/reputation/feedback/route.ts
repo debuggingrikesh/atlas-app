@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
     const feedback = await FeedbackService.getFeedback(businessId, page, limit);
     return successResponse({ feedback });
   } catch (err) {
-    console.error('[reputation/feedback GET] error:', err);
+    logger.error({ message: 'API Error', context: '[reputation/feedback GET] error:', route: 'API' }, err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
