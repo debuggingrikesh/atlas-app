@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
+import { resolveRequestId } from '@/lib/api/handler';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -51,7 +52,8 @@ export async function PATCH(request: Request) {
       return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid input.', 400);
     }
 
-    const settings = await ReputationSettingsService.updateSettings(user.id, businessId, result.data);
+    const requestId = resolveRequestId(request.headers.get('x-request-id'));
+    const settings = await ReputationSettingsService.updateSettings(user.id, businessId, result.data, requestId);
     return successResponse({ settings });
   } catch (err) {
     logger.error({ message: 'API Error', context: '[reputation/settings PATCH] error:', route: 'API' }, err);

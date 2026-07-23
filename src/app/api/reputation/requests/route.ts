@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
+import { resolveRequestId } from '@/lib/api/handler';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
       return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid input.', 400);
     }
 
-    const response = await ReviewRequestService.createRequest(user.id, businessId, result.data);
+    const requestId = resolveRequestId(request.headers.get('x-request-id'));
+    const response = await ReviewRequestService.createRequest(user.id, businessId, result.data, requestId);
     
     if (response.error) {
       return errorResponse('VALIDATION_ERROR', response.error, response.status || 400);

@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
+import { resolveRequestId } from '@/lib/api/handler';
 import { resendInvitation } from '@/modules/invitations/lib/resend-invitation';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
@@ -14,7 +15,7 @@ interface Params {
 /**
  * POST /api/business/[businessId]/invitations/[id]/resend
  */
-export async function POST(_request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -23,7 +24,8 @@ export async function POST(_request: Request, { params }: Params) {
   if (permError) return permError;
 
   try {
-    const { invitation, rawToken, errorRes } = await resendInvitation(user.id, businessId, id);
+    const requestId = resolveRequestId(request.headers.get('x-request-id'));
+    const { invitation, rawToken, errorRes } = await resendInvitation(user.id, businessId, id, requestId);
     if (errorRes) return errorRes;
 
     // Never expose raw token in production API responses

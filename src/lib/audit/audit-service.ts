@@ -3,14 +3,34 @@
 import { prisma } from '../db/prisma';
 import { logger } from '../logger';
 import type { Prisma } from '@prisma/client';
-import type { BaseAuditEvent } from '@atlas/core/audit';
+import type { BaseAuditEvent, AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 
 type TransactionClient = Omit<
   Prisma.TransactionClient,
   '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
 >;
 
-export interface CreateAuditEventArgs extends Omit<BaseAuditEvent, 'requestId' | 'sourceService'> {
+export type AppAuditAction =
+  | AuditActionType
+  | 'team.invitation.created'
+  | 'team.invitation.resent'
+  | 'team.invitation.accepted'
+  | 'reputation.settings.updated'
+  | 'reputation.review_request.created'
+  | 'reputation.feedback.analyzed'
+  | 'business.settings.updated';
+
+export type AppAuditResourceType =
+  | AuditResourceTypeType
+  | 'INVITATION'
+  | 'REPUTATION_SETTINGS'
+  | 'REVIEW_REQUEST'
+  | 'FEEDBACK_ANALYSIS'
+  | 'BUSINESS';
+
+export interface CreateAuditEventArgs extends Omit<BaseAuditEvent, 'action' | 'resourceType' | 'requestId' | 'sourceService'> {
+  action: AppAuditAction;
+  resourceType: AppAuditResourceType;
   requestId?: string;
   sourceService?: 'atlas-app' | 'atlas-hq';
   failSilently?: boolean;
@@ -65,29 +85,72 @@ export class AuditService {
         error: error instanceof Error ? error.message : String(error),
       });
 
-      if (!event.failSilently) {
+      // If explicitly part of a transaction, throw so Prisma aborts the transaction.
+      // Otherwise, log and swallow (failSilently defaults to true for standalone ops).
+      const shouldThrow = event.failSilently === false || (tx && event.failSilently !== true);
+      if (shouldThrow) {
         throw new Error(`Audit event persistence failed for action: ${event.action}`);
       }
     }
   }
 
   /**
-   * Redacts common sensitive keys (passwords, tokens, cookies, secrets).
+   * Redacts sensitive keys safely with exact matching.
    */
-  private static redactSensitiveData(obj: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
-    if (!obj) return undefined;
+  private static redactSensitiveData(
+    obj: unknown,
+    seen = new WeakSet(),
+    depth = 0
+  ): unknown {
+    if (obj === null || obj === undefined) return obj;
+    if (depth > 5) return '[MAX_DEPTH]';
+    if (typeof obj !== 'object') return obj;
 
-    const SENSITIVE_KEYS = ['password', 'token', 'secret', 'cookie', 'authorization', 'key'];
-    
-    // Create a shallow copy to modify safely
-    const redacted = { ...obj };
+    if (obj instanceof Date) return obj.toISOString();
+    if (obj instanceof Error) return { message: obj.message, name: obj.name };
 
-    for (const [key, value] of Object.entries(redacted)) {
+    // Prevent circular references
+    if (seen.has(obj)) return '[CIRCULAR]';
+    seen.add(obj);
+
+    const SENSITIVE_KEYS = [
+      'email', 'phone', 'token', 'authorization',
+      'cookie', 'password', 'secret', 'prompt', 'output',
+      'reviewtext', 'feedbacktext', 'customername', 'ip_address'
+    ];
+
+    const SAFE_IDENTIFIERS = new Set([
+      'reviewid', 'feedbackid', 'campaignid', 'resourceid',
+      'businessid', 'tenantid', 'userid', 'actoruserid'
+    ]);
+
+    if (Array.isArray(obj)) {
+      const MAX_ARRAY_LENGTH = 100;
+      if (obj.length > MAX_ARRAY_LENGTH) {
+        const truncated = obj.slice(0, MAX_ARRAY_LENGTH).map(item => this.redactSensitiveData(item, seen, depth + 1));
+        truncated.push('[MAX_ARRAY_LENGTH]');
+        return truncated;
+      }
+      return obj.map(item => this.redactSensitiveData(item, seen, depth + 1));
+    }
+
+    const redacted: Record<string, unknown> = {};
+    const MAX_OBJECT_KEYS = 100;
+    let keyCount = 0;
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (keyCount >= MAX_OBJECT_KEYS) {
+        redacted['[MAX_OBJECT_KEYS]'] = 'Truncated';
+        break;
+      }
+      keyCount++;
       const lowerKey = key.toLowerCase();
-      if (SENSITIVE_KEYS.some(sk => lowerKey.includes(sk))) {
+      if (SAFE_IDENTIFIERS.has(lowerKey)) {
+        redacted[key] = this.redactSensitiveData(value, seen, depth + 1);
+      } else if (SENSITIVE_KEYS.some(sk => lowerKey.includes(sk))) {
         redacted[key] = '[REDACTED]';
-      } else if (value && typeof value === 'object' && !Array.isArray(value)) {
-        redacted[key] = this.redactSensitiveData(value as Record<string, unknown>);
+      } else {
+        redacted[key] = this.redactSensitiveData(value, seen, depth + 1);
       }
     }
 

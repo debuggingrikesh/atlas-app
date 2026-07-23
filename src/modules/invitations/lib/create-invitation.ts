@@ -19,7 +19,8 @@ import { logger } from '@/lib/logger';
 export async function createInvitation(
   actorId: string,
   businessId: string,
-  input: CreateInvitationInput
+  input: CreateInvitationInput,
+  requestId?: string
 ): Promise<
   | { invitation: Invitation; rawToken: string; errorRes: null }
   | { invitation: Invitation | null; rawToken: null; errorRes: ReturnType<typeof errorResponse> }
@@ -112,19 +113,18 @@ export async function createInvitation(
     });
 
     await AuditService.record({
-        action: 'invitation.created' as AuditActionType,
-        resourceType: 'Invitation' as AuditResourceTypeType,
-        resourceId: invite.id,
-        actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
-        severity: 'INFO',
-        summary: `System event ${'invitation.created'}`,
-        metadata: {
-          roleId,
-        },
-      
-      }, tx)
+      action: 'team.invitation.created',
+      resourceType: 'INVITATION',
+      resourceId: invite.id,
+      actorType: 'USER',
+      actorUserId: actorId,
+      businessId: businessId,
+      tenantId: businessId, // Assuming businessId functions as tenantId here
+      requestId,
+      severity: 'INFO',
+      summary: `User sent an invitation for role: ${invite.role.name}`,
+      metadata: { roleId, roleName: invite.role.name },
+    }, tx);
 
     // 6. Check if invited user exists
     const invitedUser = await tx.userProfile.findUnique({

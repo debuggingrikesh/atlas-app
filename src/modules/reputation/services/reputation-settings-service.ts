@@ -22,23 +22,25 @@ export class ReputationSettingsService {
   static async updateSettings(
     userId: string,
     businessId: string, 
-    data: Prisma.ReputationSettingsUpdateInput
+    data: Prisma.ReputationSettingsUpdateInput,
+    requestId?: string
   ) {
     const settings = await ReputationRepository.updateSettings(businessId, data);
     
     // Create AuditLog
     await AuditService.record({
-        action: 'reputation.settings.updated' as AuditActionType,
-        resourceType: 'ReputationSettings' as AuditResourceTypeType,
-        resourceId: settings.id,
-        actorType: 'USER',
-        actorUserId: userId,
-        businessId: undefined,
-        severity: 'INFO',
-        summary: `System event ${'reputation.settings.updated'}`,
-        metadata: data as any as Record<string, unknown>,
-      
-      }, undefined)
+      action: 'reputation.settings.updated',
+      resourceType: 'REPUTATION_SETTINGS',
+      resourceId: settings.id,
+      actorType: 'USER',
+      actorUserId: userId,
+      businessId: businessId,
+      tenantId: businessId,
+      requestId,
+      severity: 'INFO',
+      summary: 'User updated reputation settings',
+      metadata: { changedFields: Object.keys(data) },
+    });
 
     return settings;
   }

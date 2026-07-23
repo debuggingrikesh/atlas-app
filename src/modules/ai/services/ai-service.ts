@@ -5,6 +5,7 @@ import { GeminiProvider } from '../providers/gemini-provider';
 import { buildAnalysisPrompt } from '../prompts/reputation-prompts';
 import { EntitlementService } from '@/modules/billing/services/entitlement-service';
 import { UsageService } from '@/modules/reputation/services/usage-service';
+import { AuditService } from '@/lib/audit/audit-service';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
@@ -35,7 +36,7 @@ export class AIService {
     });
   }
 
-  static async analyzeFeedback(businessId: string, feedbackId: string) {
+  static async analyzeFeedback(businessId: string, feedbackId: string, userId?: string, requestId?: string) {
     // 1. Fetch Feedback
     const feedback = await prisma.customerFeedback.findUnique({
       where: { id: feedbackId },
@@ -115,7 +116,7 @@ export class AIService {
           throw err;
         }
 
-        // 7. Store FeedbackAnalysis and Usage log in a final short transaction
+        // 7. Store FeedbackAnalysis, Usage log, and AuditLog in a final short transaction
         return await prisma.$transaction(async (tx) => {
           const analysisResult = await tx.feedbackAnalysis.create({
           data: {
@@ -135,6 +136,21 @@ export class AIService {
             outputTokens: usageMetadata?.candidatesTokenCount ?? null,
           }
         });
+
+        // 9. Create Audit Log
+        await AuditService.record({
+          action: 'reputation.feedback.analyzed',
+          resourceType: 'FEEDBACK_ANALYSIS',
+          resourceId: analysisResult.id,
+          actorType: userId ? 'USER' : 'SYSTEM',
+          actorUserId: userId,
+          businessId: businessId,
+          tenantId: businessId,
+          requestId,
+          severity: 'INFO',
+          summary: userId ? 'User analyzed feedback using AI' : 'System analyzed feedback using AI',
+          metadata: { feedbackId },
+        }, tx);
 
           return { response: analysisResult };
         });

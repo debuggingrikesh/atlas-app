@@ -3,6 +3,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
+import { resolveRequestId } from '@/lib/api/handler';
 import { createInvitationSchema } from '@/modules/invitations/validators';
 import { createInvitation } from '@/modules/invitations/lib/create-invitation';
 import { getInvitations } from '@/modules/invitations/lib/get-invitations';
@@ -37,7 +38,8 @@ async function postInvitationHandler(request: Request, context: unknown): Promis
     return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid input.', 400);
   }
 
-  const { invitation, rawToken, errorRes } = await createInvitation(user.id, businessId, result.data);
+  const requestId = resolveRequestId(request.headers.get('x-request-id'));
+  const { invitation, rawToken, errorRes } = await createInvitation(user.id, businessId, result.data, requestId);
   if (errorRes) return errorRes;
 
   // Never expose raw token in production API responses

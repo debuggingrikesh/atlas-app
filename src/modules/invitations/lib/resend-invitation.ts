@@ -14,7 +14,8 @@ import { logger } from '@/lib/logger';
 export async function resendInvitation(
   actorId: string,
   businessId: string,
-  invitationId: string
+  invitationId: string,
+  requestId?: string
 ): Promise<
   | { invitation: Invitation; rawToken: string; errorRes: null }
   | { invitation: Invitation | null; rawToken: null; errorRes: ReturnType<typeof errorResponse> }
@@ -59,17 +60,17 @@ export async function resendInvitation(
     });
 
     await AuditService.record({
-        action: 'invitation.resent' as AuditActionType,
-        resourceType: 'Invitation' as AuditResourceTypeType,
-        resourceId: invitationId,
-        actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
-        severity: 'INFO',
-        summary: `System event ${'invitation.resent'}`,
-        metadata: {},
-      
-      }, tx)
+      action: 'team.invitation.resent',
+      resourceType: 'INVITATION',
+      resourceId: invitationId,
+      actorType: 'USER',
+      actorUserId: actorId,
+      businessId: businessId,
+      tenantId: businessId,
+      requestId,
+      severity: 'INFO',
+      summary: `User resent invitation for role: ${updated.role.name}`,
+    }, tx);
 
     return updated;
   });

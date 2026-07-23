@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
  
 
 import { requireAuth } from '@/lib/auth/require-auth';
+import { resolveRequestId } from '@/lib/api/handler';
 import { acceptInvitation } from '@/modules/invitations/lib/accept-invitation';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
@@ -13,7 +14,7 @@ interface Params {
  * POST /api/invitations/[id]/accept
  * Accepts an invitation using the raw token (passed via the id param segment).
  */
-export async function POST(_request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -21,7 +22,8 @@ export async function POST(_request: Request, { params }: Params) {
   const token = id;
 
   try {
-    const { errorRes } = await acceptInvitation(user.id, user.email, token);
+    const requestId = resolveRequestId(request.headers.get('x-request-id'));
+    const { errorRes } = await acceptInvitation(user.id, user.email, token, requestId);
     if (errorRes) return errorRes;
 
     return successResponse({ success: true });

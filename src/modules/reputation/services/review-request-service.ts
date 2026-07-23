@@ -18,7 +18,8 @@ export class ReviewRequestService {
       customerEmail?: string;
       customerPhone?: string;
       source?: 'MANUAL' | 'WHATSAPP' | 'QR' | 'EMAIL';
-    }
+    },
+    requestId?: string
   ) {
     // 1. Validate campaign belongs to business
     const campaign = await ReputationRepository.getCampaignById(data.campaignId, businessId);
@@ -65,17 +66,18 @@ export class ReviewRequestService {
 
         // 6. Create AuditLog
         await AuditService.record({
-        action: 'review_request.created' as AuditActionType,
-        resourceType: 'ReviewRequest' as AuditResourceTypeType,
-        resourceId: reviewReq.id,
-        actorType: 'USER',
-        actorUserId: userId,
-        businessId: undefined,
-        severity: 'INFO',
-        summary: `System event ${'review_request.created'}`,
-        metadata: { campaignId: campaign.id },
-          
-      }, tx)
+          action: 'reputation.review_request.created',
+          resourceType: 'REVIEW_REQUEST',
+          resourceId: reviewReq.id,
+          actorType: 'USER',
+          actorUserId: userId,
+          businessId: businessId,
+          tenantId: businessId,
+          requestId,
+          severity: 'INFO',
+          summary: 'User created a review request',
+          metadata: { campaignId: campaign.id, branchId: campaign.branchId },
+        }, tx);
 
         return reviewReq;
       });

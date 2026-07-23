@@ -12,7 +12,8 @@ import { NOTIFICATION_EVENTS } from '@/lib/constants/notification-events';
 export async function acceptInvitation(
   userId: string,
   userEmail: string,
-  rawToken: string
+  rawToken: string,
+  requestId?: string
 ): Promise<{ errorRes: ReturnType<typeof errorResponse> | null }> {
   const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
 
@@ -96,19 +97,18 @@ export async function acceptInvitation(
 
     // 3. Audit log
     await AuditService.record({
-        action: 'invitation.accepted' as AuditActionType,
-        resourceType: 'Invitation' as AuditResourceTypeType,
-        resourceId: invitation.id,
-        actorType: 'USER',
-        actorUserId: userId,
-        businessId: invitation.businessId,
-        severity: 'INFO',
-        summary: `System event ${'invitation.accepted'}`,
-        metadata: {
-          roleId: invitation.roleId,
-        },
-      
-      }, tx)
+      action: 'team.invitation.accepted',
+      resourceType: 'INVITATION',
+      resourceId: invitation.id,
+      actorType: 'USER',
+      actorUserId: userId,
+      businessId: invitation.businessId,
+      tenantId: invitation.businessId,
+      requestId,
+      severity: 'INFO',
+      summary: `User accepted invitation for role: ${invitation.roleId}`,
+      metadata: { roleId: invitation.roleId },
+    }, tx);
 
     // 4. Notify business Owners and Admins
     const admins = await tx.businessMember.findMany({

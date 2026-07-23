@@ -5,7 +5,7 @@ import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { AIService } from '@/modules/ai/services/ai-service';
 import { withRateLimit } from '@/lib/api/rate-limit-handler';
-import { withErrorHandling } from '@/lib/api/handler';
+import { withErrorHandling, resolveRequestId } from '@/lib/api/handler';
 import { prisma } from '@/lib/db/prisma';
 
 /**
@@ -59,7 +59,8 @@ async function analyzeHandler(
     return errorResponse('FORBIDDEN', 'Only the Business Owner can generate reputation intelligence.', 403);
   }
 
-  const result = await AIService.analyzeFeedback(businessId, id);
+  const requestId = resolveRequestId(request.headers.get('x-request-id'));
+  const result = await AIService.analyzeFeedback(businessId, id, user.id, requestId);
   if ('error' in result) {
     return errorResponse('INTERNAL_ERROR', result.error, result.status || 400);
   }
