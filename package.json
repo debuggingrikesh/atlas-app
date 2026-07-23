@@ -14,7 +14,7 @@
     "db:backup": "echo 'Run pg_dump using the ATLAS_BACKUP_AND_RESTORE_RUNBOOK.md'",
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
     "@atlas/core": "github:debuggingrikesh/atlas-core#8cf58601aaa167f4f9bc35f888553ee8d4347d87",
