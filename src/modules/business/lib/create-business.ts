@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { generateUniqueSlug } from './generate-slug';
@@ -92,8 +93,8 @@ export async function createBusiness(
     // 5. Audit log: role.created (for all three system roles)
     for (const roleName of roleNames) {
       await AuditService.record({
-        action: 'role.created' as any,
-        resourceType: 'Role' as any,
+        action: 'role.created' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: createdRoles[roleName],
         actorType: 'USER',
         actorUserId: userId,
@@ -111,8 +112,8 @@ export async function createBusiness(
 
     // 6. Audit log: business.created
     await AuditService.record({
-        action: 'business.created' as any,
-        resourceType: 'Business' as any,
+        action: 'business.created' as AuditActionType,
+        resourceType: 'Business' as AuditResourceTypeType,
         resourceId: business.id,
         actorType: 'USER',
         actorUserId: userId,
@@ -125,8 +126,8 @@ export async function createBusiness(
 
     // 7. Audit log: business_member.created
     await AuditService.record({
-        action: 'business_member.created' as any,
-        resourceType: 'BusinessMember' as any,
+        action: 'business_member.created' as AuditActionType,
+        resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: member.id,
         actorType: 'USER',
         actorUserId: userId,

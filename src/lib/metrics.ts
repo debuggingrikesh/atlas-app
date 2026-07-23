@@ -111,18 +111,15 @@ class MetricsService {
     if (now - this.lastFlush > FLUSH_INTERVAL_MS && !this.isFlushing) {
       this.lastFlush = now;
       // In Vercel Edge/Serverless, we must use waitUntil to keep the function alive
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      try {
-        const vercel = require('@vercel/functions');
+      import('@vercel/functions').then((vercel) => {
         if (vercel && vercel.waitUntil) {
           vercel.waitUntil(this.flush());
         } else {
           setTimeout(() => this.flush(), 0);
         }
-      } catch {
-        // Fallback if not in Vercel environment
+      }).catch(() => {
         setTimeout(() => this.flush(), 0);
-      }
+      });
     }
   }
 

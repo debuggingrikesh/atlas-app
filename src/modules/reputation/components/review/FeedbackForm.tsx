@@ -4,13 +4,16 @@ import React from 'react';
 import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface FeedbackFormProps {
-  onSubmit: (data: { comment: string; customerName: string; customerEmail: string; customerPhone: string }) => void;
+  onSubmit: (data: { comment: string; customerName: string; customerEmail: string; customerPhone: string; token: string }) => void;
   isSubmitting: boolean;
 }
 
 export function FeedbackForm({ onSubmit, isSubmitting }: FeedbackFormProps) {
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -19,6 +22,7 @@ export function FeedbackForm({ onSubmit, isSubmitting }: FeedbackFormProps) {
       customerName: formData.get('customerName') as string,
       customerEmail: formData.get('customerEmail') as string,
       customerPhone: formData.get('customerPhone') as string,
+      token: turnstileToken!,
     });
   };
 
@@ -54,8 +58,18 @@ export function FeedbackForm({ onSubmit, isSubmitting }: FeedbackFormProps) {
           </div>
         </div>
       </div>
+      
+      <div className="flex justify-center py-2">
+        <Turnstile
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+          onSuccess={(token) => setTurnstileToken(token)}
+          onError={() => setTurnstileToken(null)}
+          onExpire={() => setTurnstileToken(null)}
+          options={{ action: 'submit_feedback' }}
+        />
+      </div>
 
-      <LoadingButton type="submit" className="w-full" size="lg" disabled={isSubmitting} isLoading={isSubmitting} loadingText="Submitting...">
+      <LoadingButton type="submit" className="w-full" size="lg" disabled={isSubmitting || !turnstileToken} isLoading={isSubmitting} loadingText="Submitting...">
         Submit Feedback
       </LoadingButton>
     </form>

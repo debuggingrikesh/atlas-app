@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -100,8 +101,8 @@ export async function DELETE(request: Request, { params }: Params) {
       });
 
       await AuditService.record({
-        action: 'business.deleted' as any,
-        resourceType: 'Business' as any,
+        action: 'business.deleted' as AuditActionType,
+        resourceType: 'Business' as AuditResourceTypeType,
         resourceId: businessId,
         actorType: 'USER',
         actorUserId: user.id,

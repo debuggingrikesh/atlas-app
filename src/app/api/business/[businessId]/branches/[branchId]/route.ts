@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -56,8 +57,8 @@ export async function PATCH(request: Request, { params }: Params) {
       });
 
       await AuditService.record({
-        action: 'branch.updated' as any,
-        resourceType: 'Branch' as any,
+        action: 'branch.updated' as AuditActionType,
+        resourceType: 'Branch' as AuditResourceTypeType,
         resourceId: branchId,
         actorType: 'USER',
         actorUserId: user.id,

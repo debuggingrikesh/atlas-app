@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -71,8 +72,8 @@ export async function POST(request: Request, { params }: Params) {
       }
 
       await AuditService.record({
-        action: 'role.created' as any,
-        resourceType: 'Role' as any,
+        action: 'role.created' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: createdRole.id,
         actorType: 'USER',
         actorUserId: user.id,

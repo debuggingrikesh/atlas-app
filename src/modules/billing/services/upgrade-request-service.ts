@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 
@@ -82,8 +83,8 @@ export class UpgradeRequestService {
 
       // 4. Create Audit Log
       await AuditService.record({
-        action: 'subscription.upgrade_approved' as any,
-        resourceType: 'BusinessSubscription' as any,
+        action: 'subscription.upgrade_approved' as AuditActionType,
+        resourceType: 'BusinessSubscription' as AuditResourceTypeType,
         resourceId: request.businessId,
         actorType: 'USER',
         actorUserId: adminActorId,
@@ -128,8 +129,8 @@ export class UpgradeRequestService {
 
       // 3. Create Audit Log
       await AuditService.record({
-        action: 'subscription.upgrade_rejected' as any,
-        resourceType: 'BusinessSubscription' as any,
+        action: 'subscription.upgrade_rejected' as AuditActionType,
+        resourceType: 'BusinessSubscription' as AuditResourceTypeType,
         resourceId: request.businessId,
         actorType: 'USER',
         actorUserId: adminActorId,

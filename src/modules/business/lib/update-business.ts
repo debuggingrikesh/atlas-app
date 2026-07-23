@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { UpdateBusinessInput } from '@/lib/validators/business';
@@ -49,8 +50,8 @@ export async function updateBusiness(
 
     // 2. Audit log with detailed changes
     await AuditService.record({
-        action: 'business.updated' as any,
-        resourceType: 'Business' as any,
+        action: 'business.updated' as AuditActionType,
+        resourceType: 'Business' as AuditResourceTypeType,
         resourceId: business.id,
         actorType: 'USER',
         actorUserId: userId,

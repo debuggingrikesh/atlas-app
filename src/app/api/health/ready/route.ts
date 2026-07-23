@@ -7,8 +7,8 @@ import { headers } from 'next/headers';
 export async function GET() {
   let requestId: string | undefined = undefined;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const h = (await headers()) as any;
+     
+    const h = (await headers()) as unknown;
     if (h && typeof h.get === 'function') {
       requestId = h.get('x-request-id') || undefined;
     }
@@ -46,7 +46,7 @@ export async function GET() {
         timestamp: new Date().toISOString(),
         latencyMs: Date.now() - startRedis,
       };
-    } catch (error) {
+    } catch {
       checks.redis = {
         status: 'degraded',
         message: 'Redis ping failed',

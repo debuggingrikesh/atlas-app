@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -77,8 +78,8 @@ export async function PATCH(request: Request, { params }: Params) {
 
         if (added.length > 0 || removed.length > 0) {
           await AuditService.record({
-        action: 'role.permissions_updated' as any,
-        resourceType: 'Role' as any,
+        action: 'role.permissions_updated' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: roleId,
         actorType: 'USER',
         actorUserId: user.id,
@@ -168,8 +169,8 @@ export async function DELETE(request: Request, { params }: Params) {
       });
 
       await AuditService.record({
-        action: 'role.deleted' as any,
-        resourceType: 'Role' as any,
+        action: 'role.deleted' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: roleId,
         actorType: 'USER',
         actorUserId: user.id,

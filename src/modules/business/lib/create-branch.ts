@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { CreateBranchInput, Branch } from '@/modules/business/types';
@@ -20,8 +21,8 @@ export async function createBranch(
     });
 
     await AuditService.record({
-        action: 'branch.created' as any,
-        resourceType: 'Branch' as any,
+        action: 'branch.created' as AuditActionType,
+        resourceType: 'Branch' as AuditResourceTypeType,
         resourceId: branch.id,
         actorType: 'USER',
         actorUserId: userId,

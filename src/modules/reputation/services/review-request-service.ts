@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
@@ -62,8 +63,8 @@ export class ReviewRequestService {
 
         // 6. Create AuditLog
         await AuditService.record({
-        action: 'review_request.created' as any,
-        resourceType: 'ReviewRequest' as any,
+        action: 'review_request.created' as AuditActionType,
+        resourceType: 'ReviewRequest' as AuditResourceTypeType,
         resourceId: reviewReq.id,
         actorType: 'USER',
         actorUserId: userId,

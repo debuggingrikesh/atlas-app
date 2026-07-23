@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { createNotification } from '@/modules/notifications/lib/create-notification';
@@ -52,8 +53,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
 
     // 4. Audit: permission.assigned
     await AuditService.record({
-        action: 'permission.assigned' as any,
-        resourceType: 'BusinessMember' as any,
+        action: 'permission.assigned' as AuditActionType,
+        resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
         actorUserId: undefined,
@@ -71,8 +72,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
 
     // 5. Audit: member.role.updated
     await AuditService.record({
-        action: 'member.role.updated' as any,
-        resourceType: 'BusinessMember' as any,
+        action: 'member.role.updated' as AuditActionType,
+        resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
         actorUserId: undefined,

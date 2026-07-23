@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { completeOnboardingSchema } from '@/lib/validators/business';
@@ -138,8 +139,8 @@ export async function POST(request: Request) {
       // 7. AuditLog: role.created (for each system role)
       for (const roleName of roleNames) {
         await AuditService.record({
-        action: 'role.created' as any,
-        resourceType: 'Role' as any,
+        action: 'role.created' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: createdRoles[roleName],
         actorType: 'USER',
         actorUserId: user.id,
@@ -157,8 +158,8 @@ export async function POST(request: Request) {
 
       // 8. AuditLog: UserProfile created
       await AuditService.record({
-        action: 'user_profile.created' as any,
-        resourceType: 'UserProfile' as any,
+        action: 'user_profile.created' as AuditActionType,
+        resourceType: 'UserProfile' as AuditResourceTypeType,
         resourceId: profile.id,
         actorType: 'USER',
         actorUserId: user.id,
@@ -171,8 +172,8 @@ export async function POST(request: Request) {
 
       // 9. AuditLog: Business created
       await AuditService.record({
-        action: 'business.created' as any,
-        resourceType: 'Business' as any,
+        action: 'business.created' as AuditActionType,
+        resourceType: 'Business' as AuditResourceTypeType,
         resourceId: business.id,
         actorType: 'USER',
         actorUserId: user.id,
@@ -185,8 +186,8 @@ export async function POST(request: Request) {
 
       // 10. AuditLog: BusinessMember created
       await AuditService.record({
-        action: 'business_member.created' as any,
-        resourceType: 'BusinessMember' as any,
+        action: 'business_member.created' as AuditActionType,
+        resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: member.id,
         actorType: 'USER',
         actorUserId: user.id,
@@ -199,8 +200,8 @@ export async function POST(request: Request) {
 
       // 11. AuditLog: Branch created
       await AuditService.record({
-        action: 'branch.created' as any,
-        resourceType: 'Branch' as any,
+        action: 'branch.created' as AuditActionType,
+        resourceType: 'Branch' as AuditResourceTypeType,
         resourceId: branch.id,
         actorType: 'USER',
         actorUserId: user.id,

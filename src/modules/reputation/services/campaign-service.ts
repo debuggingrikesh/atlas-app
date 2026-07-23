@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
 import { ReputationRepository } from '../repositories/reputation-repository';
@@ -20,8 +21,8 @@ export class CampaignService {
     });
 
     await AuditService.record({
-        action: 'review_campaign.created' as any,
-        resourceType: 'ReviewCampaign' as any,
+        action: 'review_campaign.created' as AuditActionType,
+        resourceType: 'ReviewCampaign' as AuditResourceTypeType,
         resourceId: campaign.id,
         actorType: 'USER',
         actorUserId: userId,
@@ -53,8 +54,8 @@ export class CampaignService {
     
     if (campaigns.count > 0) {
       await AuditService.record({
-        action: 'review_campaign.updated' as any,
-        resourceType: 'ReviewCampaign' as any,
+        action: 'review_campaign.updated' as AuditActionType,
+        resourceType: 'ReviewCampaign' as AuditResourceTypeType,
         resourceId: id,
         actorType: 'USER',
         actorUserId: userId,

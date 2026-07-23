@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
@@ -28,8 +29,8 @@ export async function cancelInvitation(
     });
 
     await AuditService.record({
-        action: 'invitation.cancelled' as any,
-        resourceType: 'Invitation' as any,
+        action: 'invitation.cancelled' as AuditActionType,
+        resourceType: 'Invitation' as AuditResourceTypeType,
         resourceId: invitationId,
         actorType: 'USER',
         actorUserId: undefined,

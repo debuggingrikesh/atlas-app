@@ -27,7 +27,7 @@ export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
     redirectUrl?: string;
   } | null>(null);
 
-  const handleSubmit = async (data: { comment: string; customerName: string; customerEmail: string; customerPhone: string }) => {
+  const handleSubmit = async (data: { comment: string; customerName: string; customerEmail: string; customerPhone: string; token?: string }) => {
     if (rating === 0) {
       setError('Please select a rating first.');
       return;

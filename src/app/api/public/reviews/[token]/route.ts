@@ -51,6 +51,30 @@ export async function POST(request: Request, { params }: Params) {
       return errorResponse('VALIDATION_ERROR', result.error.issues[0]?.message ?? 'Invalid input.', 400);
     }
 
+    // Validate Turnstile token
+    if (!result.data.token) {
+      return errorResponse('VALIDATION_ERROR', 'Missing security token.', 400);
+    }
+
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
+    
+    const formData = new URLSearchParams();
+    formData.append('secret', turnstileSecret);
+    formData.append('response', result.data.token);
+    formData.append('remoteip', ip);
+
+    const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const turnstileResult = await turnstileResponse.json();
+
+    if (!turnstileResult.success) {
+      console.warn('[public/reviews/:token POST] Turnstile validation failed:', turnstileResult);
+      return errorResponse('VALIDATION_ERROR', 'Security check failed. Please try again.', 400);
+    }
+
     const response = await FeedbackService.submitPublicReview(token, result.data);
 
     if ('error' in response) {

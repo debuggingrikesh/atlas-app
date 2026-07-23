@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
@@ -94,8 +95,8 @@ export class FeedbackService {
         await ReputationRepository.updateRequestStatus(request.id, 'COMPLETED', tx);
 
         await AuditService.record({
-        action: 'customer_feedback.received' as any,
-        resourceType: 'CustomerFeedback' as any,
+        action: 'customer_feedback.received' as AuditActionType,
+        resourceType: 'CustomerFeedback' as AuditResourceTypeType,
         resourceId: request.id,
         actorType: 'USER',
         actorUserId: undefined,
@@ -178,8 +179,8 @@ export class FeedbackService {
         }, tx);
 
         await AuditService.record({
-        action: 'customer_feedback.received' as any,
-        resourceType: 'CustomerFeedback' as any,
+        action: 'customer_feedback.received' as AuditActionType,
+        resourceType: 'CustomerFeedback' as AuditResourceTypeType,
         resourceId: request.id,
         actorType: 'USER',
         actorUserId: undefined,

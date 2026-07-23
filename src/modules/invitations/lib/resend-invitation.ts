@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
@@ -55,8 +56,8 @@ export async function resendInvitation(
     });
 
     await AuditService.record({
-        action: 'invitation.resent' as any,
-        resourceType: 'Invitation' as any,
+        action: 'invitation.resent' as AuditActionType,
+        resourceType: 'Invitation' as AuditResourceTypeType,
         resourceId: invitationId,
         actorType: 'USER',
         actorUserId: undefined,

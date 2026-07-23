@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
@@ -29,8 +30,8 @@ export async function removeMember(
     });
 
     await AuditService.record({
-        action: 'member.removed' as any,
-        resourceType: 'BusinessMember' as any,
+        action: 'member.removed' as AuditActionType,
+        resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
         actorUserId: undefined,

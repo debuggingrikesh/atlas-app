@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { UpdateProfileInput } from '@/lib/validators/auth';
@@ -36,8 +37,8 @@ export async function updateProfile(
 
     // 2. Audit log
     await AuditService.record({
-        action: 'user.profile.updated' as any,
-        resourceType: 'UserProfile' as any,
+        action: 'user.profile.updated' as AuditActionType,
+        resourceType: 'UserProfile' as AuditResourceTypeType,
         resourceId: userId,
         actorType: 'USER',
         actorUserId: userId,

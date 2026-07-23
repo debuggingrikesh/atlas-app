@@ -19,8 +19,8 @@ export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 export function successResponse<T>(data: T, status = 200): NextResponse<ApiSuccessResponse<T>> {
   let requestId: string | undefined = undefined;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const h = headers() as any;
+     
+    const h = headers() as unknown;
     if (h && typeof h.get === 'function') {
       requestId = h.get('x-request-id') || undefined;
     }
@@ -51,8 +51,8 @@ export function errorResponse(
   
   if (!requestId) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const h = headers() as any;
+       
+      const h = headers() as unknown;
       if (h && typeof h.get === 'function') {
         requestId = h.get('x-request-id') || undefined;
       }

@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -43,8 +44,8 @@ export async function DELETE(request: Request, { params }: Params) {
       });
 
       await AuditService.record({
-        action: 'invitation.cancelled' as any,
-        resourceType: 'Invitation' as any,
+        action: 'invitation.cancelled' as AuditActionType,
+        resourceType: 'Invitation' as AuditResourceTypeType,
         resourceId: invitationId,
         actorType: 'USER',
         actorUserId: user.id,

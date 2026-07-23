@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import type { RoleWithPermissions } from '@/modules/permissions/types';
@@ -54,8 +55,8 @@ export async function createRole(options: CreateRoleOptions): Promise<RoleWithPe
 
     // 3. Audit log: role.created
     await AuditService.record({
-        action: 'role.created' as any,
-        resourceType: 'Role' as any,
+        action: 'role.created' as AuditActionType,
+        resourceType: 'Role' as AuditResourceTypeType,
         resourceId: role.id,
         actorType: 'USER',
         actorUserId: undefined,

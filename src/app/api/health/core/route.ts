@@ -6,8 +6,8 @@ import { headers } from "next/headers";
 import crypto from "crypto";
 
 export async function GET() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const headersList = (await headers()) as any;
+   
+  const headersList = (await headers()) as unknown;
   const authHeader = headersList.get("authorization");
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

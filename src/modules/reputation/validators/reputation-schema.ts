@@ -30,4 +30,5 @@ export const publicReviewSubmissionSchema = z.object({
   customerName: z.string().max(100).optional(),
   customerEmail: z.string().email().optional().or(z.literal('')),
   customerPhone: z.string().max(20).optional(),
+  token: z.string().optional(),
 });

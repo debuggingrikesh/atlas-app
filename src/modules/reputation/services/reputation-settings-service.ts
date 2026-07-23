@@ -1,3 +1,4 @@
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
 import { ReputationRepository } from '../repositories/reputation-repository';
@@ -25,8 +26,8 @@ export class ReputationSettingsService {
     
     // Create AuditLog
     await AuditService.record({
-        action: 'reputation.settings.updated' as any,
-        resourceType: 'ReputationSettings' as any,
+        action: 'reputation.settings.updated' as AuditActionType,
+        resourceType: 'ReputationSettings' as AuditResourceTypeType,
         resourceId: settings.id,
         actorType: 'USER',
         actorUserId: userId,
