@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 export function formatActivityAction(action: string): string {
   switch (action) {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import "dotenv/config";
 import { defineConfig } from "prisma/config";

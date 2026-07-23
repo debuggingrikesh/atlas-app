@@ -15,7 +15,7 @@ export default function SubscriptionSettingsPage() {
   const { currentBusiness } = useBusiness();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [data, setData] = useState<any>(null);
   
   // Modal states

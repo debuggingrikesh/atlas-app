@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { redirect } from 'next/navigation';
 import { type Metadata } from 'next';

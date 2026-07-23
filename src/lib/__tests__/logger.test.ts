@@ -21,7 +21,7 @@ describe('Logger Sentry Integration', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     (global as any).fetch = vi.fn();
     vi.clearAllMocks();
     process.env = { ...originalEnv, ENABLE_SENTRY: 'true' };

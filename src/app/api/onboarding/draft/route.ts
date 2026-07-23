@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { prisma } from '@/lib/db/prisma';

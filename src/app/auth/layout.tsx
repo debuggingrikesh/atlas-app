@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

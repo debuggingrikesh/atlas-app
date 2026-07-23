@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logger } from "@/lib/logger";

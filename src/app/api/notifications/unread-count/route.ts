@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { getUnreadCount } from '@/modules/notifications/lib/get-unread-count';

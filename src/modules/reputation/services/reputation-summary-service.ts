@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';

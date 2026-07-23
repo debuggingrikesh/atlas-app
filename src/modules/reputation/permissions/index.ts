@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { PERMISSIONS } from '@atlas/core/auth';
 

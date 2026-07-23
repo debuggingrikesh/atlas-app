@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { BillingRepository } from '../repositories/billing-repository';
 import type { BusinessSubscriptionWithDetails } from '@atlas/core/contracts/billing';

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { getActiveTemplates } from '@/modules/industry/lib/get-templates';
 import { successResponse, errorResponse } from '@/lib/api/response';

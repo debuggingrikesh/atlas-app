@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 export const NOTIFICATION_EVENTS = {
   INVITATION_RECEIVED: 'invitation.received',

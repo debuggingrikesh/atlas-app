@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { prisma } from '@/lib/db/prisma';
 import type { IndustryTemplate } from '@/modules/industry/types';

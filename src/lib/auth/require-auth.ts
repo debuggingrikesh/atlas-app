@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { createClient } from '@/lib/supabase/server';
 import { errorResponse } from '@/lib/api/response';

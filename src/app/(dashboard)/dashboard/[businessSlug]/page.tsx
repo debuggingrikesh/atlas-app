@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db/prisma';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { DashboardReputationSummary } from '@/modules/dashboard/components/DashboardReputationSummary';
+import { ProductActivationChecklist } from '@/modules/dashboard/components/ProductActivationChecklist';
 import type { BusinessWithMembership } from '@/modules/business/types';
 
 interface Props {
@@ -111,6 +112,10 @@ export default async function DashboardPage({ params }: Props) {
           </div>
         }>
           <DashboardReputationSummary business={businessWithMembership} businessSlug={businessSlug} />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <ProductActivationChecklist businessId={business.id} businessSlug={businessSlug} />
         </Suspense>
       </div>
     </div>

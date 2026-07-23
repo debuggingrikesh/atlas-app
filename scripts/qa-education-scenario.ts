@@ -123,7 +123,7 @@ async function runQa() {
   console.log("✅ Owner checks Dashboard...");
   const ownerPerms = resolvePermissions({ ...business, role: ownerMembership.role, rbacRole: ownerMembership.rbacRole });
   if (ownerPerms.hasPermission(PERMISSIONS.reputation.view)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const summary = await ReputationSummaryService.getSummary(business.id, { ...business, role: ownerMembership.role, rbacRole: ownerMembership.rbacRole } as any);
     console.log("   Dashboard Stats:", summary);
   } else {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { prisma } from '../src/lib/db/prisma';
 import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';

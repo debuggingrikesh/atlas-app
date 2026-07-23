@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { cookies } from 'next/headers';
 import type { BusinessWithMembership } from '@/modules/business/types';
