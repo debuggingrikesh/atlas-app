@@ -1,0 +1,97 @@
+Total routes: 47
+Route: auth/login/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: auth/logout/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: No
+Route: auth/me/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: auth/signup/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: business/[businessId]/activity/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/audit-events/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/branches/[branchId]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/branches/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/invitations/[id]/resend/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/invitations/[id]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/invitations/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/members/[memberId]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/roles/[roleId]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/roles/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/[businessId]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: business/route.ts
+ Auth: Yes | Perm: No | Tenant: Yes | Public: No
+Route: debug/sentry/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: No
+Route: health/core/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: health/live/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: health/ready/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: health/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: industry/templates/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: internal/audit-events/route.ts
+ Auth: No | Perm: No | Tenant: Yes | Public: No
+ Prisma Lookups: 1
+Route: internal/operational-metrics/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: No
+ Prisma Lookups: 1
+Route: invitations/[id]/accept/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: invitations/[id]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: notifications/[id]/read/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: notifications/prune/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: notifications/read-all/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: notifications/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: notifications/unread-count/route.ts
+ Auth: Yes | Perm: No | Tenant: Yes | Public: No
+Route: onboarding/complete/route.ts
+ Auth: Yes | Perm: No | Tenant: Yes | Public: No
+Route: onboarding/draft/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: public/campaigns/[publicId]/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: public/reviews/[token]/route.ts
+ Auth: No | Perm: No | Tenant: No | Public: Likely
+Route: reputation/ai-settings/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/campaigns/[id]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/campaigns/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/feedback/[id]/analyze/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/feedback/[id]/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/feedback/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/requests/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: reputation/settings/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: subscription/current/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: subscription/features/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No
+Route: subscription/upgrade-request/route.ts
+ Auth: Yes | Perm: Yes | Tenant: Yes | Public: No
+Route: users/profile/route.ts
+ Auth: Yes | Perm: No | Tenant: No | Public: No

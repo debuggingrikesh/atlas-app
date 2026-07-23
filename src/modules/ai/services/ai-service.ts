@@ -37,18 +37,14 @@ export class AIService {
   }
 
   static async analyzeFeedback(businessId: string, feedbackId: string, userId?: string, requestId?: string) {
-    // 1. Fetch Feedback
-    const feedback = await prisma.customerFeedback.findUnique({
-      where: { id: feedbackId },
+    // 1. Fetch Feedback (Scoped to Business)
+    const feedback = await prisma.customerFeedback.findFirst({
+      where: { id: feedbackId, businessId },
       include: { business: true }
     });
 
     if (!feedback) {
       return { error: 'Feedback not found', status: 404 };
-    }
-
-    if (feedback.businessId !== businessId) {
-      return { error: 'Unauthorized', status: 403 };
     }
 
     // 2. Fetch AI Settings

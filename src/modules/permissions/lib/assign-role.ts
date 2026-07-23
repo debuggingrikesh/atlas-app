@@ -28,8 +28,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
 
   await prisma.$transaction(async (tx) => {
     // 1. Fetch current state for the audit diff
-    const current = await tx.businessMember.findUnique({
-      where: { id: memberId },
+    const current = await tx.businessMember.findFirst({
+      where: { id: memberId, businessId },
       select: { roleId: true, userId: true },
     });
 
@@ -38,8 +38,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
     }
 
     // 2. Fetch the new role name for audit metadata
-    const newRole = await tx.role.findUnique({
-      where: { id: roleId },
+    const newRole = await tx.role.findFirst({
+      where: { id: roleId, businessId },
       select: { name: true },
     });
 
@@ -48,8 +48,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
     }
 
     // 3. Apply the new roleId
-    await tx.businessMember.update({
-      where: { id: memberId },
+    await tx.businessMember.updateMany({
+      where: { id: memberId, businessId },
       data: { roleId },
     });
 
@@ -59,8 +59,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
         resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'permission.assigned'}`,
         metadata: {
@@ -78,8 +78,8 @@ export async function assignRole(options: AssignRoleOptions): Promise<void> {
         resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'member.role.updated'}`,
         metadata: {

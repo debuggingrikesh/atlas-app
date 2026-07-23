@@ -28,11 +28,11 @@ export async function DELETE(request: Request, { params }: Params) {
   if (permError) return permError;
 
   try {
-    const invitation = await prisma.invitation.findUnique({
-      where: { id: invitationId },
+    const invitation = await prisma.invitation.findFirst({
+      where: { id: invitationId, businessId },
     });
 
-    if (!invitation || invitation.businessId !== businessId) {
+    if (!invitation) {
       return errorResponse('NOT_FOUND', 'Invitation not found.', 404);
     }
 
@@ -52,7 +52,7 @@ export async function DELETE(request: Request, { params }: Params) {
         resourceId: invitationId,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'invitation.cancelled'}`,
         metadata: { email: invitation.email },

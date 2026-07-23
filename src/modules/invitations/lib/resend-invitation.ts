@@ -20,11 +20,11 @@ export async function resendInvitation(
   | { invitation: Invitation; rawToken: string; errorRes: null }
   | { invitation: Invitation | null; rawToken: null; errorRes: ReturnType<typeof errorResponse> }
 > {
-  const existingInvite = await prisma.invitation.findUnique({
-    where: { id: invitationId },
+  const existingInvite = await prisma.invitation.findFirst({
+    where: { id: invitationId, businessId },
   });
 
-  if (!existingInvite || existingInvite.businessId !== businessId) {
+  if (!existingInvite) {
     return {
       invitation: null,
       rawToken: null,

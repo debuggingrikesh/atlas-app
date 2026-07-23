@@ -33,7 +33,7 @@ vi.mock('@/lib/db/prisma', () => {
         return typeof cb === 'function' ? cb(tx) : cb;
       }),
       customerFeedback: {
-        findUnique: vi.fn().mockResolvedValue({
+        findFirst: vi.fn().mockResolvedValue({
           id: 'fb-1',
           businessId: 'biz-1',
           rating: 4,

@@ -109,7 +109,7 @@ export async function DELETE(request: Request, { params }: Params) {
         resourceId: businessId,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'business.deleted'}`,
         metadata: { deletedAt: new Date() },

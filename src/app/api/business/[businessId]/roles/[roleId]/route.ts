@@ -26,14 +26,14 @@ export async function PATCH(request: Request, { params }: Params) {
     const body = await request.json();
     const { name, description, permissions } = body;
 
-    const role = await prisma.role.findUnique({
-      where: { id: roleId },
+    const role = await prisma.role.findFirst({
+      where: { id: roleId, businessId },
       include: {
         permissions: { include: { permission: { select: { key: true } } } },
       }
     });
 
-    if (!role || role.businessId !== businessId) {
+    if (!role) {
       return errorResponse('NOT_FOUND', 'Role not found.', 404);
     }
 
@@ -86,7 +86,7 @@ export async function PATCH(request: Request, { params }: Params) {
         resourceId: roleId,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'role.permissions_updated'}`,
         metadata: { roleName: updated.name, added, removed },
@@ -115,14 +115,14 @@ export async function DELETE(request: Request, { params }: Params) {
   if (permError) return permError;
 
   try {
-    const role = await prisma.role.findUnique({
-      where: { id: roleId },
+    const role = await prisma.role.findFirst({
+      where: { id: roleId, businessId },
       include: {
         members: { select: { userId: true } },
       }
     });
 
-    if (!role || role.businessId !== businessId) {
+    if (!role) {
       return errorResponse('NOT_FOUND', 'Role not found.', 404);
     }
 
@@ -131,8 +131,8 @@ export async function DELETE(request: Request, { params }: Params) {
     }
 
     // Find the default MEMBER role to fall back to
-    const memberRole = await prisma.role.findUnique({
-      where: { businessId_name: { businessId, name: 'MEMBER' } },
+    const memberRole = await prisma.role.findFirst({
+      where: { name: 'MEMBER', businessId }
     });
 
     if (!memberRole) {
@@ -177,7 +177,7 @@ export async function DELETE(request: Request, { params }: Params) {
         resourceId: roleId,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'role.deleted'}`,
         metadata: { name: role.name, usersMoved: role.members.length },

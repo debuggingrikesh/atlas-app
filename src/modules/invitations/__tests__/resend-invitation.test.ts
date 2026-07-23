@@ -8,19 +8,19 @@ import type { Invitation } from '../types';
 
 vi.mock('@/lib/db/prisma', () => {
   const tx = {
-    invitation: { 
-      update: vi.fn().mockResolvedValue({ 
-        id: 'inv-1', 
-        email: 'test@example.com', 
-        businessId: 'biz-1', 
+    invitation: {
+      update: vi.fn().mockResolvedValue({
+        id: 'inv-1',
+        email: 'test@example.com',
+        businessId: 'biz-1',
         status: 'PENDING',
         role: { name: 'MEMBER' }
-      }) 
+      })
     }
   };
   return {
     prisma: {
-      invitation: { findUnique: vi.fn() },
+      invitation: { findFirst: vi.fn() },
       $transaction: vi.fn(async (cb) => {
         return typeof cb === 'function' ? cb(tx) : cb;
       }),
@@ -52,15 +52,15 @@ describe('resendInvitation Reliability', () => {
   });
 
   it('successfully resends a valid pending invitation', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'PENDING'
     } as unknown as never);
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     expect(result.errorRes).toBeNull();
     expect(result.invitation).toBeDefined();
     expect(result.rawToken).toBeDefined();
@@ -70,17 +70,17 @@ describe('resendInvitation Reliability', () => {
   });
 
   it('fails safely and recovers when email provider fails', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'PENDING'
     } as unknown as never);
-    
+
     vi.mocked(sendEmail).mockResolvedValueOnce({ success: false, error: 'Network Error' });
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     // Returns 500 but still preserves the updated invitation data
     expect(result.errorRes?.status).toBe(500);
     expect(result.invitation).toBeDefined();
@@ -89,13 +89,13 @@ describe('resendInvitation Reliability', () => {
   });
 
   it('maintains idempotency across repeated manual resend attempts', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValue({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValue({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'PENDING'
     } as unknown as never);
-    
+
     await resendInvitation('user-1', 'biz-1', 'inv-1');
     await resendInvitation('user-1', 'biz-1', 'inv-1');
 
@@ -106,25 +106,25 @@ describe('resendInvitation Reliability', () => {
   });
 
   it('returns a safe error when invitation is not found', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce(null as unknown as never);
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce(null as unknown as never);
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-missing');
-    
+
     expect(result.errorRes?.status).toBe(404);
     expect(sendEmail).not.toHaveBeenCalled();
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
   it('rejects resend for invalid status (ACCEPTED)', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'ACCEPTED'
     } as unknown as never);
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     expect(result.errorRes?.status).toBe(400);
 
     expect(sendEmail).not.toHaveBeenCalled();
@@ -132,46 +132,43 @@ describe('resendInvitation Reliability', () => {
   });
 
   it('refreshes and resends an EXPIRED invitation', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'EXPIRED'
     } as unknown as never);
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     expect(result.errorRes).toBeNull();
     expect(sendEmail).toHaveBeenCalledTimes(1);
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
   });
 
   it('fails authorization if cross-tenant actor tries to resend', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-2', // Different business
-      email: 'test@example.com',
-      status: 'PENDING'
-    } as unknown as never);
+    // Simulate findFirst returning null because the where clause includes businessId: 'biz-1'
+    // but the record actually belongs to 'biz-2'
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce(null as unknown as never);
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     expect(result.errorRes?.status).toBe(404);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it('preserves privacy by not logging email address on unexpected error', async () => {
-    vi.mocked(prisma.invitation.findUnique).mockResolvedValueOnce({ 
-      id: 'inv-1', 
-      businessId: 'biz-1', 
+    vi.mocked(prisma.invitation.findFirst).mockResolvedValueOnce({
+      id: 'inv-1',
+      businessId: 'biz-1',
       email: 'test@example.com',
       status: 'PENDING'
     } as unknown as never);
-    
+
     vi.mocked(sendEmail).mockRejectedValueOnce(new Error('Unknown Failure'));
 
     const result = await resendInvitation('user-1', 'biz-1', 'inv-1');
-    
+
     expect(result.errorRes?.status).toBe(500);
     expect(logger.error).toHaveBeenCalled();
     expect(logger.error).not.toHaveBeenCalledWith(expect.objectContaining({ email: expect.anything() }));

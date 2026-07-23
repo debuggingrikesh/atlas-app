@@ -80,7 +80,7 @@ export async function POST(request: Request, { params }: Params) {
         resourceId: createdRole.id,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'role.created'}`,
         metadata: { name, permissions },

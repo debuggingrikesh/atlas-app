@@ -29,11 +29,11 @@ export async function createInvitation(
   const normalizedEmail = email.toLowerCase().trim();
 
   // 1. Verify role exists and is not OWNER
-  const role = await prisma.role.findUnique({
-    where: { id: roleId },
+  const role = await prisma.role.findFirst({
+    where: { id: roleId, businessId },
   });
 
-  if (!role || role.businessId !== businessId) {
+  if (!role) {
     return {
       invitation: null,
       rawToken: null,

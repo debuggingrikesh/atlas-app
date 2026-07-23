@@ -61,8 +61,8 @@ export async function createRole(options: CreateRoleOptions): Promise<RoleWithPe
         resourceType: 'Role' as AuditResourceTypeType,
         resourceId: role.id,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'role.created'}`,
         metadata: {

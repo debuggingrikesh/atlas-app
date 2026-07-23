@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
-    role: { findUnique: vi.fn().mockResolvedValue({ id: 'role-1', businessId: 'biz-1', name: 'MEMBER' }) },
+    role: { findFirst: vi.fn().mockResolvedValue({ id: 'role-1', businessId: 'biz-1', name: 'MEMBER' }) },
     businessMember: { findFirst: vi.fn().mockResolvedValue(null) },
     invitation: { findFirst: vi.fn().mockResolvedValue(null) },
     $transaction: vi.fn(async (cb) => {

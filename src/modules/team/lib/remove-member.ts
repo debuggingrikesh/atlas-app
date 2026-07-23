@@ -10,12 +10,12 @@ export async function removeMember(
   businessId: string,
   memberId: string
 ): Promise<{ errorRes: ReturnType<typeof errorResponse> | null }> {
-  const member = await prisma.businessMember.findUnique({
-    where: { id: memberId },
+  const member = await prisma.businessMember.findFirst({
+    where: { id: memberId, businessId },
     include: { rbacRole: true, user: true },
   });
 
-  if (!member || member.businessId !== businessId) {
+  if (!member) {
     return { errorRes: errorResponse('NOT_FOUND', 'Member not found.', 404) };
   }
 
@@ -36,10 +36,10 @@ export async function removeMember(
         resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
-        summary: `System event ${'member.removed'}`,
+        summary: `Member removed: ${member.user.email}`,
         metadata: {
           removedUserId: member.userId,
           removedUserEmail: member.user.email,

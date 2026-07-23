@@ -65,7 +65,7 @@ export async function PATCH(request: Request, { params }: Params) {
         resourceId: branchId,
         actorType: 'USER',
         actorUserId: user.id,
-        businessId: undefined,
+        businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'branch.updated'}`,
         metadata: {

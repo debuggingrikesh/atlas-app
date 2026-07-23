@@ -16,9 +16,10 @@ export async function updateMemberRole(
   version?: number
 ): Promise<{ errorRes: ReturnType<typeof errorResponse> | null }> {
   // 1. Fetch the target member to update
-  const targetMember = await prisma.businessMember.findUnique({
+  const targetMember = await prisma.businessMember.findFirst({
     where: {
       id: memberId,
+      businessId
     },
     include: {
       rbacRole: true,
@@ -26,7 +27,7 @@ export async function updateMemberRole(
     },
   });
 
-  if (!targetMember || targetMember.businessId !== businessId) {
+  if (!targetMember) {
     return { errorRes: errorResponse('NOT_FOUND', 'Member not found.', 404) };
   }
 
@@ -36,11 +37,11 @@ export async function updateMemberRole(
   }
 
   // 2. Fetch the new role to assign
-  const newRole = await prisma.role.findUnique({
-    where: { id: newRoleId },
+  const newRole = await prisma.role.findFirst({
+    where: { id: newRoleId, businessId },
   });
 
-  if (!newRole || newRole.businessId !== businessId) {
+  if (!newRole) {
     return { errorRes: errorResponse('VALIDATION_ERROR', 'Invalid role specified.', 400) };
   }
 
@@ -113,10 +114,10 @@ export async function updateMemberRole(
         resourceType: 'BusinessMember' as AuditResourceTypeType,
         resourceId: memberId,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
-        summary: `System event ${'member.role_updated'}`,
+        summary: `Role updated for ${targetMember.user.email}`,
         metadata: {
           previousRole: targetMember.rbacRole?.name || 'UNKNOWN',
           newRole: newRole.name,

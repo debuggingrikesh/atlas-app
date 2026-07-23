@@ -10,11 +10,11 @@ export async function cancelInvitation(
   businessId: string,
   invitationId: string
 ): Promise<{ errorRes: ReturnType<typeof errorResponse> | null }> {
-  const invitation = await prisma.invitation.findUnique({
-    where: { id: invitationId },
+  const invitation = await prisma.invitation.findFirst({
+    where: { id: invitationId, businessId },
   });
 
-  if (!invitation || invitation.businessId !== businessId) {
+  if (!invitation) {
     return { errorRes: errorResponse('NOT_FOUND', 'Invitation not found.', 404) };
   }
 
@@ -35,10 +35,10 @@ export async function cancelInvitation(
         resourceType: 'Invitation' as AuditResourceTypeType,
         resourceId: invitationId,
         actorType: 'USER',
-        actorUserId: undefined,
-        businessId: undefined,
+        actorUserId: actorId,
+        businessId: businessId,
         severity: 'INFO',
-        summary: `System event ${'invitation.cancelled'}`,
+        summary: `Invitation cancelled for ${invitation.email}`,
         metadata: {
           email: invitation.email,
         },
