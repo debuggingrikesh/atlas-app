@@ -10,6 +10,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:check": "prisma migrate status",
+    "db:backup": "echo 'Run pg_dump using the ATLAS_BACKUP_AND_RESTORE_RUNBOOK.md'",
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate"
