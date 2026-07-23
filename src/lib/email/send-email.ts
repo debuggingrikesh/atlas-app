@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Resend } from 'resend';
-
-const resendApiKey = process.env.RESEND_API_KEY;
-const emailFromAddress = process.env.EMAIL_FROM_ADDRESS || 'noreply@projectatlas.app';
-
-// Initialize Resend client only if API key is provided
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+import { getEmailEnv } from '@/lib/env.server';
 
 export interface SendEmailOptions {
   to: string;
@@ -15,17 +10,26 @@ export interface SendEmailOptions {
 }
 
 export async function sendEmail(options: SendEmailOptions) {
+  let resendApiKey: string;
+  let emailFromAddress: string;
+
+  try {
+    const env = getEmailEnv();
+    resendApiKey = env.RESEND_API_KEY;
+    emailFromAddress = env.EMAIL_FROM_ADDRESS || 'noreply@projectatlas.app';
+  } catch (err: any) {
+    console.warn('[Email] Skipped. Email provider not configured:', err.message);
+    return { success: false, error: 'Email provider not configured.' };
+  }
+
+  const resend = new Resend(resendApiKey);
+
   console.info('[Email] Dispatching email...', {
     recipient: options.to,
     sender: emailFromAddress,
     subject: options.subject,
     hasApiKey: !!resendApiKey,
   });
-
-  if (!resend) {
-    console.warn('[Email] Skipped. RESEND_API_KEY is not configured.');
-    return { success: false, error: 'Email provider not configured.' };
-  }
 
   try {
     const { data, error } = await resend.emails.send({

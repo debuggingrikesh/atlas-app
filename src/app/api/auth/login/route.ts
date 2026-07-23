@@ -13,14 +13,14 @@ import { prisma } from '@/lib/db/prisma';
  * Sets the session cookie automatically via the SSR client.
  */
 export async function POST(request: Request) {
-  // Rate limit: 10 login attempts per minute per IP
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const { allowed } = await checkRateLimit(`login_${ip}`, 10, 60 * 1000);
-  if (!allowed) {
-    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many login attempts. Please try again later.', 429);
-  }
-
   try {
+    // Rate limit: 10 login attempts per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const { allowed } = await checkRateLimit(`login_${ip}`, 10, 60 * 1000);
+    if (!allowed) {
+      return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many login attempts. Please try again later.', 429);
+    }
+
     const body = await request.json();
     const result = loginSchema.safeParse(body);
 
@@ -65,6 +65,10 @@ export async function POST(request: Request) {
       },
     });
   } catch (err) {
+    if (err instanceof Error && err.name === 'RateLimitConfigError') {
+      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
+    }
     console.error('[login] Unexpected error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

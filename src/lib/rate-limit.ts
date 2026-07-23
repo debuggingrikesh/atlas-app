@@ -3,17 +3,33 @@
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
-const getRedis = () => {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-    return null;
+import { getRateLimitEnv } from './env.server';
+
+let _redis: Redis | null = null;
+let _redisInitialized = false;
+
+export const getRedis = () => {
+  if (_redisInitialized) return _redis;
+  try {
+    const env = getRateLimitEnv();
+    _redis = new Redis({
+      url: env.UPSTASH_REDIS_REST_URL,
+      token: env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  } catch (err) {
+    console.error('Redis init error:', err);
+    _redis = null;
   }
-  return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  _redisInitialized = true;
+  return _redis;
 };
 
-export const redis = getRedis();
+export class RateLimitConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RateLimitConfigError';
+  }
+}
 
 /**
  * Distributed rate limiter using Upstash Redis and @upstash/ratelimit.
@@ -25,11 +41,10 @@ export async function checkRateLimit(
   windowMs: number
 ): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
   const now = Date.now();
+  const redis = getRedis();
   
   if (!redis) {
-    // Fallback for local development if Redis is not configured
-    console.warn('[RateLimiter] UPSTASH_REDIS_REST_URL missing. Skipping rate limit.');
-    return { allowed: true, remaining: limit, resetTime: now + windowMs };
+    throw new RateLimitConfigError('UPSTASH_REDIS_REST_URL or TOKEN is missing. Rate limiter is not configured.');
   }
 
   // Create a new ratelimit instance dynamically based on the passed windowMs and limit.

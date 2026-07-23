@@ -15,13 +15,13 @@ export async function POST(
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
-  // Rate limit: 10 generation requests per minute per business
-  const { allowed } = await checkRateLimit(`ai_generate_${user.id}`, 10, 60 * 1000);
-  if (!allowed) {
-    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many AI generation requests. Please try again later.', 429);
-  }
-
   try {
+    // Rate limit: 10 generation requests per minute per business
+    const { allowed } = await checkRateLimit(`ai_generate_${user.id}`, 10, 60 * 1000);
+    if (!allowed) {
+      return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many AI generation requests. Please try again later.', 429);
+    }
+
     const { id } = await params;
 
     let body: Record<string, unknown>;
@@ -56,7 +56,11 @@ export async function POST(
     }
 
     return successResponse(result.response);
-  } catch (err: any) {
+  } catch (err) {
+    if (err instanceof Error && err.name === 'RateLimitConfigError') {
+      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
+    }
     console.error('[analyze POST] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

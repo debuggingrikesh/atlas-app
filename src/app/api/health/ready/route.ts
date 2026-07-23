@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { redis } from '@/lib/rate-limit';
+import { getRedis } from '@/lib/rate-limit';
 import type { ReadinessResponse, HealthStatus, HealthCheckResult } from '@atlas/core/observability';
 import { headers } from 'next/headers';
 
@@ -39,6 +39,7 @@ export async function GET() {
   }
 
   // Check Redis (if configured)
+  const redis = getRedis();
   if (redis) {
     const startRedis = Date.now();
     try {

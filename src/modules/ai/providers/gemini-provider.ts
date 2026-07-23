@@ -4,13 +4,12 @@ import { GoogleGenAI } from '@google/genai';
 
 let aiInstance: GoogleGenAI | null = null;
 
+import { getAiEnv } from '@/lib/env.server';
+
 const getGenAI = () => {
   if (!aiInstance) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not set');
-    }
-    aiInstance = new GoogleGenAI({ apiKey });
+    const { GEMINI_API_KEY } = getAiEnv();
+    aiInstance = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   }
   return aiInstance;
 };

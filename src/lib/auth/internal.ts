@@ -1,8 +1,9 @@
  
 
 import { headers } from 'next/headers';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import crypto from 'crypto';
+import { getInternalAuthEnv } from '../env.server';
 
 function safeCompare(a: string | null | undefined, b: string | null | undefined): boolean {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
@@ -20,12 +21,20 @@ function safeCompare(a: string | null | undefined, b: string | null | undefined)
 export async function verifyInternalRequest(): Promise<boolean> {
   const h = await headers();
   const authHeader = h.get('Authorization');
-  const secret = process.env.HQ_INTERNAL_API_SECRET;
-  const previousSecret = process.env.HQ_INTERNAL_API_SECRET_PREVIOUS;
-
-  if (!secret) {
-    logger.warn('HQ_INTERNAL_API_SECRET is not configured on this server');
+  let env;
+  try {
+    env = getInternalAuthEnv();
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      logger.warn(`HQ_INTERNAL_API_SECRET is not configured properly: ${err.message}`);
+    }
     return false;
+  }
+  const secret = env.HQ_INTERNAL_API_SECRET;
+  let previousSecret = env.HQ_INTERNAL_API_SECRET_PREVIOUS;
+
+  if (previousSecret && previousSecret.trim() === '') {
+    previousSecret = undefined;
   }
 
   const isCurrentMatch = safeCompare(authHeader, `Bearer ${secret}`);

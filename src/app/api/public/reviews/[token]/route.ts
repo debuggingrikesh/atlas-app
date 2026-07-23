@@ -4,6 +4,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
 import { FeedbackService } from '@/modules/reputation/services/feedback-service';
 import { publicReviewSubmissionSchema } from '@/modules/reputation/validators/reputation-schema';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { getTurnstileEnv } from '@/lib/env.server';
 
 interface Params {
   params: Promise<{ token: string }>;
@@ -38,14 +39,14 @@ export async function GET(request: Request, { params }: Params) {
 export async function POST(request: Request, { params }: Params) {
   const { token } = await params;
 
-  // Rate limit: 5 requests per minute per IP
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const { allowed } = await checkRateLimit(`public_review_${ip}`, 5, 60 * 1000);
-  if (!allowed) {
-    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many requests. Please try again later.', 429);
-  }
-
   try {
+    // Rate limit: 5 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const { allowed } = await checkRateLimit(`public_review_${ip}`, 5, 60 * 1000);
+    if (!allowed) {
+      return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many requests. Please try again later.', 429);
+    }
+
     const body = await request.json();
     const result = publicReviewSubmissionSchema.safeParse(body);
     
@@ -58,12 +59,14 @@ export async function POST(request: Request, { params }: Params) {
       return errorResponse('VALIDATION_ERROR', 'Missing security token.', 400);
     }
 
-    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-    if (!turnstileSecret) {
-      console.error('[public/reviews/:token POST] TURNSTILE_SECRET_KEY is not configured');
+    let turnstileSecret: string;
+    try {
+      turnstileSecret = getTurnstileEnv().TURNSTILE_SECRET_KEY;
+    } catch (err) {
+      console.error('[public/reviews/:token POST] TURNSTILE_SECRET_KEY is not configured', err);
       return errorResponse('INTERNAL_ERROR', 'Security configuration error.', 500);
     }
-    
+
     const formData = new URLSearchParams();
     formData.append('secret', turnstileSecret);
     formData.append('response', result.data.token);
@@ -89,6 +92,10 @@ export async function POST(request: Request, { params }: Params) {
 
     return successResponse(response);
   } catch (err) {
+    if (err instanceof Error && err.name === 'RateLimitConfigError') {
+      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
+    }
     console.error('[public/reviews/:token POST] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

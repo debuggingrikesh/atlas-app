@@ -13,14 +13,14 @@ import { checkRateLimit } from '@/lib/rate-limit';
  * after email verification during onboarding.
  */
 export async function POST(request: Request) {
-  // Rate limit: 10 signup attempts per minute per IP
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const { allowed } = await checkRateLimit(`signup_${ip}`, 10, 60 * 1000);
-  if (!allowed) {
-    return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many signup attempts. Please try again later.', 429);
-  }
-
   try {
+    // Rate limit: 10 signup attempts per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const { allowed } = await checkRateLimit(`signup_${ip}`, 10, 60 * 1000);
+    if (!allowed) {
+      return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many signup attempts. Please try again later.', 429);
+    }
+
     const body = await request.json();
     const result = signUpSchema.safeParse(body);
 
@@ -60,6 +60,10 @@ export async function POST(request: Request) {
       201
     );
   } catch (err) {
+    if (err instanceof Error && err.name === 'RateLimitConfigError') {
+      console.error(`[RateLimiter] Configuration error: ${err.message}`);
+      return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
+    }
     console.error('[signup] Unexpected error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
