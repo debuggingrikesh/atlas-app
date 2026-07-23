@@ -27,7 +27,7 @@ export default async function ReputationOverviewPage({ params }: PageProps) {
   const membership = await prisma.businessMember.findFirst({
     where: {
       userId: user.id,
-      business: { slug: businessSlug },
+      business: { slug: businessSlug, deletedAt: null },
     },
     include: {
       business: true,

@@ -29,7 +29,7 @@ export default async function ReputationLayout({ children, params }: Props) {
   const membership = await prisma.businessMember.findFirst({
     where: {
       userId: user.id,
-      business: { slug: businessSlug },
+      business: { slug: businessSlug, deletedAt: null },
     },
     include: {
       business: true,

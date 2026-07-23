@@ -58,7 +58,11 @@ export async function POST(request: Request, { params }: Params) {
       return errorResponse('VALIDATION_ERROR', 'Missing security token.', 400);
     }
 
-    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (!turnstileSecret) {
+      console.error('[public/reviews/:token POST] TURNSTILE_SECRET_KEY is not configured');
+      return errorResponse('INTERNAL_ERROR', 'Security configuration error.', 500);
+    }
     
     const formData = new URLSearchParams();
     formData.append('secret', turnstileSecret);

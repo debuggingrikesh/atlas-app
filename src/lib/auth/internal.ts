@@ -2,6 +2,14 @@
 
 import { headers } from 'next/headers';
 import { logger } from '@/lib/logger';
+import crypto from 'crypto';
+
+function safeCompare(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const hashA = crypto.createHash('sha256').update(a).digest();
+  const hashB = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(hashA, hashB);
+}
 
 /**
  * Validates internal requests from HQ using a shared generalized credential.
@@ -20,7 +28,10 @@ export async function verifyInternalRequest(): Promise<boolean> {
     return false;
   }
 
-  if (authHeader !== `Bearer ${secret}` && authHeader !== `Bearer ${previousSecret}`) {
+  const isCurrentMatch = safeCompare(authHeader, `Bearer ${secret}`);
+  const isPreviousMatch = previousSecret ? safeCompare(authHeader, `Bearer ${previousSecret}`) : false;
+
+  if (!isCurrentMatch && !isPreviousMatch) {
     logger.warn('Invalid or missing internal API credential');
     return false;
   }

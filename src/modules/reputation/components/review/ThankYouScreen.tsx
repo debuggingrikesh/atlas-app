@@ -59,7 +59,7 @@ export function ThankYouScreen({ action, redirectUrl, userComment }: ThankYouScr
             {copied ? (
               <span className="text-green-600 font-medium flex items-center justify-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                We've automatically copied your review to your clipboard!
+                We&apos;ve automatically copied your review to your clipboard!
               </span>
             ) : (
               <span>Your review is ready to be pasted on Google.</span>
