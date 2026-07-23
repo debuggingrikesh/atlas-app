@@ -27,6 +27,7 @@ export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
   const [submitResult, setSubmitResult] = useState<{
     action: 'GOOGLE_REDIRECT' | 'INTERNAL_FEEDBACK_SAVED';
     redirectUrl?: string;
+    comment?: string;
   } | null>(null);
 
   const handleSubmit = async (data: { comment: string; customerName: string; customerEmail: string; customerPhone: string; token?: string }) => {
@@ -54,6 +55,7 @@ export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
       setSubmitResult({
         action: result.data.action,
         redirectUrl: result.data.redirectUrl,
+        comment: data.comment,
       });
     } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
@@ -63,7 +65,7 @@ export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
   };
 
   if (submitResult) {
-    return <ThankYouScreen action={submitResult.action} redirectUrl={submitResult.redirectUrl} />;
+    return <ThankYouScreen action={submitResult.action} redirectUrl={submitResult.redirectUrl} userComment={submitResult.comment} />;
   }
 
   return (
