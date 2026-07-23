@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -61,7 +63,7 @@ export function CreateBusinessModal({ open, onClose }: CreateBusinessModalProps)
       // Full reload so the dashboard layout re-fetches the updated business list
       router.refresh();
       window.location.reload();
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);

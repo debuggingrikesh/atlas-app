@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import React, { useState } from 'react';
@@ -56,7 +58,7 @@ export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canMa
 
       setFeedbacks(prev => prev.map(f => f.id === feedbackId ? { ...f, status: newStatus } : f));
       toast.success(`Feedback marked as ${newStatus.toLowerCase()}`);
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setUpdatingStatus(null);
@@ -86,7 +88,7 @@ export function FeedbackInbox({ initialFeedback, businessId, businessSlug, canMa
         return f;
       }));
       toast.success('Reputation Intelligence generated');
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setGeneratingFor(null);

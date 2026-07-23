@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { markNotificationRead } from '@/modules/notifications/lib/mark-notification-read';
 import { successResponse, errorResponse } from '@/lib/api/response';

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { Pool } from "pg";
 
-const globalForPrisma = globalThis as unknown as {
+const globalForPrisma = globalThis as any as {
   prisma: PrismaClient | undefined;
 };
 

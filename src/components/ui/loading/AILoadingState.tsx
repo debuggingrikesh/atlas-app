@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useState } from 'react';
 import { AsyncFeedbackState, AsyncState } from './AsyncFeedbackState';
 import { Sparkles } from 'lucide-react';

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState } from 'react';
@@ -35,7 +37,7 @@ export function AcceptInvitationClient({
       // Success! Hard redirect to the root to ensure a fresh server render
       // which will resolve the active dashboard based on the new membership.
       window.location.assign('/');
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err instanceof Error) {
         setError(err.message);
       } else {

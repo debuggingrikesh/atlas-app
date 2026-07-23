@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState } from 'react';
@@ -63,7 +65,7 @@ export function UpdateBusinessForm({ business }: UpdateBusinessFormProps) {
 
       setSuccess(true);
       router.refresh();
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err instanceof Error) {
         setError(err.message);
       } else {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({

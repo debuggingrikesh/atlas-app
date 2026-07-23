@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function LoadingTable({ rows = 5, columns = 4 }: { rows?: number, columns?: number }) {

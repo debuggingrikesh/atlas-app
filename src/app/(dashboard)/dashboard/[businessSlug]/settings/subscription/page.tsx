@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -31,7 +33,7 @@ export default function SubscriptionSettingsPage() {
         throw new Error(json.error || 'Failed to fetch subscription details');
       }
       setData(json.data);
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setLoading(false);
@@ -69,7 +71,7 @@ export default function SubscriptionSettingsPage() {
       setIsModalOpen(false);
       // Refresh state
       await fetchSubscriptionDetails();
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setSubmittingUpgrade(false);

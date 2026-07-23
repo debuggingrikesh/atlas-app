@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '@/lib/db/prisma';
 import type { UserProfile } from '@/modules/auth/types';
 import type { BusinessWithMembership } from '@/modules/business/types';

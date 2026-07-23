@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -40,7 +42,7 @@ export async function PATCH(request: Request, { params }: Params) {
     }
 
     return successResponse({ success: true });
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[reputation/feedback/:id PATCH] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

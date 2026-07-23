@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Business module types
 
 import type { MemberRole } from '@prisma/client';

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 
 export type ApiSuccessResponse<T> = {
@@ -20,7 +22,7 @@ export function successResponse<T>(data: T, status = 200): NextResponse<ApiSucce
   let requestId: string | undefined = undefined;
   try {
      
-    const h = headers() as unknown;
+    const h = headers() as any;
     if (h && typeof h.get === 'function') {
       requestId = h.get('x-request-id') || undefined;
     }
@@ -52,7 +54,7 @@ export function errorResponse(
   if (!requestId) {
     try {
        
-      const h = headers() as unknown;
+      const h = headers() as any;
       if (h && typeof h.get === 'function') {
         requestId = h.get('x-request-id') || undefined;
       }

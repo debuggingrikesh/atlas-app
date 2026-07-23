@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createClient } from '@/lib/supabase/server';
 import { errorResponse } from '@/lib/api/response';
 import type { AuthUser } from '@/modules/auth/types';

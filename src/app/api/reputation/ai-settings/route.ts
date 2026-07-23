@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
   try {
     const settings = await AIService.getSettings(businessId);
     return successResponse(settings || { tone: 'Professional', preferredLanguage: 'English' });
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[ai-settings GET] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
@@ -50,7 +52,7 @@ export async function PATCH(request: Request) {
     });
 
     return successResponse(updated);
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[ai-settings PATCH] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

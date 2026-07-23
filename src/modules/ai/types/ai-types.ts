@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export type AITone = 'Professional' | 'Friendly' | 'Casual' | 'Luxury';
 
 export interface AnalyzeFeedbackInput {

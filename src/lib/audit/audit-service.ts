@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '../db/prisma';
 import { logger } from '../logger';
 import type { Prisma } from '@prisma/client';

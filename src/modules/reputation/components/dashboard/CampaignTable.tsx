@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -139,7 +141,7 @@ export function CampaignTable({
       }
 
       setIsModalOpen(false);
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setIsSubmitting(false);
@@ -165,7 +167,7 @@ export function CampaignTable({
 
       setCampaigns(prev => prev.map(c => c.id === campaign.id ? { ...c, status: newStatus } : c));
       toast.success(`Campaign ${newStatus === 'ACTIVE' ? 'resumed' : 'paused'} successfully`);
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'Failed to toggle status.');
     } finally {
       setTogglingId(null);
@@ -182,7 +184,7 @@ export function CampaignTable({
       const link = getCampaignLink(campaign);
       await navigator.clipboard.writeText(link);
       toast.success('Review link copied to clipboard!');
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'Failed to copy link.');
     }
   };

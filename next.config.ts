@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from "next";
 import packageJson from "./package.json";

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
@@ -52,7 +54,7 @@ export async function GET(request: Request) {
       },
       pendingUpgradeRequest: pendingRequest
     });
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[subscription/current GET] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

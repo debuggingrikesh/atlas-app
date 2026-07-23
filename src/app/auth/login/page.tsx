@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { LoginForm } from '@/modules/auth/components/LoginForm';

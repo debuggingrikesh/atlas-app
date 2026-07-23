@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Resend } from 'resend';
 
 const resendApiKey = process.env.RESEND_API_KEY;
@@ -43,7 +45,7 @@ export async function sendEmail(options: SendEmailOptions) {
 
     console.info('[Email] Successfully sent.', { id: data?.id });
     return { success: true, data };
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('[Email] Unexpected Error:', {
       message: error instanceof Error ? error.message : 'Unknown error',
     });

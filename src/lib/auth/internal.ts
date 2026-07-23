@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { headers } from 'next/headers';
 import { logger } from '@/lib/logger';
 

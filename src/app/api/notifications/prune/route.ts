@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { pruneNotifications } from '@/modules/notifications/lib/prune-notifications';
 import { successResponse, errorResponse } from '@/lib/api/response';

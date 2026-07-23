@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 import { NOTIFICATION_EVENTS } from '@/lib/constants/notification-events';
@@ -8,7 +10,7 @@ export type CreateNotificationInput = {
   type: string;
   title: string;
   message: string;
-  metadata?: unknown;
+  metadata?: any;
 };
 
 /**

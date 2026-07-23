@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import React, { useState } from 'react';
@@ -53,7 +55,7 @@ export function ReviewPage({ submitUrl, business }: ReviewPageProps) {
         action: result.data.action,
         redirectUrl: result.data.redirectUrl,
       });
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

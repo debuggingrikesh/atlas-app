@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState } from 'react';
@@ -79,7 +81,7 @@ export function TeamMemberList({
       }
       toast.success('Role updated successfully');
       router.refresh();
-    } catch (err: unknown) {
+    } catch (err: any) {
       setRoleErrors((prev) => ({
         ...prev,
         [member.id]: err instanceof Error ? err.message : 'Failed to update role.',

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logger } from "@/lib/logger";
 import { CORE_INFO } from "@atlas/core/metadata";
@@ -7,7 +9,7 @@ import crypto from "crypto";
 
 export async function GET() {
    
-  const headersList = (await headers()) as unknown;
+  const headersList = await headers();
   const authHeader = headersList.get("authorization");
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

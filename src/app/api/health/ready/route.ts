@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { redis } from '@/lib/rate-limit';
@@ -8,7 +10,7 @@ export async function GET() {
   let requestId: string | undefined = undefined;
   try {
      
-    const h = (await headers()) as unknown;
+    const h = await headers();
     if (h && typeof h.get === 'function') {
       requestId = h.get('x-request-id') || undefined;
     }

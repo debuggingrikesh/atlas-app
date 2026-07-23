@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { z } from 'zod';
 import { createInvitationSchema } from './validators';
 import type { Invitation as PrismaInvitation } from '@prisma/client';

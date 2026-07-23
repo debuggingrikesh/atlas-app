@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
 import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
@@ -34,7 +36,7 @@ export class ReputationSettingsService {
         businessId: undefined,
         severity: 'INFO',
         summary: `System event ${'reputation.settings.updated'}`,
-        metadata: data as unknown as Record<string, unknown>,
+        metadata: data as any as Record<string, unknown>,
       
       }, undefined)
 

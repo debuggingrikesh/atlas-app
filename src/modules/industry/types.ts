@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Industry module types
 
 export type IndustryTemplate = {

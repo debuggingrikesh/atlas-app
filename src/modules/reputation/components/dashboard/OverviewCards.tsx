@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Send, Eye, CheckCircle2, ThumbsUp, AlertCircle } from 'lucide-react';

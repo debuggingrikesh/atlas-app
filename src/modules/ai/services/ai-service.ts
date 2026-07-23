@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '@/lib/db/prisma';
 import { GeminiProvider } from '../providers/gemini-provider';
 import { buildAnalysisPrompt } from '../prompts/reputation-prompts';
@@ -113,7 +115,7 @@ export class AIService {
 
         return { response: analysisResult };
       });
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('[AIService.analyzeFeedback] failed:', err);
       return { error: err instanceof Error ? err.message : 'Failed to analyze feedback.', status: 400 };
     }

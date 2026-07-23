@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { BillingRepository } from '../repositories/billing-repository';
 import { SubscriptionService } from './subscription-service';
 

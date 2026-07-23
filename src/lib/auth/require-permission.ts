@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';

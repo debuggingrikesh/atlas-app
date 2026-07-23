@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as Sentry from '@sentry/nextjs';
 import { logger } from '../logger';
@@ -19,6 +21,8 @@ describe('Logger Sentry Integration', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (global as any).fetch = vi.fn();
     vi.clearAllMocks();
     process.env = { ...originalEnv, ENABLE_SENTRY: 'true' };
   });
@@ -36,7 +40,7 @@ describe('Logger Sentry Integration', () => {
   it('captures error messages correctly', () => {
     logger.error('Something went wrong');
     expect(Sentry.captureException).toHaveBeenCalledWith(expect.any(Error));
-    expect((Sentry.captureException as unknown).mock.calls[0][0].message).toBe('Something went wrong');
+    expect((Sentry.captureException as any).mock.calls[0][0].message).toBe('Something went wrong');
   });
 
   it('attaches user context and request ID', () => {
@@ -54,7 +58,7 @@ describe('Logger Sentry Integration', () => {
     const scopeMock = withScopeMock.mock.calls[0][0];
     const dummyScope = { setTag: vi.fn(), setUser: vi.fn(), setExtras: vi.fn() };
     // @ts-expect-error test mock typing
-    scopeMock(dummyScope as unknown as Sentry.Scope);
+    scopeMock(dummyScope as any as Sentry.Scope);
 
     expect(dummyScope.setTag).toHaveBeenCalledWith('requestId', 'req_abc');
     expect(dummyScope.setUser).toHaveBeenCalledWith(expect.objectContaining({

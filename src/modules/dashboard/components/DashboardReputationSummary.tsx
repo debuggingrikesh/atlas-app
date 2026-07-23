@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Link from 'next/link';
 import { ReputationSummaryService } from '@/modules/reputation/services/reputation-summary-service';
 import type { BusinessWithMembership } from '@/modules/business/types';

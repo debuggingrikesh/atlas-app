@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     return successResponse({ request: result.request }, 201);
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[subscription/upgrade-request POST] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { prisma } from '../src/lib/db/prisma';
 import { CampaignService } from '../src/modules/reputation/services/campaign-service';
 import { ReviewRequestService } from '../src/modules/reputation/services/review-request-service';

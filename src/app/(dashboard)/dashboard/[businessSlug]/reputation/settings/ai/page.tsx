@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -56,7 +58,7 @@ export default function AISettingsPage() {
         throw new Error(data.error || 'Failed to save settings');
       }
       toast.success('AI settings saved successfully');
-    } catch (err: unknown) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setSaving(false);

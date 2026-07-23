@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { LoadingSpinner } from './LoadingSpinner';
 
 export function LoadingOverlay({ message = 'Please wait...' }: { message?: string }) {

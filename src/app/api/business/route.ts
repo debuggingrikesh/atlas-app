@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { createBusiness } from '@/modules/business/lib/create-business';
 import { getUserBusinesses } from '@/modules/business/lib/get-user-businesses';

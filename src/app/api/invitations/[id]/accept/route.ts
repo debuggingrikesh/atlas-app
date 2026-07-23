@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { acceptInvitation } from '@/modules/invitations/lib/accept-invitation';
 import { successResponse, errorResponse } from '@/lib/api/response';

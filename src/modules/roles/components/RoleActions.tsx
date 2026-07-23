@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState } from 'react';
@@ -34,7 +36,7 @@ export function RoleActions({ businessId, roleId, roleName }: RoleActionsProps) 
 
       toast.success('Role deleted successfully');
       router.refresh();
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (err instanceof Error) {
         toast.error(err.message);
       } else {

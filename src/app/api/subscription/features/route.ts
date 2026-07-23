@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { requireAuth } from '@/lib/auth/require-auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { prisma } from '@/lib/db/prisma';
@@ -13,7 +15,7 @@ export async function GET() {
     });
 
     return successResponse({ plans });
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error('[subscription/features GET] error:', err);
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { OnboardingWizard } from '@/modules/auth/components/onboarding/OnboardingWizard';

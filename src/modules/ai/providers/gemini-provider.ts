@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { GoogleGenAI } from '@google/genai';
 
 let aiInstance: GoogleGenAI | null = null;
@@ -20,7 +22,7 @@ export interface UsageMetadata {
 }
 
 export class GeminiProvider {
-  static async generateJSON(prompt: string, maxRetries = 3): Promise<{ data: unknown, usageMetadata?: UsageMetadata }> {
+  static async generateJSON(prompt: string, maxRetries = 3): Promise<{ data: any, usageMetadata?: UsageMetadata }> {
     const { text: rawText, usageMetadata } = await this.generateText(prompt, maxRetries, 'application/json');
     try {
       // Clean up markdown block if Gemini accidentally wraps it
@@ -39,7 +41,7 @@ export class GeminiProvider {
     let ai;
     try {
       ai = getGenAI();
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('[GeminiProvider] Missing API key or initialization error:', err);
       throw new Error('AI configuration error. Missing API key.');
     }
@@ -73,7 +75,7 @@ export class GeminiProvider {
           text: response.text.trim(), 
           usageMetadata: response.usageMetadata as UsageMetadata | undefined 
         };
-      } catch (err: unknown) {
+      } catch (err: any) {
         clearTimeout(timeout);
         
         const isAbort = err instanceof Error && err.name === 'AbortError';

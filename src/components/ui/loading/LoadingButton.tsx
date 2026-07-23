@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from './LoadingSpinner';

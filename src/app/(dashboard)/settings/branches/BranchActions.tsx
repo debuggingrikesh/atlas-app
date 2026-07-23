@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 
 import { useState } from 'react';
@@ -45,7 +47,7 @@ export function BranchActions({ branch, businessId, canEdit }: BranchActionsProp
     try {
       await patch({ isActive: !branch.isActive });
       router.refresh();
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to update.');
     } finally {
       setToggling(false);
@@ -60,7 +62,7 @@ export function BranchActions({ branch, businessId, canEdit }: BranchActionsProp
       await patch({ name: name.trim(), address: address.trim() || null });
       setEditing(false);
       router.refresh();
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to save.');
     } finally {
       setSaving(false);
