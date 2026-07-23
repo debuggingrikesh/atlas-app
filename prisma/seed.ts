@@ -189,9 +189,9 @@ async function main() {
     create: { planId: freePlan.id, featureKey: 'REPUTATION_REVIEW_REQUESTS', limit: 6, enabled: true },
   });
   await prisma.planFeature.upsert({
-    where: { planId_featureKey: { planId: freePlan.id, featureKey: 'AI_REPUTATION_RESPONSE' } },
+    where: { planId_featureKey: { planId: freePlan.id, featureKey: 'AI_REPUTATION_ANALYSIS' } },
     update: { limit: -1, enabled: false },
-    create: { planId: freePlan.id, featureKey: 'AI_REPUTATION_RESPONSE', limit: -1, enabled: false },
+    create: { planId: freePlan.id, featureKey: 'AI_REPUTATION_ANALYSIS', limit: -1, enabled: false },
   });
 
   // Pro Features
@@ -201,9 +201,9 @@ async function main() {
     create: { planId: proPlan.id, featureKey: 'REPUTATION_REVIEW_REQUESTS', limit: -1, enabled: true },
   });
   await prisma.planFeature.upsert({
-    where: { planId_featureKey: { planId: proPlan.id, featureKey: 'AI_REPUTATION_RESPONSE' } },
+    where: { planId_featureKey: { planId: proPlan.id, featureKey: 'AI_REPUTATION_ANALYSIS' } },
     update: { limit: -1, enabled: true },
-    create: { planId: proPlan.id, featureKey: 'AI_REPUTATION_RESPONSE', limit: -1, enabled: true },
+    create: { planId: proPlan.id, featureKey: 'AI_REPUTATION_ANALYSIS', limit: -1, enabled: true },
   });
   console.log('✅ Billing plans seeded');
 

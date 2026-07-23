@@ -1,6 +1,6 @@
  
 
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '../../../lib/db/prisma';
 import type { BusinessSubscriptionWithDetails, SubscriptionStatus } from '@atlas/core/contracts/billing';
 
 export class BillingRepository {

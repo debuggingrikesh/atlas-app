@@ -2,7 +2,9 @@
 
 import { BillingRepository } from '../repositories/billing-repository';
 import type { BusinessSubscriptionWithDetails } from '@atlas/core/contracts/billing';
-import { logger } from '@/lib/logger';
+import { logger } from '../../../lib/logger';
+
+import { prisma } from '../../../lib/db/prisma';
 
 export class SubscriptionService {
   /**
@@ -15,9 +17,18 @@ export class SubscriptionService {
       return null;
     }
 
-    // Upsert subscription logic is simplified here as create.
-    // Assuming this is only called when active sub does not exist.
-    await BillingRepository.createSubscription(businessId, freePlan.id);
+    await prisma.businessSubscription.upsert({
+      where: { businessId },
+      update: {
+        planId: freePlan.id,
+        status: 'ACTIVE',
+      },
+      create: {
+        businessId,
+        planId: freePlan.id,
+        status: 'ACTIVE',
+      },
+    });
     
     // Re-fetch to get the fully hydrated model
     return BillingRepository.getActiveSubscription(businessId);

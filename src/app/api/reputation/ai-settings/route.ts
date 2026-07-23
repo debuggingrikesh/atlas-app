@@ -6,6 +6,7 @@ import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { AIService } from '@/modules/ai/services/ai-service';
+import { EntitlementService } from '@/modules/billing/services/entitlement-service';
 
 export async function GET(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
@@ -20,6 +21,11 @@ export async function GET(request: Request) {
 
   const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.aiSettingsManage);
   if (memberError) return memberError;
+
+  const canAccess = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_ANALYSIS');
+  if (!canAccess) {
+    return errorResponse('PAYMENT_REQUIRED', 'AI generation is a paid feature. Please upgrade your subscription.', 402);
+  }
 
   try {
     const settings = await AIService.getSettings(businessId);
@@ -44,6 +50,11 @@ export async function PATCH(request: Request) {
 
     const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.aiSettingsManage);
     if (memberError) return memberError;
+
+    const canAccess = await EntitlementService.canAccessFeature(businessId, 'AI_REPUTATION_ANALYSIS');
+    if (!canAccess) {
+      return errorResponse('PAYMENT_REQUIRED', 'AI generation is a paid feature. Please upgrade your subscription.', 402);
+    }
 
     const updated = await AIService.updateSettings(businessId, {
       tone,
