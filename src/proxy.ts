@@ -19,6 +19,8 @@ export async function proxy(request: NextRequest) {
   const requestId = getOrGenerateRequestId(request);
   request.headers.set('x-request-id', requestId);
 
+  const startTime = Date.now();
+  
   // Skip proxy logic for API routes, static assets, and the auth callback
   if (
     pathname.startsWith('/api/') || 
@@ -27,6 +29,12 @@ export async function proxy(request: NextRequest) {
   ) {
     const response = NextResponse.next({ request });
     response.headers.set('x-request-id', requestId);
+    
+    // We don't trace static assets in DB metrics, but we can trace API routes
+    if (pathname.startsWith('/api/')) {
+      const duration = Date.now() - startTime;
+      reportMetricEdge(request, 'http.duration', duration, response.status);
+    }
     return response;
   }
 
@@ -78,14 +86,46 @@ export async function proxy(request: NextRequest) {
   // ── Dashboard routes: require authenticated ────────────────────
   if (pathname.startsWith('/dashboard')) {
     if (!isAuthenticated) {
+      reportMetricEdge(request, 'http.duration', Date.now() - startTime, 307);
       return NextResponse.redirect(new URL('/auth/login', request.url));
     }
     // DB-level check (onboarding complete, membership) is handled in the
     // dashboard Server Component layout for the same reason.
+    reportMetricEdge(request, 'http.duration', Date.now() - startTime, 200);
     return response;
   }
 
+  reportMetricEdge(request, 'http.duration', Date.now() - startTime, 200);
   return response;
+}
+
+function reportMetricEdge(req: NextRequest, metric: string, value: number, status: number) {
+  // Fire and forget to internal metric collector (avoids blocking response)
+  const secret = process.env.HQ_INTERNAL_API_SECRET;
+  if (!secret) return;
+
+  // Use absolute URL since relative fetch is not allowed in middleware
+  const url = new URL('/api/internal/operational-metrics', req.url).toString();
+  
+  // Determine status class (2xx, 3xx, 4xx, 5xx)
+  const statusClass = `${Math.floor(status / 100)}xx`;
+  
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${secret}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      metric,
+      value,
+      opts: {
+        route: req.nextUrl.pathname,
+        method: req.method,
+        statusClass
+      }
+    })
+  }).catch(() => { /* silent fail for metrics */ });
 }
 
 export const config = {

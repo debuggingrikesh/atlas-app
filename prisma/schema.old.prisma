@@ -571,31 +571,3 @@ model UpgradeRequest {
 // Operational Metrics
 // ──────────────────────────────────────────
 
-model OperationalMetric {
-  id                    String   @id @default(cuid())
-  service               String
-  environment           String
-  metric                String
-  dimension             String   @default("default")
-  bucketStartedAt       DateTime
-  bucketDurationMinutes Int
-
-  count                 Int      @default(0)
-  successCount          Int      @default(0)
-  errorCount            Int      @default(0)
-
-  sum                   Float    @default(0)
-  min                   Float?
-  max                   Float?
-
-  p50                   Float?
-  p95                   Float?
-  p99                   Float?
-
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  @@unique([service, environment, metric, dimension, bucketStartedAt, bucketDurationMinutes])
-  @@index([service, metric, bucketStartedAt])
-}
-

@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('Authorization');
-  const secret = process.env.HQ_INTERNAL_API_SECRET;
+import { verifyInternalRequest } from '@/lib/auth/internal';
 
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+export async function GET(request: Request) {
+  if (!(await verifyInternalRequest())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
