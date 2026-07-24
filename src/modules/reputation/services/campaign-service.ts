@@ -71,4 +71,55 @@ export class CampaignService {
 
     return campaigns.count > 0;
   }
+
+  static async archiveCampaign(
+    userId: string,
+    id: string,
+    businessId: string
+  ) {
+    const campaigns = await ReputationRepository.updateCampaign(id, businessId, { 
+      archivedAt: new Date(),
+      archivedBy: userId,
+    });
+    
+    if (campaigns.count > 0) {
+      await AuditService.record({
+        action: 'review_campaign.archived' as AuditActionType,
+        resourceType: 'ReviewCampaign' as AuditResourceTypeType,
+        resourceId: id,
+        actorType: 'USER',
+        actorUserId: userId,
+        businessId: businessId,
+        severity: 'INFO',
+        summary: `System event ${'review_campaign.archived'}`,
+        metadata: {},
+      }, undefined);
+    }
+
+    return campaigns.count > 0;
+  }
+
+  static async duplicateCampaign(
+    userId: string,
+    id: string,
+    businessId: string
+  ) {
+    const existing = await ReputationRepository.getCampaignById(id, businessId);
+    
+    if (!existing) {
+      throw new Error('Campaign not found');
+    }
+
+    const allCampaigns = await ReputationRepository.getCampaigns(businessId);
+    const existingNames = allCampaigns.map(c => c.name);
+
+    const { CampaignDuplicateFactory } = await import('../lib/campaign-duplicate-factory');
+    const input = CampaignDuplicateFactory.createDuplicateInput(existing, existingNames);
+
+    return this.createCampaign(userId, businessId, {
+      name: input.name,
+      branchId: input.branchId || undefined,
+      googleReviewUrl: input.googleReviewUrl || undefined,
+    });
+  }
 }

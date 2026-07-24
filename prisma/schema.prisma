@@ -345,9 +345,11 @@ model ReviewCampaign {
   businessId      String
   branchId        String?
   name            String
-  status          String   @default("ACTIVE") // DRAFT, ACTIVE, PAUSED, COMPLETED, ARCHIVED
+  status          String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
   googleReviewUrl String?
   publicId        String   @unique @default(cuid())
+  archivedAt      DateTime?
+  archivedBy      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
