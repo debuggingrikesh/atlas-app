@@ -5,6 +5,7 @@ import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { ReputationSettingsService } from './reputation-settings-service';
+import { ReviewLifecycleService, type CustomerFeedbackState } from './review-lifecycle-service';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
 
@@ -20,13 +21,19 @@ export class FeedbackService {
       return { error: 'Invalid or expired review token.', status: 404 };
     }
 
-    if (request.status !== 'PENDING') {
+    if (request.status !== 'PENDING' && request.status !== 'OPENED') {
       return { error: 'This review request has already been processed.', status: 400 };
     }
 
-    const expiresAt = new Date(request.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const expiresAt = request.expiresAt || new Date(request.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000);
     if (new Date() > expiresAt) {
+      await ReviewLifecycleService.expire(request.id, request.businessId);
       return { error: 'This review request has expired.', status: 400 };
+    }
+
+    if (request.status === 'PENDING') {
+      await ReviewLifecycleService.markOpened(request.id, request.businessId);
+      request.status = 'OPENED';
     }
 
     return { request };
@@ -61,12 +68,12 @@ export class FeedbackService {
     }
 
     // 2. Verify status and expiry (+30 days)
-    if (request.status !== 'PENDING') {
+    if (request.status !== 'PENDING' && request.status !== 'OPENED') {
       return { error: 'This review request has already been processed.', status: 400 };
     }
-
-    const expiresAt = new Date(request.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const expiresAt = request.expiresAt || new Date(request.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000);
     if (new Date() > expiresAt) {
+      await ReviewLifecycleService.expire(request.id, request.businessId);
       return { error: 'This review request has expired.', status: 400 };
     }
 
@@ -95,7 +102,7 @@ export class FeedbackService {
           status: feedbackStatus,
         }, tx);
 
-        await ReputationRepository.updateRequestStatus(request.id, 'COMPLETED', tx);
+        await ReviewLifecycleService.completeSurvey(request.id, request.businessId, undefined, tx);
 
         await AuditService.record({
         action: 'customer_feedback.received' as AuditActionType,
@@ -118,9 +125,9 @@ export class FeedbackService {
     }
   }
 
-  static async updateFeedbackStatus(id: string, businessId: string, status: string) {
-    const updated = await ReputationRepository.updateFeedbackStatus(id, businessId, status);
-    return updated.count > 0;
+  static async updateFeedbackStatus(id: string, businessId: string, status: string, actorId?: string) {
+    const updated = await ReviewLifecycleService.transitionFeedback(id, businessId, status as CustomerFeedbackState, actorId);
+    return !!updated;
   }
 
   static async submitCampaignReview(publicId: string, data: {

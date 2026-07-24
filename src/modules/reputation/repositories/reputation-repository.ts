@@ -94,20 +94,6 @@ export class ReputationRepository {
     });
   }
 
-  static async updateRequestStatus(
-    id: string,
-    status: string,
-    tx: Prisma.TransactionClient = prisma
-  ) {
-    return tx.reviewRequest.update({
-      where: { id },
-      data: { 
-        status,
-        ...(status === 'COMPLETED' ? { completedAt: new Date() } : {})
-      },
-    });
-  }
-
   // ──────────────────────────────────────────
   // Feedback
   // ──────────────────────────────────────────
@@ -224,10 +210,4 @@ export class ReputationRepository {
     };
   }
 
-  static async updateFeedbackStatus(id: string, businessId: string, status: string) {
-    return prisma.customerFeedback.updateMany({
-      where: { id, businessId },
-      data: { status }
-    });
-  }
 }

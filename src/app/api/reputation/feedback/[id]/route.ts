@@ -15,7 +15,7 @@ interface Params {
 
 const patchFeedbackSchema = z.object({
   businessId: z.string().min(1),
-  status: z.enum(['UNREAD', 'REVIEWED', 'RESOLVED']),
+  status: z.enum(['UNREAD', 'REVIEWED', 'RESOLVED', 'NEW', 'IN_REVIEW', 'ACTION_REQUIRED', 'ARCHIVED']),
 });
 
 async function PATCH_handler(request: Request, { params }: Params) {
@@ -38,7 +38,7 @@ async function PATCH_handler(request: Request, { params }: Params) {
     const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.manage);
     if (memberError) return memberError;
 
-    const updated = await FeedbackService.updateFeedbackStatus(id, businessId, status);
+    const updated = await FeedbackService.updateFeedbackStatus(id, businessId, status, user.id);
     if (!updated) {
       return errorResponse('NOT_FOUND', 'Feedback not found or could not be updated.', 404);
     }
