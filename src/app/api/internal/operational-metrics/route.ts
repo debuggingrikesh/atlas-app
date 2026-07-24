@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+
 import { withErrorHandling } from '@/lib/api/handler';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';

@@ -16,31 +16,28 @@ interface Params {
  *
  * No rate limit applied — token-scoped read, low risk.
  */
-export async function GET(request: Request, { params }: Params) {
+async function GET_handler(_request: Request, { params }: Params) {
   const { token } = await params;
 
-  try {
-    const response = await FeedbackService.getReviewRequestDetails(token);
+  const response = await FeedbackService.getReviewRequestDetails(token);
 
-    if (response.error || !response.request) {
-      return errorResponse('VALIDATION_ERROR', response.error || 'Invalid token.', response.status || 400);
-    }
-
-    return successResponse({
-      valid: true,
-      business: {
-        name: response.request.business.name,
-        logoUrl: response.request.business.logoUrl,
-      },
-      campaign: {
-        name: response.request.campaign.name,
-      }
-    });
-  } catch (err) {
-    logger.error({ message: 'API Error', context: '[public/reviews/:token GET] error:', route: 'API' }, err);
-    return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
+  if (response.error || !response.request) {
+    return errorResponse('VALIDATION_ERROR', response.error || 'Invalid token.', response.status || 400);
   }
+
+  return successResponse({
+    valid: true,
+    business: {
+      name: response.request.business.name,
+      logoUrl: response.request.business.logoUrl,
+    },
+    campaign: {
+      name: response.request.campaign.name,
+    }
+  });
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/public/reviews/[token]');
 
 /**
  * POST /api/public/reviews/[token]

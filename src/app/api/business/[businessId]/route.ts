@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -20,7 +21,7 @@ interface Params {
  * GET /api/business/[businessId]
  * Returns a single business. Requires membership.
  */
-export async function GET(_request: Request, { params }: Params) {
+async function GET_handler(_request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -48,7 +49,7 @@ export async function GET(_request: Request, { params }: Params) {
  * Requires ADMIN or OWNER role.
  * Runs inside a Prisma transaction and writes an AuditLog entry.
  */
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -86,7 +87,7 @@ export async function PATCH(request: Request, { params }: Params) {
  * Soft deletes a business.
  * Requires OWNER role ('business.delete' permission).
  */
-export async function DELETE(request: Request, { params }: Params) {
+async function DELETE_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -123,3 +124,9 @@ export async function DELETE(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/business/[businessId]');
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/business/[businessId]');
+
+export const DELETE = withErrorHandling(DELETE_handler, 'DELETE /api/business/[businessId]');

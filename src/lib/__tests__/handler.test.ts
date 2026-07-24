@@ -95,4 +95,35 @@ describe('withErrorHandling', () => {
     expect(response.headers.get('X-Custom-Header')).toBe('custom-value');
     expect(response.headers.get('x-request-id')).toBeTruthy();
   });
+
+  it('forwards dynamic params and context correctly', async () => {
+    interface TestContext {
+      params: Promise<{ id: string }>;
+    }
+    const mockHandler = async (req: Request, ctx: TestContext) => {
+      const { id } = await ctx.params;
+      return NextResponse.json({ receivedId: id });
+    };
+
+    const wrapped = withErrorHandling<TestContext>(mockHandler, 'test-route');
+    const req = new Request('http://localhost');
+    const context = { params: Promise.resolve({ id: 'test-123' }) };
+
+    const response = await wrapped(req, context);
+    const json = await response.json();
+    expect(json.receivedId).toBe('test-123');
+  });
+
+  it('supports request-only handlers without context', async () => {
+    const mockHandler = async (req: Request) => {
+      return NextResponse.json({ url: req.url });
+    };
+
+    const wrapped = withErrorHandling(mockHandler, 'test-route');
+    const req = new Request('http://localhost/test');
+
+    const response = await wrapped(req, {});
+    const json = await response.json();
+    expect(json.url).toBe('http://localhost/test');
+  });
 });

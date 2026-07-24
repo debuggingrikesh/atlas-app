@@ -30,7 +30,7 @@ import { checkRateLimit } from '../rate-limit';
 import { logger } from '../logger';
 
 // Match the RouteHandler type used by withErrorHandling
-type RouteHandler = (request: Request, context: unknown) => Promise<Response> | Response;
+type RouteHandler<TContext = unknown> = (request: Request, context: TContext) => Promise<Response> | Response;
 
 /** Maximum byte length we accept for a forwarded-for header value. */
 const MAX_FORWARDED_FOR_BYTES = 256;
@@ -109,8 +109,8 @@ export interface RateLimitConfig {
  * Rate-limit exceeded => 429 returned directly (does not invoke the handler).
  * Config / Redis failure => error is thrown, propagating to withErrorHandling.
  */
-export function withRateLimit(config: RateLimitConfig, handler: RouteHandler): RouteHandler {
-  return async (request: Request, context: unknown): Promise<Response> => {
+export function withRateLimit<TContext = unknown>(config: RateLimitConfig, handler: RouteHandler<TContext>): RouteHandler<TContext> {
+  return async (request: Request, context: TContext): Promise<Response> => {
     // Resolve the per-request key component
     const keyPart = config.keyGenerator
       ? await config.keyGenerator(request)

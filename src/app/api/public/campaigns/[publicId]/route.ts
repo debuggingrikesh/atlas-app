@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -10,7 +11,7 @@ interface Params {
   params: Promise<{ publicId: string }>;
 }
 
-export async function GET(request: Request, { params }: Params) {
+async function GET_handler(request: Request, { params }: Params) {
   const { publicId } = await params;
 
   try {
@@ -36,7 +37,7 @@ export async function GET(request: Request, { params }: Params) {
   }
 }
 
-export async function POST(request: Request, { params }: Params) {
+async function POST_handler(request: Request, { params }: Params) {
   const { publicId } = await params;
 
   try {
@@ -70,3 +71,7 @@ export async function POST(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/public/campaigns/[publicId]');
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/public/campaigns/[publicId]');

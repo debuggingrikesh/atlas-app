@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -9,7 +10,7 @@ import { EntitlementService } from '@/modules/billing/services/entitlement-servi
 import { UsageRepository } from '@/modules/reputation/repositories/usage-repository';
 import { prisma } from '@/lib/db/prisma';
 
-export async function GET(request: Request) {
+async function GET_handler(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -60,3 +61,5 @@ export async function GET(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/subscription/current');

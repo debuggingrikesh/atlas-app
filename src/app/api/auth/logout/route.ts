@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -9,7 +10,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
  *
  * Signs the user out and clears the session cookie.
  */
-export async function POST() {
+async function POST_handler() {
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.signOut();
@@ -25,3 +26,5 @@ export async function POST() {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/auth/logout');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
  
 
 import { NextResponse } from 'next/server';
@@ -6,7 +7,7 @@ import { getRedis } from '@/lib/rate-limit';
 import type { ReadinessResponse, HealthStatus, HealthCheckResult } from '@atlas/core/observability';
 import { headers } from 'next/headers';
 
-export async function GET() {
+async function GET_handler() {
   let requestId: string | undefined = undefined;
   try {
      
@@ -28,7 +29,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       latencyMs: Date.now() - startDb,
     };
-  } catch (error) {
+  } catch {
     checks.database = {
       status: 'unhealthy',
       message: 'Database connection failed',
@@ -81,3 +82,5 @@ export async function GET() {
     headers: requestId ? { 'x-request-id': requestId } : undefined
   });
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/health/ready');

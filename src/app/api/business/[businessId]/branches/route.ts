@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -17,7 +18,7 @@ interface Params {
  * POST /api/business/[businessId]/branches
  * Creates a branch. Requires ADMIN or OWNER role.
  */
-export async function POST(request: Request, { params }: Params) {
+async function POST_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -55,7 +56,7 @@ export async function POST(request: Request, { params }: Params) {
  * GET /api/business/[businessId]/branches
  * Lists all branches for a business. Requires membership.
  */
-export async function GET(_request: Request, { params }: Params) {
+async function GET_handler(_request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -77,3 +78,7 @@ export async function GET(_request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/business/[businessId]/branches');
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/business/[businessId]/branches');

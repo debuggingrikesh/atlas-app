@@ -32,32 +32,37 @@ describe('App Core Route Authentication', () => {
   });
 
   it('fails with missing authorization header', async () => {
-    const res = await GET();
+    const req = new Request('http://localhost');
+    const res = await GET(req as Request, {});
     expect(res.status).toBe(401);
   });
 
   it('fails with invalid format', async () => {
     mockHeaders.set('authorization', 'invalid_format');
-    const res = await GET();
+    const req = new Request('http://localhost');
+    const res = await GET(req as Request, {});
     expect(res.status).toBe(401);
   });
 
   it('fails with incorrect secret', async () => {
     mockHeaders.set('authorization', 'Bearer invalid_secret');
-    const res = await GET();
+    const req = new Request('http://localhost');
+    const res = await GET(req as Request, {});
     expect(res.status).toBe(403);
   });
 
   it('succeeds with correct secret', async () => {
     mockHeaders.set('authorization', 'Bearer valid_secret');
-    const res = await GET();
+    const req = new Request('http://localhost');
+    const res = await GET(req as Request, {});
     expect(res.status).toBe(200);
   });
   
   it('fails if server misconfigured (no internal secret)', async () => {
     delete process.env.INTERNAL_INTEGRITY_SECRET;
     mockHeaders.set('authorization', 'Bearer valid_secret');
-    const res = await GET();
+    const req = new Request('http://localhost');
+    const res = await GET(req as Request, {});
     expect(res.status).toBe(500);
   });
 });

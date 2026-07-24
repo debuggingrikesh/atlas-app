@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -17,7 +18,7 @@ interface Params {
 /**
  * GET /api/business/[businessId]/activity
  */
-export async function GET(request: Request, { params }: Params) {
+async function GET_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -59,3 +60,5 @@ export async function GET(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch activity feed.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/business/[businessId]/activity');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -17,7 +18,7 @@ const patchFeedbackSchema = z.object({
   status: z.enum(['UNREAD', 'REVIEWED', 'RESOLVED']),
 });
 
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -48,3 +49,5 @@ export async function PATCH(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/reputation/feedback/[id]');

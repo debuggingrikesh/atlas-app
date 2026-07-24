@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -16,7 +17,7 @@ interface Params {
  * DELETE /api/invitations/[id]
  * Cancels a pending invitation.
  */
-export async function DELETE(_request: Request, { params }: Params) {
+async function DELETE_handler(_request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -49,3 +50,5 @@ export async function DELETE(_request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to cancel invitation.', 500);
   }
 }
+
+export const DELETE = withErrorHandling(DELETE_handler, 'DELETE /api/invitations/[id]');

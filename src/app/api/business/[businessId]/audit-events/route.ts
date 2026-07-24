@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -16,7 +17,7 @@ interface Params {
  * Returns audit events for a business.
  * Requires ADMIN or OWNER role (business.read_audit or similar permission if defined, we'll use business.read for now, or check for admin role).
  */
-export async function GET(request: Request, { params }: Params) {
+async function GET_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -54,3 +55,5 @@ export async function GET(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/business/[businessId]/audit-events');

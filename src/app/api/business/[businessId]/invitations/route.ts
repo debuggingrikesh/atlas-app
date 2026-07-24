@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
@@ -64,7 +64,7 @@ export const POST = withErrorHandling(
  * No rate limit in this story — read-only, requires auth and permission.
  * Staged rollout: add limit in a later story if needed.
  */
-export async function GET(_request: Request, { params }: Params) {
+async function GET_handler(_request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -72,11 +72,8 @@ export async function GET(_request: Request, { params }: Params) {
   const { errorRes: permError } = await requirePermission(user.id, businessId, PERMISSIONS.member.read);
   if (permError) return permError;
 
-  try {
-    const invitations = await getInvitations(businessId);
-    return successResponse({ invitations });
-  } catch (err) {
-    logger.error({ message: 'API Error', context: '[invitations GET] Error:', route: 'API' }, err);
-    return errorResponse('INTERNAL_ERROR', 'Failed to fetch invitations.', 500);
-  }
+  const invitations = await getInvitations(businessId);
+  return successResponse({ invitations });
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/business/[businessId]/invitations');

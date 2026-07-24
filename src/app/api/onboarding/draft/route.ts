@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -17,7 +18,7 @@ const draftSchema = z.object({
  * Fetches the user's current onboarding draft state.
  * Note: This is a user-scoped endpoint, not tenant-isolated.
  */
-export async function GET() {
+async function GET_handler() {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -42,7 +43,7 @@ export async function GET() {
  * Upserts the user's onboarding progress.
  * Note: This is a user-scoped endpoint, not tenant-isolated.
  */
-export async function POST(request: Request) {
+async function POST_handler(request: Request) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -81,3 +82,7 @@ export async function POST(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'Failed to save draft.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/onboarding/draft');
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/onboarding/draft');

@@ -26,12 +26,12 @@ import { prisma } from '@/lib/db/prisma';
  */
 async function analyzeHandler(
   request: Request,
-  context: unknown
+  context: { params: Promise<{ id: string }> }
 ): Promise<Response> {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
-  const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  const { id } = await context.params;
 
   let body: Record<string, unknown>;
   try {

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -8,7 +9,7 @@ import { getNotifications } from '@/modules/notifications/lib/get-notifications'
 import { notificationPaginationSchema } from '@/modules/notifications/validators';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
-export async function GET(request: Request) {
+async function GET_handler(request: Request) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -41,3 +42,5 @@ export async function GET(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'Failed to fetch notifications', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/notifications');

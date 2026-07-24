@@ -1,9 +1,10 @@
+import { withErrorHandling } from '@/lib/api/handler';
  
 
 import { NextResponse } from 'next/server';
 import type { LivenessResponse } from '@atlas/core/observability';
 
-export async function GET() {
+async function GET_handler() {
   const response: LivenessResponse = {
     service: 'atlas-app',
     status: 'ok',
@@ -11,3 +12,5 @@ export async function GET() {
   };
   return NextResponse.json(response);
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/health/live');

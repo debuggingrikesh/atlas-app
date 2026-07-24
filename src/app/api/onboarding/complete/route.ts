@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -29,7 +30,7 @@ import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
  *   7.  AuditLog entries
  *   8.  Mark onboardingCompletedAt on UserProfile
  */
-export async function POST(request: Request) {
+async function POST_handler(request: Request) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -237,3 +238,5 @@ export async function POST(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'Failed to complete onboarding. Please try again.', 500);
   }
 }
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/onboarding/complete');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -11,7 +12,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
  * Returns all active IndustryTemplate records.
  * Cached for 1 hour (s-maxage) to avoid redundant DB queries.
  */
-export async function GET() {
+async function GET_handler() {
   try {
     const templates = await getActiveTemplates();
 
@@ -26,3 +27,5 @@ export async function GET() {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/industry/templates');

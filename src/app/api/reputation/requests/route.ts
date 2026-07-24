@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -9,7 +10,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
 import { ReviewRequestService } from '@/modules/reputation/services/review-request-service';
 import { createReviewRequestSchema } from '@/modules/reputation/validators/reputation-schema';
 
-export async function POST(request: Request) {
+async function POST_handler(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -42,3 +43,5 @@ export async function POST(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/reputation/requests');

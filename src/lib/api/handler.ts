@@ -3,7 +3,7 @@ import { logger } from '../logger';
 import { normalizeError, safeErrorResponse } from '../errors';
 import crypto from 'crypto';
 
-type RouteHandler = (request: Request, context: unknown) => Promise<Response> | Response;
+type RouteHandler<TContext = unknown> = (request: Request, context: TContext) => Promise<Response> | Response;
 
 const REQUEST_ID_REGEX = /^[A-Za-z0-9._-]{1,64}$/;
 
@@ -14,11 +14,12 @@ export function resolveRequestId(incomingId: string | null): string {
   return crypto.randomUUID();
 }
 
-export function withErrorHandling(handler: RouteHandler, routeName: string): RouteHandler {
-  return async (request: Request, context: unknown) => {
+export function withErrorHandling<TContext = unknown>(handler: RouteHandler<TContext>, routeName: string): RouteHandler<TContext> {
+  return async (request: Request, context: TContext) => {
     // 1. Request correlation
     const incomingId = request.headers.get('x-request-id');
     const requestId = resolveRequestId(incomingId);
+    request.headers.set('x-request-id', requestId);
 
     try {
       // Execute the handler

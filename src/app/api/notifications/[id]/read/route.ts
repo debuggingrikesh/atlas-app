@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -9,7 +10,7 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -30,3 +31,5 @@ export async function PATCH(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to mark notification as read', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/notifications/[id]/read');

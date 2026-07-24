@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -7,7 +8,7 @@ import { PERMISSIONS } from '@atlas/core/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { FeedbackService } from '@/modules/reputation/services/feedback-service';
 
-export async function GET(request: Request) {
+async function GET_handler(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -34,3 +35,5 @@ export async function GET(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/reputation/feedback');

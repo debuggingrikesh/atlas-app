@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -6,7 +7,7 @@ import { prisma } from '@/lib/db/prisma';
 
 import { verifyInternalRequest } from '@/lib/auth/internal';
 
-export async function GET(request: Request) {
+async function GET_handler(request: Request) {
   if (!(await verifyInternalRequest())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -36,3 +37,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/internal/audit-events');

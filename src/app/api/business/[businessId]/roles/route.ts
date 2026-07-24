@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -13,7 +14,7 @@ interface Params {
   params: Promise<{ businessId: string }>;
 }
 
-export async function POST(request: Request, { params }: Params) {
+async function POST_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -96,3 +97,5 @@ export async function POST(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to create role.', 500);
   }
 }
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/business/[businessId]/roles');

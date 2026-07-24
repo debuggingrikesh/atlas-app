@@ -1,10 +1,11 @@
-import { logger } from '@/lib/logger';
+import { withErrorHandling } from '@/lib/api/handler';
+import { withRateLimit } from '@/lib/api/rate-limit-handler';
+
  
 
 import { createClient } from '@/lib/supabase/server';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { signUpSchema } from '@/lib/validators/auth';
-import { checkRateLimit } from '@/lib/rate-limit';
 
 /**
  * POST /api/auth/signup
@@ -13,59 +14,51 @@ import { checkRateLimit } from '@/lib/rate-limit';
  * No Prisma records are created here — all application records are created
  * after email verification during onboarding.
  */
-export async function POST(request: Request) {
-  try {
-    // Rate limit: 10 signup attempts per minute per IP
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    const { allowed } = await checkRateLimit(`signup_${ip}`, 10, 60 * 1000);
-    if (!allowed) {
-      return errorResponse('RATE_LIMIT_EXCEEDED', 'Too many signup attempts. Please try again later.', 429);
-    }
+async function POST_handler(request: Request) {
+  const body = await request.json();
+  const result = signUpSchema.safeParse(body);
 
-    const body = await request.json();
-    const result = signUpSchema.safeParse(body);
+  if (!result.success) {
+    return errorResponse(
+      'VALIDATION_ERROR',
+      result.error.issues[0]?.message ?? 'Invalid input.',
+      400
+    );
+  }
 
-    if (!result.success) {
-      return errorResponse(
-        'VALIDATION_ERROR',
-        result.error.issues[0]?.message ?? 'Invalid input.',
-        400
+  const { email, password } = result.data;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    // Do not reveal whether an email is already registered (prevents enumeration)
+    if (error.code === 'user_already_exists') {
+      return successResponse(
+        { message: 'Account created successfully.' },
+        200
       );
     }
-
-    const { email, password } = result.data;
-
-    const supabase = await createClient();
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      // Do not reveal whether an email is already registered (prevents enumeration)
-      if (error.code === 'user_already_exists') {
-        return successResponse(
-          { message: 'Account created successfully.' },
-          200
-        );
-      }
-      logger.error({ message: 'API Error', context: '[signup] Supabase error:', route: 'API' }, error.message);
-      return errorResponse('INTERNAL_ERROR', 'Failed to create account. Please try again.', 500);
-    }
-
-    return successResponse(
-      { message: 'Account created successfully.' },
-      201
-    );
-  } catch (err) {
-    if (err instanceof Error && err.name === 'RateLimitConfigError') {
-      logger.error({ message: 'API Error', context: `[RateLimiter] Configuration error: ${err.message}`, route: 'API' });
-      return errorResponse('INTERNAL_ERROR', 'Service temporarily unavailable.', 500);
-    }
-    logger.error({ message: 'API Error', context: '[signup] Unexpected error:', route: 'API' }, err);
-    return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
+    // Propagate up so withErrorHandling logs and normalizes it
+    throw error;
   }
+
+  return successResponse(
+    { message: 'Account created successfully.' },
+    201
+  );
 }
+
+export const POST = withErrorHandling(
+  withRateLimit(
+    { namespace: 'signup', limit: 10, windowMs: 60 * 1000 },
+    POST_handler
+  ),
+  'POST /api/auth/signup'
+);

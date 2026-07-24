@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -12,7 +13,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
  *
  * Returns the authenticated user's profile including business memberships.
  */
-export async function GET() {
+async function GET_handler() {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -34,7 +35,7 @@ export async function GET() {
  * Partially updates the authenticated user's profile (fullName, avatarUrl).
  * Runs inside a Prisma transaction and writes an AuditLog entry.
  */
-export async function PATCH(request: Request) {
+async function PATCH_handler(request: Request) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -57,3 +58,7 @@ export async function PATCH(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/users/profile');
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/users/profile');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -9,7 +10,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
 import { ReputationSettingsService } from '@/modules/reputation/services/reputation-settings-service';
 import { updateReputationSettingsSchema } from '@/modules/reputation/validators/reputation-schema';
 
-export async function GET(request: Request) {
+async function GET_handler(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+async function PATCH_handler(request: Request) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -60,3 +61,7 @@ export async function PATCH(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'An unexpected error occurred.', 500);
   }
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/reputation/settings');
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/reputation/settings');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -9,7 +10,7 @@ import { successResponse, errorResponse } from '@/lib/api/response';
  * POST /api/notifications/prune
  * Prunes read notifications older than 30 days.
  */
-export async function POST() {
+async function POST_handler() {
   const { errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -21,3 +22,5 @@ export async function POST() {
     return errorResponse('INTERNAL_ERROR', 'Failed to prune notifications', 500);
   }
 }
+
+export const POST = withErrorHandling(POST_handler, 'POST /api/notifications/prune');

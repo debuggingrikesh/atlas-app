@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -13,7 +14,7 @@ interface Params {
   params: Promise<{ businessId: string; roleId: string }>;
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -105,7 +106,7 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+async function DELETE_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -191,3 +192,7 @@ export async function DELETE(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to delete role.', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/business/[businessId]/roles/[roleId]');
+
+export const DELETE = withErrorHandling(DELETE_handler, 'DELETE /api/business/[businessId]/roles/[roleId]');

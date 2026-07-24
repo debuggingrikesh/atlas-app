@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -24,7 +25,7 @@ const updateBranchSchema = z.object({
  * PATCH /api/business/[businessId]/branches/[branchId]
  * Updates a branch name, address, or active status. Requires branch.update permission.
  */
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -88,3 +89,5 @@ export async function PATCH(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to update branch.', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/business/[businessId]/branches/[branchId]');

@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -8,7 +9,7 @@ import { markAllNotificationsReadSchema } from '@/modules/notifications/validato
 import { markAllNotificationsRead } from '@/modules/notifications/lib/mark-all-notifications-read';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
-export async function PATCH(request: Request) {
+async function PATCH_handler(request: Request) {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 
@@ -34,3 +35,5 @@ export async function PATCH(request: Request) {
     return errorResponse('INTERNAL_ERROR', 'Failed to mark notifications as read', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/notifications/read-all');

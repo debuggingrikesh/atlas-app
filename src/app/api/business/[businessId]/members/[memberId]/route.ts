@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
@@ -17,7 +18,7 @@ interface Params {
  * DELETE /api/business/[businessId]/members/[memberId]
  * Removes a member from the business.
  */
-export async function DELETE(_request: Request, { params }: Params) {
+async function DELETE_handler(_request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -40,7 +41,7 @@ export async function DELETE(_request: Request, { params }: Params) {
  * PATCH /api/business/[businessId]/members/[memberId]
  * Updates a member's role.
  */
-export async function PATCH(request: Request, { params }: Params) {
+async function PATCH_handler(request: Request, { params }: Params) {
   const { user, errorRes: authError } = await requireAuth();
   if (authError) return authError;
 
@@ -68,3 +69,7 @@ export async function PATCH(request: Request, { params }: Params) {
     return errorResponse('INTERNAL_ERROR', 'Failed to update member role.', 500);
   }
 }
+
+export const PATCH = withErrorHandling(PATCH_handler, 'PATCH /api/business/[businessId]/members/[memberId]');
+
+export const DELETE = withErrorHandling(DELETE_handler, 'DELETE /api/business/[businessId]/members/[memberId]');

@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+
 import { withErrorHandling } from '@/lib/api/handler';
 
 import { requireAuth } from '@/lib/auth/require-auth';
@@ -47,7 +47,7 @@ export const POST = withErrorHandling(async function POST(request: Request) {
  * Lists all businesses the authenticated user is a member of.
  * Note: This is a user-scoped endpoint (pre-tenant).
  */
-export const GET = withErrorHandling(async function GET(request: Request) {
+export const GET = withErrorHandling(async function GET() {
   const { user, errorRes } = await requireAuth();
   if (errorRes) return errorRes;
 

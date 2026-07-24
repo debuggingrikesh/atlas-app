@@ -1,3 +1,4 @@
+import { withErrorHandling } from '@/lib/api/handler';
  
 
 import { successResponse, errorResponse } from "@/lib/api/response";
@@ -7,7 +8,7 @@ import packageJson from "../../../../../package.json";
 import { headers } from "next/headers";
 import crypto from "crypto";
 
-export async function GET() {
+async function GET_handler() {
    
   const headersList = await headers();
   const authHeader = headersList.get("authorization");
@@ -32,7 +33,7 @@ export async function GET() {
     if (a.length === b.length) {
       isValid = crypto.timingSafeEqual(a, b);
     }
-  } catch (e) {
+  } catch {
     isValid = false;
   }
 
@@ -53,3 +54,5 @@ export async function GET() {
     timestamp: new Date().toISOString(),
   });
 }
+
+export const GET = withErrorHandling(GET_handler, 'GET /api/health/core');
