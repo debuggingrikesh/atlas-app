@@ -3,8 +3,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { LoadingButton } from '@/components/ui/loading/LoadingButton';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -17,7 +18,8 @@ import {
   MessageCircle,
   Download,
   FolderOpen,
-  Loader2
+  Loader2,
+  BarChart2
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
@@ -36,6 +38,7 @@ interface Campaign {
 interface CampaignTableProps {
   initialCampaigns: Campaign[];
   businessId: string;
+  businessSlug: string;
   businessName: string;
   branches: { id: string; name: string }[];
   canManage: boolean;
@@ -44,6 +47,7 @@ interface CampaignTableProps {
 export function CampaignTable({ 
   initialCampaigns, 
   businessId, 
+  businessSlug,
   businessName,
   branches,
   canManage 
@@ -270,7 +274,15 @@ export function CampaignTable({
                     <td className="p-4 text-muted-foreground">
                       {new Date(campaign.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="p-4 text-right space-x-2">
+                    <td className="p-4 text-right space-x-1">
+                      <Link 
+                        href={`/dashboard/${businessSlug}/reputation/campaigns/${campaign.id}`}
+                        className={buttonVariants({ variant: 'ghost', size: 'icon' })}
+                        title="View Campaign Dashboard"
+                        aria-label={`View dashboard for ${campaign.name}`}
+                      >
+                        <BarChart2 className="h-4 w-4" />
+                      </Link>
                       <Button
                         onClick={() => handleCopyLink(campaign)}
                         variant="ghost"

@@ -82,6 +82,7 @@ export default async function CampaignsPage({ params }: PageProps) {
       <CampaignTable
         initialCampaigns={serializedCampaigns}
         businessId={businessId}
+        businessSlug={businessSlug}
         businessName={membership.business.name}
         branches={membership.business.branches}
         canManage={canManage}
