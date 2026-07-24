@@ -211,4 +211,39 @@ export class ReputationRepository {
     };
   }
 
+  // ──────────────────────────────────────────
+  // Metrics
+  // ──────────────────────────────────────────
+  static async getCampaignMetricAggregates(campaignId: string, businessId: string) {
+    const settings = await this.getSettings(businessId);
+    
+    // Group by status for requests
+    const requestStats = await prisma.reviewRequest.groupBy({
+      by: ['status'],
+      where: { campaignId, businessId },
+      _count: true,
+      _max: { createdAt: true }
+    });
+
+    // Group by rating and status for feedback
+    const feedbackStats = await prisma.customerFeedback.groupBy({
+      by: ['rating', 'status'],
+      where: { request: { campaignId, businessId } },
+      _count: true,
+      _max: { createdAt: true }
+    });
+
+    // Fetch dates for resolution time average
+    const resolvedFeedbackTimes = await prisma.customerFeedback.findMany({
+      where: { request: { campaignId, businessId }, status: 'RESOLVED', resolvedAt: { not: null } },
+      select: { createdAt: true, resolvedAt: true }
+    });
+
+    return {
+      requestStats,
+      feedbackStats,
+      resolvedFeedbackTimes,
+      settings
+    };
+  }
 }
