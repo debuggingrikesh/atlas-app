@@ -50,7 +50,7 @@ export class CampaignService {
     userId: string,
     id: string,
     businessId: string,
-    data: Prisma.ReviewCampaignUpdateInput
+    data: Prisma.ReviewCampaignUncheckedUpdateInput
   ) {
     const campaigns = await ReputationRepository.updateCampaign(id, businessId, data);
     
@@ -79,7 +79,7 @@ export class CampaignService {
   ) {
     const campaigns = await ReputationRepository.updateCampaign(id, businessId, { 
       archivedAt: new Date(),
-      archivedBy: userId,
+      archivedById: userId,
     });
     
     if (campaigns.count > 0) {
@@ -92,7 +92,7 @@ export class CampaignService {
         businessId: businessId,
         severity: 'INFO',
         summary: `System event ${'review_campaign.archived'}`,
-        metadata: {},
+        metadata: { archivedById: userId } as any as Record<string, unknown>,
       }, undefined);
     }
 

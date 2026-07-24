@@ -64,7 +64,7 @@ export class ReputationRepository {
     });
   }
 
-  static async updateCampaign(id: string, businessId: string, data: Prisma.ReviewCampaignUpdateInput) {
+  static async updateCampaign(id: string, businessId: string, data: Prisma.ReviewCampaignUncheckedUpdateInput) {
     return prisma.reviewCampaign.updateMany({
       where: { id, businessId, archivedAt: null },
       data,

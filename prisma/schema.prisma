@@ -105,6 +105,7 @@ model UserProfile {
   notifications     Notification[]
   upgradeRequests   UpgradeRequest[]
   customerFeedbacks CustomerFeedback[]
+  archivedCampaigns ReviewCampaign[]   @relation("CampaignArchiver")
 }
 
 // ──────────────────────────────────────────
@@ -341,17 +342,18 @@ model ReputationSettings {
 // ──────────────────────────────────────────
 
 model ReviewCampaign {
-  id              String   @id @default(cuid())
+  id              String       @id @default(cuid())
   businessId      String
   branchId        String?
   name            String
-  status          String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
+  status          String       @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
   googleReviewUrl String?
-  publicId        String   @unique @default(cuid())
+  publicId        String       @unique @default(cuid())
   archivedAt      DateTime?
-  archivedBy      String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  archivedById    String?
+  archivedByUser  UserProfile? @relation("CampaignArchiver", fields: [archivedById], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   business Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
   branch   Branch?         @relation(fields: [branchId], references: [id], onDelete: Cascade)
