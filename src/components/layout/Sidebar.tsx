@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 
 export function Sidebar() {
   const pathname = usePathname();

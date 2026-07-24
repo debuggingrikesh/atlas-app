@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { headers } from 'next/headers';
-import type { LogLevel, LogPayload } from '@atlas/core/observability';
+import type { LogLevel, LogPayload } from '@atlas/core';
 import * as Sentry from '@sentry/nextjs';
 
 const SENSITIVE_KEYS = new Set([

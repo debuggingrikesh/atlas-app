@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { resolveRequestId } from '@/lib/api/handler';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { ReputationSettingsService } from '@/modules/reputation/services/reputation-settings-service';
 import { updateReputationSettingsSchema } from '@/modules/reputation/validators/reputation-schema';

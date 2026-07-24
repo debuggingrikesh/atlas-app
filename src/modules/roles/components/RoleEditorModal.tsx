@@ -18,7 +18,7 @@ import { LoadingButton } from '@/components/ui/loading/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ASSIGNABLE_PERMISSIONS } from '@atlas/core/auth';
+import { ASSIGNABLE_PERMISSIONS } from '@atlas/core';
 import { Pencil } from 'lucide-react';
 
 interface RoleEditorModalProps {

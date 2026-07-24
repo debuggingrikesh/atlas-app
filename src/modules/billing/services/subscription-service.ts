@@ -1,7 +1,7 @@
  
 
 import { BillingRepository } from '../repositories/billing-repository';
-import type { BusinessSubscriptionWithDetails } from '@atlas/core/contracts/billing';
+import type { BusinessSubscriptionWithDetails } from '@atlas/core';
 import { logger } from '../../../lib/logger';
 
 import { prisma } from '../../../lib/db/prisma';

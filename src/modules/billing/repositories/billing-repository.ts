@@ -1,7 +1,7 @@
  
 
 import { prisma } from '../../../lib/db/prisma';
-import type { BusinessSubscriptionWithDetails, SubscriptionStatus } from '@atlas/core/contracts/billing';
+import type { BusinessSubscriptionWithDetails, SubscriptionStatus } from '@atlas/core';
 
 export class BillingRepository {
   static async getActiveSubscription(businessId: string): Promise<BusinessSubscriptionWithDetails | null> {

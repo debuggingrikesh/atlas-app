@@ -6,7 +6,7 @@ import { withRateLimit } from '@/lib/api/rate-limit-handler';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { UpgradeRequestService } from '@/modules/billing/services/upgrade-request-service';
 
 async function POST_handler(request: Request) {

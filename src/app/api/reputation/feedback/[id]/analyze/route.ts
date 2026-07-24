@@ -1,7 +1,7 @@
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { AIService } from '@/modules/ai/services/ai-service';
 import { withRateLimit } from '@/lib/api/rate-limit-handler';

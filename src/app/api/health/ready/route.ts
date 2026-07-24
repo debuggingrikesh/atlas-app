@@ -4,7 +4,7 @@ import { withErrorHandling } from '@/lib/api/handler';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { getRedis } from '@/lib/rate-limit';
-import type { ReadinessResponse, HealthStatus, HealthCheckResult } from '@atlas/core/observability';
+import type { ReadinessResponse, HealthStatus, HealthCheckResult } from '@atlas/core';
 import { headers } from 'next/headers';
 
 async function GET_handler() {

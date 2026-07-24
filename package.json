@@ -17,7 +17,7 @@
     "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
-    "@atlas/core": "github:debuggingrikesh/atlas-core#8cf58601aaa167f4f9bc35f888553ee8d4347d87",
+    "@atlas/core": "file:../Project-Atlas-Core",
     "@base-ui/react": "^1.6.0",
     "@google/genai": "^2.11.0",
     "@marsidev/react-turnstile": "^1.5.3",

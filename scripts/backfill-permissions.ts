@@ -1,7 +1,7 @@
  
 
 import { prisma } from '../src/lib/db/prisma';
-import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core';
 
 async function main() {
   console.log('Starting permission backfill...');

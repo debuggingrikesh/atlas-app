@@ -2,7 +2,7 @@ import { withErrorHandling } from '@/lib/api/handler';
  
 
 import { NextResponse } from 'next/server';
-import type { LivenessResponse } from '@atlas/core/observability';
+import type { LivenessResponse } from '@atlas/core';
 
 async function GET_handler() {
   const response: LivenessResponse = {

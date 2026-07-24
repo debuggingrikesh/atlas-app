@@ -2,11 +2,11 @@ import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { prisma } from '@/lib/db/prisma';
 import { z } from 'zod';

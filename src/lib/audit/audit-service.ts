@@ -3,7 +3,7 @@
 import { prisma } from '../db/prisma';
 import { logger } from '../logger';
 import type { Prisma } from '@prisma/client';
-import type { BaseAuditEvent, AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { BaseAuditEvent, AuditActionType, AuditResourceTypeType } from '@atlas/core';
 
 type TransactionClient = Omit<
   Prisma.TransactionClient,

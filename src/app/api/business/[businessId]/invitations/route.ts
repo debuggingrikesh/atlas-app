@@ -2,7 +2,7 @@
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { resolveRequestId } from '@/lib/api/handler';
 import { createInvitationSchema } from '@/modules/invitations/validators';
 import { createInvitation } from '@/modules/invitations/lib/create-invitation';

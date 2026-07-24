@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger';
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { removeMember } from '@/modules/team/lib/remove-member';
 import { updateMemberRole } from '@/modules/team/lib/update-member-role';
 import { updateMemberRoleSchema } from '@/modules/team/validators';

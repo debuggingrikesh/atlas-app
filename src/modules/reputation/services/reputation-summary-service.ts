@@ -2,7 +2,7 @@
 
 import { ReputationRepository } from '../repositories/reputation-repository';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import type { BusinessWithMembership } from '@/modules/business/types';
 
 import { cache } from 'react';

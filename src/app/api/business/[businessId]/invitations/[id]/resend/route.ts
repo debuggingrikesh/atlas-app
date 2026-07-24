@@ -5,7 +5,7 @@ import { withRateLimit } from '@/lib/api/rate-limit-handler';
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { resolveRequestId } from '@/lib/api/handler';
 import { resendInvitation } from '@/modules/invitations/lib/resend-invitation';
 import { successResponse } from '@/lib/api/response';

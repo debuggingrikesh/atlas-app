@@ -7,7 +7,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getUserProfile } from '@/modules/auth/lib/get-user-profile';
 import { getActiveBusiness } from '@/lib/auth/get-active-business';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { UpdateBusinessForm } from './UpdateBusinessForm';
 
 export const metadata: Metadata = {

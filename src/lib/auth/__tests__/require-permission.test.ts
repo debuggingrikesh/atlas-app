@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { requirePermission } from '../require-permission';
 import { prisma } from '@/lib/db/prisma';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import type { Prisma } from '@prisma/client';
 
 type MockMembership = Prisma.BusinessMemberGetPayload<{

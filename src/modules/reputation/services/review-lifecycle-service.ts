@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { AppError } from '@/lib/errors';
 import { AuditService } from '@/lib/audit/audit-service';
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import type { Prisma } from '@prisma/client';
 
 export type ReviewRequestState = 'PENDING' | 'OPENED' | 'COMPLETED' | 'EXPIRED' | 'CANCELLED';

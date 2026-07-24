@@ -4,12 +4,12 @@ import { logger } from '@/lib/logger';
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { getActivityFeed } from '@/modules/activity/lib/get-activity-feed';
 import { successResponse, errorResponse } from '@/lib/api/response';
-import { safeParse } from '@atlas/core/validation';
-import { CursorPaginationSchema } from '@atlas/core/domain';
-import type { PageInfo } from '@atlas/core/domain';
+import { safeParse } from '@atlas/core';
+import { CursorPaginationSchema } from '@atlas/core';
+import type { PageInfo } from '@atlas/core';
 
 interface Params {
   params: Promise<{ businessId: string }>;

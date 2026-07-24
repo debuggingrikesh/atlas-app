@@ -1,6 +1,6 @@
  
 
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { errorResponse } from '@/lib/api/response';

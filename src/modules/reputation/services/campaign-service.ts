@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { Prisma } from '@prisma/client';
 import { ReputationRepository } from '../repositories/reputation-repository';

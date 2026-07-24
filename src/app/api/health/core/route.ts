@@ -3,7 +3,7 @@ import { withErrorHandling } from '@/lib/api/handler';
 
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logger } from "@/lib/logger";
-import { CORE_INFO } from "@atlas/core/metadata";
+import { CORE_INFO } from "@atlas/core";
 import packageJson from "../../../../../package.json";
 import { headers } from "next/headers";
 import crypto from "crypto";

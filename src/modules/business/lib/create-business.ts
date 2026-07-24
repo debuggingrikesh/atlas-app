@@ -1,12 +1,12 @@
  
 
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
 import { generateUniqueSlug } from './generate-slug';
 import type { CreateBusinessInput, Business } from '@/modules/business/types';
 
-import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core';
 
 type CreateBusinessResult = Business & {
   memberId: string;

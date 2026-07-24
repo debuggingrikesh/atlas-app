@@ -1,7 +1,7 @@
  
 
 import type { BusinessWithMembership } from '@/modules/business/types';
-import { DEFAULT_ADMIN_PERMISSIONS, DEFAULT_MEMBER_PERMISSIONS } from '@atlas/core/auth';
+import { DEFAULT_ADMIN_PERMISSIONS, DEFAULT_MEMBER_PERMISSIONS } from '@atlas/core';
 
 export type ResolvedPermissions = {
   role: string;

@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { resolvePermissions } from '@/lib/permissions/resolve-permissions';
-import { PERMISSIONS } from '@atlas/core/auth';
+import { PERMISSIONS } from '@atlas/core';
 import { ReputationRepository } from '@/modules/reputation/repositories/reputation-repository';
 import { FeedbackInbox } from '@/modules/reputation/components/dashboard/FeedbackInbox';
 import { EntitlementService } from '@/modules/billing/services/entitlement-service';

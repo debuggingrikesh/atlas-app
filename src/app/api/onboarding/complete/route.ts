@@ -2,7 +2,7 @@ import { withErrorHandling } from '@/lib/api/handler';
 import { logger } from '@/lib/logger';
  
 
-import type { AuditActionType, AuditResourceTypeType } from '@atlas/core/audit';
+import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { completeOnboardingSchema } from '@/lib/validators/business';
@@ -11,7 +11,7 @@ import { generateUniqueSlug } from '@/modules/business/lib/generate-slug';
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 
-import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core/auth';
+import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core';
 
 /**
  * POST /api/onboarding/complete
