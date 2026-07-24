@@ -56,6 +56,7 @@ model Business {
   businessInsights   BusinessInsight[]
   subscription       BusinessSubscription?
   upgradeRequests    UpgradeRequest[]
+  feedbackNotes      FeedbackNote[]
 
   @@index([industryTemplateId])
 }
@@ -88,21 +89,22 @@ model Branch {
 // ──────────────────────────────────────────
 
 model UserProfile {
-  id                    String    @id
-  email                 String    @unique
+  id                    String       @id
+  email                 String       @unique
   fullName              String?
   avatarUrl             String?
-  onboardingStep        Int       @default(1)
+  onboardingStep        Int          @default(1)
   onboardingCompletedAt DateTime?
   onboardingData        Json?
   isActive              Boolean      @default(true)
   platformRole          PlatformRole @default(NONE)
   createdAt             DateTime     @default(now())
-  updatedAt             DateTime  @updatedAt
+  updatedAt             DateTime     @updatedAt
 
-  memberships     BusinessMember[]
-  notifications   Notification[]
-  upgradeRequests UpgradeRequest[]
+  memberships       BusinessMember[]
+  notifications     Notification[]
+  upgradeRequests   UpgradeRequest[]
+  customerFeedbacks CustomerFeedback[]
 }
 
 // ──────────────────────────────────────────
@@ -128,9 +130,11 @@ model BusinessMember {
   updatedAt  DateTime   @updatedAt
   version    Int        @default(1)
 
-  user     UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  business Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  rbacRole Role?       @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  user             UserProfile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business         Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  rbacRole         Role?              @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  assignedFeedback CustomerFeedback[]
+  feedbackNotes    FeedbackNote[]
 
   @@unique([userId, businessId])
   @@index([userId])
@@ -158,29 +162,29 @@ enum PlatformRole {
 // ──────────────────────────────────────────
 
 model AuditEvent {
-  id               String   @id @default(cuid())
-  occurredAt       DateTime @default(now())
+  id         String   @id @default(cuid())
+  occurredAt DateTime @default(now())
 
-  action           String
-  resourceType     String
-  resourceId       String?
+  action       String
+  resourceType String
+  resourceId   String?
 
-  actorType        String   @default("USER")
-  actorUserId      String?
-  actorRole        String?
+  actorType   String  @default("USER")
+  actorUserId String?
+  actorRole   String?
 
-  businessId       String?
-  tenantId         String?
+  businessId String?
+  tenantId   String?
 
-  requestId        String?
-  sourceService    String   @default("atlas-app")
-  severity         String   @default("INFO")
+  requestId     String?
+  sourceService String  @default("atlas-app")
+  severity      String  @default("INFO")
 
-  summary          String
-  metadata         Json?
+  summary  String
+  metadata Json?
 
-  previousState    Json?
-  newState         Json?
+  previousState Json?
+  newState      Json?
 
   ipAddressHash    String?
   userAgentSummary String?
@@ -337,15 +341,15 @@ model ReputationSettings {
 // ──────────────────────────────────────────
 
 model ReviewCampaign {
-  id         String   @id @default(cuid())
-  businessId String
-  branchId   String?
-  name       String
-  status          String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
+  id              String   @id @default(cuid())
+  businessId      String
+  branchId        String?
+  name            String
+  status          String   @default("ACTIVE") // DRAFT, ACTIVE, PAUSED, COMPLETED, ARCHIVED
   googleReviewUrl String?
   publicId        String   @unique @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   business Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
   branch   Branch?         @relation(fields: [branchId], references: [id], onDelete: Cascade)
@@ -359,19 +363,21 @@ model ReviewCampaign {
 // ──────────────────────────────────────────
 
 model ReviewRequest {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   businessId    String
   branchId      String?
   campaignId    String
   customerName  String?
   customerEmail String?
   customerPhone String?
-  token         String   @unique
-  status        String   @default("PENDING") // PENDING, OPENED, COMPLETED
-  source        String   @default("MANUAL")  // MANUAL, WHATSAPP, QR, EMAIL
+  token         String    @unique
+  status        String    @default("PENDING") // PENDING, OPENED, COMPLETED, EXPIRED, CANCELLED
+  source        String    @default("MANUAL") // MANUAL, WHATSAPP, QR, EMAIL
+  openedAt      DateTime?
   completedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   business Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
   branch   Branch?           @relation(fields: [branchId], references: [id], onDelete: Cascade)
@@ -387,25 +393,57 @@ model ReviewRequest {
 // ──────────────────────────────────────────
 
 model CustomerFeedback {
-  id            String   @id @default(cuid())
-  businessId    String
-  branchId      String?
-  requestId     String   @unique
-  rating        Int
-  comment       String?
-  customerName  String?
-  customerEmail String?
-  customerPhone String?
-  status        String   @default("UNREAD") // UNREAD, REVIEWED, RESOLVED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String    @id @default(cuid())
+  businessId        String
+  branchId          String?
+  requestId         String    @unique
+  rating            Int
+  comment           String?
+  customerName      String?
+  customerEmail     String?
+  customerPhone     String?
+  status            String    @default("UNREAD") // UNREAD, REVIEWED, RESOLVED, NEW, IN_REVIEW, ACTION_REQUIRED, ARCHIVED
+  priority          String    @default("MEDIUM") // LOW, MEDIUM, HIGH
+  assigneeId        String?
+  resolvedAt        DateTime?
+  resolutionActorId String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  business Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  branch   Branch?       @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  request  ReviewRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  business Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  branch   Branch?            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  request  ReviewRequest      @relation(fields: [requestId], references: [id], onDelete: Cascade)
   analyses FeedbackAnalysis[]
+  notes    FeedbackNote[]
+
+  assignee        BusinessMember? @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  resolutionActor UserProfile?    @relation(fields: [resolutionActorId], references: [id], onDelete: SetNull)
 
   @@index([businessId])
+  @@index([assigneeId])
+  @@index([resolutionActorId])
+}
+
+// ──────────────────────────────────────────
+// Reputation: FeedbackNote
+// ──────────────────────────────────────────
+
+model FeedbackNote {
+  id         String   @id @default(cuid())
+  businessId String
+  feedbackId String
+  authorId   String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  feedback CustomerFeedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  author   BusinessMember   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([feedbackId])
+  @@index([authorId])
 }
 
 // ──────────────────────────────────────────
@@ -446,13 +484,13 @@ model BusinessAISettings {
 }
 
 model FeedbackAnalysis {
-  id            String   @id @default(cuid())
-  businessId    String
-  feedbackId    String
-  analysisData  Json     // Replaces generatedText string, structured analysis
-  status        String   @default("DRAFT") // DRAFT, APPROVED, COPIED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  businessId   String
+  feedbackId   String
+  analysisData Json // Replaces generatedText string, structured analysis
+  status       String   @default("DRAFT") // DRAFT, EDITED, APPROVED, DISCARDED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   business Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
   feedback CustomerFeedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
@@ -505,8 +543,8 @@ model Plan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  features       PlanFeature[]
-  subscriptions  BusinessSubscription[]
+  features        PlanFeature[]
+  subscriptions   BusinessSubscription[]
   upgradeRequests UpgradeRequest[]
 }
 
@@ -580,22 +618,21 @@ model OperationalMetric {
   bucketStartedAt       DateTime
   bucketDurationMinutes Int
 
-  count                 Int      @default(0)
-  successCount          Int      @default(0)
-  errorCount            Int      @default(0)
+  count        Int @default(0)
+  successCount Int @default(0)
+  errorCount   Int @default(0)
 
-  sum                   Float    @default(0)
-  min                   Float?
-  max                   Float?
+  sum Float  @default(0)
+  min Float?
+  max Float?
 
-  p50                   Float?
-  p95                   Float?
-  p99                   Float?
+  p50 Float?
+  p95 Float?
+  p99 Float?
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([service, environment, metric, dimension, bucketStartedAt, bucketDurationMinutes])
   @@index([service, metric, bucketStartedAt])
 }
-
