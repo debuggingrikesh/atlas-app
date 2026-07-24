@@ -42,20 +42,20 @@ export class ReputationRepository {
 
   static async getCampaigns(businessId: string) {
     return prisma.reviewCampaign.findMany({
-      where: { businessId },
+      where: { businessId, archivedAt: null },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   static async getCampaignById(id: string, businessId: string) {
     return prisma.reviewCampaign.findFirst({
-      where: { id, businessId },
+      where: { id, businessId, archivedAt: null },
     });
   }
 
   static async getCampaignByPublicId(publicId: string) {
-    return prisma.reviewCampaign.findUnique({
-      where: { publicId },
+    return prisma.reviewCampaign.findFirst({
+      where: { publicId, archivedAt: null },
       include: {
         business: {
           select: { name: true, logoUrl: true }
@@ -66,7 +66,7 @@ export class ReputationRepository {
 
   static async updateCampaign(id: string, businessId: string, data: Prisma.ReviewCampaignUpdateInput) {
     return prisma.reviewCampaign.updateMany({
-      where: { id, businessId },
+      where: { id, businessId, archivedAt: null },
       data,
     });
   }
@@ -131,7 +131,7 @@ export class ReputationRepository {
 
   static async getCampaignsWithCounts(businessId: string) {
     return prisma.reviewCampaign.findMany({
-      where: { businessId },
+      where: { businessId, archivedAt: null },
       include: {
         branch: { select: { name: true } },
         _count: { select: { requests: true } }
