@@ -144,7 +144,8 @@ export class ReputationRepository {
     return prisma.reviewRequest.findMany({
       where: { businessId },
       include: {
-        campaign: { select: { name: true } }
+        campaign: { select: { name: true } },
+        branch: { select: { name: true } }
       },
       orderBy: { createdAt: 'desc' }
     });

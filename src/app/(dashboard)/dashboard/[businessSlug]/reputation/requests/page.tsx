@@ -41,6 +41,10 @@ export default async function ReviewRequestsPage({ params }: PageProps) {
     ...r,
     createdAt: r.createdAt.toISOString(),
     updatedAt: r.updatedAt.toISOString(),
+    openedAt: r.openedAt?.toISOString() || null,
+    completedAt: r.completedAt?.toISOString() || null,
+    expiresAt: r.expiresAt?.toISOString() || null,
+    branch: r.branch ? { name: r.branch.name } : null,
   }));
 
   return (
