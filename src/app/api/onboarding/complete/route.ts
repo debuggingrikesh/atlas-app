@@ -11,7 +11,7 @@ import { generateUniqueSlug } from '@/modules/business/lib/generate-slug';
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 
-import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core';
+import { SYSTEM_ROLE_PERMISSIONS } from '@/modules/reputation/permissions';
 
 /**
  * POST /api/onboarding/complete

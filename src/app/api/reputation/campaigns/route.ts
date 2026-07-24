@@ -6,6 +6,7 @@ import { withRateLimit } from '@/lib/api/rate-limit-handler';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core';
+import { REPUTATION_PERMISSIONS } from '@/modules/reputation/permissions';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { CampaignService } from '@/modules/reputation/services/campaign-service';
 import { createCampaignSchema } from '@/modules/reputation/validators/reputation-schema';
@@ -39,7 +40,7 @@ async function POST_handler(request: Request) {
     return errorResponse('VALIDATION_ERROR', 'businessId is required in body.', 400);
   }
 
-  const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.manage);
+  const { errorRes: memberError } = await requirePermission(user.id, businessId, REPUTATION_PERMISSIONS.CAMPAIGN_CREATE);
   if (memberError) return memberError;
 
   const result = createCampaignSchema.safeParse(data);

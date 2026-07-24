@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { FeatureKeySchema } from '@atlas/core';
 import { UsageService } from '../services/usage-service';
 
 describe('Usage Enforcement', () => {
@@ -20,12 +21,12 @@ describe('Usage Enforcement', () => {
     mockTx.businessFeatureUsage.findUnique.mockResolvedValue({ id: '1', limit: 6 });
     mockTx.businessFeatureUsage.updateMany.mockResolvedValue({ count: 1 }); // 1 row updated
 
-    const result = await UsageService.checkAndIncrementUsage('biz_1', 'REPUTATION_REVIEW_REQUESTS', 6, mockTx);
+    const result = await UsageService.checkAndIncrementUsage('biz_1', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS, 6, mockTx);
     expect(result.allowed).toBe(true);
     expect(mockTx.businessFeatureUsage.updateMany).toHaveBeenCalledWith({
       where: {
         businessId: 'biz_1',
-        feature: 'REPUTATION_REVIEW_REQUESTS',
+        feature: FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS,
         count: { lt: 6 }
       },
       data: { count: { increment: 1 } }
@@ -36,7 +37,7 @@ describe('Usage Enforcement', () => {
     mockTx.businessFeatureUsage.findUnique.mockResolvedValue({ id: '1', limit: 6 });
     mockTx.businessFeatureUsage.updateMany.mockResolvedValue({ count: 0 }); // 0 rows updated
 
-    const result = await UsageService.checkAndIncrementUsage('biz_1', 'REPUTATION_REVIEW_REQUESTS', 6, mockTx);
+    const result = await UsageService.checkAndIncrementUsage('biz_1', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS, 6, mockTx);
     expect(result.allowed).toBe(false);
     expect(result.code).toBe('PAYMENT_REQUIRED');
   });
@@ -45,12 +46,12 @@ describe('Usage Enforcement', () => {
     mockTx.businessFeatureUsage.findUnique.mockResolvedValue(null);
     mockTx.businessFeatureUsage.create.mockResolvedValue({ id: '1' });
 
-    const result = await UsageService.checkAndIncrementUsage('biz_1', 'REPUTATION_REVIEW_REQUESTS', 6, mockTx);
+    const result = await UsageService.checkAndIncrementUsage('biz_1', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS, 6, mockTx);
     expect(result.allowed).toBe(true);
     expect(mockTx.businessFeatureUsage.create).toHaveBeenCalledWith({
       data: {
         businessId: 'biz_1',
-        feature: 'REPUTATION_REVIEW_REQUESTS',
+        feature: FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS,
         limit: 6,
         count: 1
       }
@@ -61,7 +62,7 @@ describe('Usage Enforcement', () => {
     mockTx.businessFeatureUsage.findUnique.mockResolvedValue({ id: '1', limit: 6 });
     mockTx.businessFeatureUsage.updateMany.mockResolvedValue({ count: 1 });
 
-    await UsageService.checkAndIncrementUsage('biz_1', 'REPUTATION_REVIEW_REQUESTS', 10, mockTx);
+    await UsageService.checkAndIncrementUsage('biz_1', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS, 10, mockTx);
 
     expect(mockTx.businessFeatureUsage.update).toHaveBeenCalledWith({
       where: { id: '1' },

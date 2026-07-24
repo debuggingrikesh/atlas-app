@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { GoogleGenAI } from '@google/genai';
+import { AIModelSchema } from '@atlas/core';
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -60,7 +61,7 @@ export class GeminiProvider {
 
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: AIModelSchema.enum['gemini-2.5-flash'],
           contents: prompt,
           config: {
             temperature: 0.7,
@@ -99,7 +100,7 @@ export class GeminiProvider {
           attempt,
           status,
           provider: 'gemini',
-          model: 'gemini-2.5-flash',
+          model: AIModelSchema.enum['gemini-2.5-flash'],
           feature: 'ai'
         }, err instanceof Error ? err.message : String(err));
 

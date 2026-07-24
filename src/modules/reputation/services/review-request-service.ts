@@ -1,5 +1,6 @@
  
 
+import { FeatureKeySchema } from '@atlas/core';
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
@@ -31,14 +32,14 @@ export class ReviewRequestService {
     try {
       const request = await prisma.$transaction(async (tx) => {
         // 3. Check and increment usage
-        const featureLimit = await EntitlementService.getFeatureLimit(businessId, 'REPUTATION_REVIEW_REQUESTS');
+        const featureLimit = await EntitlementService.getFeatureLimit(businessId, FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS);
         
         // Skip increment check if limit is -1 (unlimited)
         let usageCheck: { allowed: boolean; error?: string } = { allowed: true };
         if (featureLimit !== -1) {
           usageCheck = await UsageService.checkAndIncrementUsage(
             businessId,
-            'REPUTATION_REVIEW_REQUESTS',
+            FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS,
             featureLimit,
             tx
           );

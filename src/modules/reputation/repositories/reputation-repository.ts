@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
+import { FeatureKeySchema } from '@atlas/core';
 
 export class ReputationRepository {
   // ──────────────────────────────────────────
@@ -191,7 +192,7 @@ export class ReputationRepository {
         where: {
           businessId_feature: {
             businessId,
-            feature: 'REPUTATION_REVIEW_REQUESTS'
+            feature: FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS
           }
         }
       })

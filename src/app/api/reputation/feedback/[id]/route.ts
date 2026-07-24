@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core';
+import { REPUTATION_PERMISSIONS } from '@/modules/reputation/permissions';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { FeedbackService } from '@/modules/reputation/services/feedback-service';
 import { z } from 'zod';
@@ -35,7 +36,11 @@ async function PATCH_handler(request: Request, { params }: Params) {
     const { businessId, status } = result.data;
 
     // Must have reputation.manage or reputation.feedbackView permission
-    const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.manage);
+    const requiredPermission = status === 'RESOLVED' 
+      ? REPUTATION_PERMISSIONS.FEEDBACK_RESOLVE 
+      : REPUTATION_PERMISSIONS.MANAGE;
+      
+    const { errorRes: memberError } = await requirePermission(user.id, businessId, requiredPermission);
     if (memberError) return memberError;
 
     const updated = await FeedbackService.updateFeedbackStatus(id, businessId, status, user.id);

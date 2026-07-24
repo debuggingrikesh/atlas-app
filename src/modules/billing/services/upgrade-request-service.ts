@@ -1,5 +1,6 @@
  
 
+import { UpgradeRequestStatusSchema } from '@atlas/core';
 import type { AuditActionType, AuditResourceTypeType } from '@atlas/core';
 import { AuditService } from '@/lib/audit/audit-service';
 import { prisma } from '@/lib/db/prisma';
@@ -23,7 +24,7 @@ export class UpgradeRequestService {
     const existingPending = await prisma.upgradeRequest.findFirst({
       where: {
         businessId,
-        status: 'PENDING'
+        status: UpgradeRequestStatusSchema.enum.PENDING
       }
     });
 
@@ -38,7 +39,7 @@ export class UpgradeRequestService {
         requestedPlanId: plan.id,
         requestedBy,
         note,
-        status: 'PENDING'
+        status: UpgradeRequestStatusSchema.enum.PENDING
       },
       include: {
         requestedPlan: true,
@@ -61,7 +62,7 @@ export class UpgradeRequestService {
         throw new Error('Upgrade request not found.');
       }
 
-      if (request.status !== 'PENDING') {
+      if (request.status !== UpgradeRequestStatusSchema.enum.PENDING) {
         throw new Error('Upgrade request is not pending.');
       }
 
@@ -78,7 +79,7 @@ export class UpgradeRequestService {
       const updatedRequest = await tx.upgradeRequest.update({
         where: { id: requestId },
         data: {
-          status: 'APPROVED',
+          status: UpgradeRequestStatusSchema.enum.APPROVED,
           updatedAt: new Date()
         }
       });
@@ -116,7 +117,7 @@ export class UpgradeRequestService {
         throw new Error('Upgrade request not found.');
       }
 
-      if (request.status !== 'PENDING') {
+      if (request.status !== UpgradeRequestStatusSchema.enum.PENDING) {
         throw new Error('Upgrade request is not pending.');
       }
 
@@ -124,7 +125,7 @@ export class UpgradeRequestService {
       const updatedRequest = await tx.upgradeRequest.update({
         where: { id: requestId },
         data: {
-          status: 'REJECTED',
+          status: UpgradeRequestStatusSchema.enum.REJECTED,
           updatedAt: new Date()
         }
       });

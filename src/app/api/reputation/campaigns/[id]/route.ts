@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requirePermission } from '@/lib/auth/require-permission';
 import { PERMISSIONS } from '@atlas/core';
+import { REPUTATION_PERMISSIONS } from '@/modules/reputation/permissions';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { CampaignService } from '@/modules/reputation/services/campaign-service';
 import { updateCampaignSchema } from '@/modules/reputation/validators/reputation-schema';
@@ -55,7 +56,7 @@ async function PATCH_handler(request: Request, { params }: Params) {
       return errorResponse('VALIDATION_ERROR', 'businessId is required in body.', 400);
     }
 
-    const { errorRes: memberError } = await requirePermission(user.id, businessId, PERMISSIONS.reputation.manage);
+    const { errorRes: memberError } = await requirePermission(user.id, businessId, REPUTATION_PERMISSIONS.CAMPAIGN_UPDATE);
     if (memberError) return memberError;
 
     const result = updateCampaignSchema.safeParse(data);

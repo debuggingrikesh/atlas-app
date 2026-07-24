@@ -9,7 +9,7 @@ export type CustomerFeedbackState = 'UNREAD' | 'REVIEWED' | 'RESOLVED' | 'NEW' |
 
 interface TransitionConfig<T> {
   target: T;
-  sideEffects?: (updates: any, actorId?: string) => void;
+  sideEffects?: (updates: Record<string, unknown>, actorId?: string) => void;
   description?: string;
 }
 

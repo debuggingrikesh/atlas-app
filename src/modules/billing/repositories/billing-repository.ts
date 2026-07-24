@@ -1,6 +1,7 @@
  
 
 import { prisma } from '../../../lib/db/prisma';
+import { SubscriptionStatusSchema } from '@atlas/core';
 import type { BusinessSubscriptionWithDetails, SubscriptionStatus } from '@atlas/core';
 
 export class BillingRepository {
@@ -8,7 +9,7 @@ export class BillingRepository {
     const sub = await prisma.businessSubscription.findFirst({
       where: {
         businessId,
-        status: 'ACTIVE',
+        status: SubscriptionStatusSchema.enum.ACTIVE,
       },
       include: {
         plan: {
@@ -49,7 +50,7 @@ export class BillingRepository {
       data: {
         businessId,
         planId,
-        status: 'ACTIVE',
+        status: SubscriptionStatusSchema.enum.ACTIVE,
       }
     });
   }

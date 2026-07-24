@@ -8,6 +8,7 @@ import { UsageService } from '@/modules/reputation/services/usage-service';
 import { AuditService } from '@/lib/audit/audit-service';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { AIModelSchema } from '@atlas/core';
 
 const FeedbackAnalysisSchema = z.object({
   sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Very Negative']),
@@ -127,7 +128,7 @@ export class AIService {
         await tx.aIUsageLog.create({
           data: {
             businessId,
-            model: 'gemini-2.5-flash',
+            model: AIModelSchema.enum['gemini-2.5-flash'],
             inputTokens: usageMetadata?.promptTokenCount ?? null,
             outputTokens: usageMetadata?.candidatesTokenCount ?? null,
           }

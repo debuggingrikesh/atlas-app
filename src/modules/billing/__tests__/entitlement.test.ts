@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { FeatureKeySchema } from '@atlas/core';
 import { EntitlementService } from '../services/entitlement-service';
 import { SubscriptionService } from '../services/subscription-service';
 import { BillingRepository } from '../repositories/billing-repository';
@@ -60,12 +61,12 @@ describe('Entitlement Enforcement', () => {
         code: 'FREE',
         name: 'Free Plan',
         features: [
-          { featureKey: 'REPUTATION_REVIEW_REQUESTS', enabled: true, limit: 6 }
+          { featureKey: FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS, enabled: true, limit: 6 }
         ]
       }
     });
 
-    const limit = await EntitlementService.getFeatureLimit('biz_1', 'REPUTATION_REVIEW_REQUESTS');
+    const limit = await EntitlementService.getFeatureLimit('biz_1', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS);
     expect(SubscriptionService.assignFreePlan).toHaveBeenCalledWith('biz_1');
     expect(limit).toBe(6);
   });
@@ -74,7 +75,7 @@ describe('Entitlement Enforcement', () => {
     vi.mocked(BillingRepository.getActiveSubscription).mockResolvedValue(null);
     vi.mocked(SubscriptionService.assignFreePlan).mockResolvedValue(null); // Failing assignment
 
-    const limit = await EntitlementService.getFeatureLimit('biz_2', 'REPUTATION_REVIEW_REQUESTS');
+    const limit = await EntitlementService.getFeatureLimit('biz_2', FeatureKeySchema.enum.REPUTATION_REVIEW_REQUESTS);
     expect(limit).toBe(0); // Safely denied
   });
 

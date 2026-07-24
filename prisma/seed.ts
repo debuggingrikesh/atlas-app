@@ -2,7 +2,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { SYSTEM_ROLE_PERMISSIONS } from '@atlas/core';
+import { SYSTEM_ROLE_PERMISSIONS } from '../src/modules/reputation/permissions';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -51,6 +51,14 @@ const PERMISSIONS: PermissionDef[] = [
   { key: 'reputation.feedback_view',      description: 'View customer feedback',      category: 'reputation' },
   { key: 'reputation.ai_response_generate', description: 'Generate AI responses',     category: 'reputation' },
   { key: 'reputation.ai_settings_manage', description: 'Manage AI settings',          category: 'reputation' },
+  // Reputation V2
+  { key: 'reputation.campaign_create',    description: 'Create reputation campaigns', category: 'reputation' },
+  { key: 'reputation.campaign_update',    description: 'Update reputation campaigns', category: 'reputation' },
+  { key: 'reputation.campaign_archive',   description: 'Archive reputation campaigns',category: 'reputation' },
+  { key: 'reputation.feedback_assign',    description: 'Assign customer feedback',    category: 'reputation' },
+  { key: 'reputation.feedback_resolve',   description: 'Resolve customer feedback',   category: 'reputation' },
+  { key: 'reputation.notes_manage',       description: 'Manage feedback notes',       category: 'reputation' },
+  { key: 'reputation.analytics_view',     description: 'View reputation analytics',   category: 'reputation' },
 ];
 
 
